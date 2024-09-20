@@ -20,13 +20,9 @@ fun HomeScreen(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ) {
-        Button(
-            onClick = { navController.navigate(AppScreens.LOGIN.name) },
-            modifier = Modifier
-        ) {
-            LoginScreen();
-        }
+
+    ) { Text(text = "4")
+
     }
 
 }

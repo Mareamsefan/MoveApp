@@ -21,7 +21,6 @@ import com.example.moveapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(navController: NavController, route: String? = null) {
-
     val currentScreen = getCurrentScreen(navController)
     val isMainScreen = shortcuts.any { it.route.name == currentScreen }
 
