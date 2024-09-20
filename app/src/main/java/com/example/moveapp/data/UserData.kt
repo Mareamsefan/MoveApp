@@ -5,6 +5,10 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
+// IgnoreExtraProperties is a safety feature that prevents failure
+// when retrieving data from firestore and deserialize into an object
+// If there are fields in the database that is not listed here
+// They will simply be ignored
 @IgnoreExtraProperties
 data class UserData (
     // Id of the user
