@@ -1,10 +1,9 @@
-package com.example.moveapp.ui.screens.login
+package com.example.moveapp.ui.screens.register
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -18,8 +17,9 @@ import androidx.navigation.NavController
 import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun Register(navController: NavController) {
     val username = remember { mutableStateOf("")}
+    val email = remember { mutableStateOf("")}
     val password = remember { mutableStateOf("")}
 
     Box(
@@ -36,6 +36,11 @@ fun LoginScreen(navController: NavController) {
                 label = { Text("Username") }
             )
             OutlinedTextField(
+                value = email.value,
+                onValueChange = { email.value = it },
+                label = { Text("Email") }
+            )
+            OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
                 label = { Text("Password") }
@@ -43,18 +48,9 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = { navController.navigate(AppScreens.HOME.name) }
             ) {
-                Text(text = "Log in")
-            }
-            Button(
-                onClick = { navController.navigate(AppScreens.HOME.name) }
-            ) {
-                Text(text = "Log in as guest")
-            }
-            Button(
-                onClick = { navController.navigate(AppScreens.REGISTER.name) }
-            ) {
                 Text(text = "Register")
             }
         }
     }
+
 }

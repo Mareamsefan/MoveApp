@@ -13,6 +13,7 @@ import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import com.example.moveapp.ui.screens.register.Register
 
 @Composable
 fun AppNavigation () {
@@ -21,15 +22,13 @@ fun AppNavigation () {
 
     Scaffold(
         topBar = {
-            when(currentScreen) {
-                AppScreens.LOGIN.name -> { TopBar(navController, route = AppScreens.HOME.name) }
-                else -> TopBar(navController)
+            if (currentScreen == AppScreens.HOME.name) {
+                TopBar(navController)
             }
         },
         bottomBar = {
-            when(currentScreen) {
-                AppScreens.LOGIN.name -> {  }
-                else -> BottomNavBar(navController)
+            if (currentScreen == AppScreens.HOME.name) {
+                BottomNavBar(navController)
             }
         },
         modifier = Modifier.fillMaxSize()
@@ -37,16 +36,20 @@ fun AppNavigation () {
 
         NavHost(
             navController = navController,
-            startDestination = AppScreens.HOME.name,
+            startDestination = AppScreens.LOGIN.name,
             modifier = Modifier.padding(innerPadding)
         ) {
 
             composable(AppScreens.LOGIN.name) {
-                LoginScreen()
+                LoginScreen(navController)
             }
 
             composable(AppScreens.HOME.name) {
                 HomeScreen(navController)
+            }
+
+            composable(AppScreens.REGISTER.name) {
+                Register(navController)
             }
 
 
