@@ -8,7 +8,7 @@ import java.util.Date
 @IgnoreExtraProperties
 data class UserData (
     // Id of the user
-    var id: String = "",
+    var userId: String = "",
     // The username the user is registred with
     var username: String = "",
     // The email the user is registred with
