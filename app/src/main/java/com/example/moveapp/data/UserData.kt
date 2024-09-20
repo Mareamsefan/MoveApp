@@ -4,6 +4,7 @@ import com.example.moveapp.utility.UserTypeEnum
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
+import java.util.UUID
 
 // IgnoreExtraProperties is a safety feature that prevents failure
 // when retrieving data from firestore and deserialize into an object
@@ -11,8 +12,9 @@ import java.util.Date
 // They will simply be ignored
 @IgnoreExtraProperties
 data class UserData (
-    // Id of the user
-    var userId: String = "",
+    // Id of the user, generates a unique ID when the object is instansiated
+    // Using val instead of var to make userId immutable
+    val userId: String = UUID.randomUUID().toString(),
     // The username the user is registred with
     var username: String = "",
     // The email the user is registred with

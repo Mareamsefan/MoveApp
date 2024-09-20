@@ -11,6 +11,7 @@ composeBom = "2024.04.01"
 navigationRuntimeKtx = "2.8.1"
 navigationCompose = "2.8.1"
 firebaseFirestoreKtxVersion = "25.1.0"
+junitKtx = "1.2.1"
 
 
 [libraries]
@@ -32,6 +33,7 @@ androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navig
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtxVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.0.0" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
