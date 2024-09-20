@@ -73,4 +73,14 @@ class HelpUnitTests {
 
         assertNotEquals(hashedPassword1, hashedPassword2)
     }
+
+    @Test
+    fun testSameStringGivesSameHash(){
+        val testString1 = "DetteErMittPassord"
+
+        val hashedPassword1 = HelpFunctions.passwordEncryptor(testString1)
+        val hashedPassword2 = HelpFunctions.passwordEncryptor(testString1)
+
+        assertEquals(hashedPassword1, hashedPassword2)
+    }
 }
