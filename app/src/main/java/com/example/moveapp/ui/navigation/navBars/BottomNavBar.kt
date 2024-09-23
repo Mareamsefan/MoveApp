@@ -2,7 +2,9 @@ package com.example.moveapp.ui.navigation.navBars
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -17,13 +19,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import androidx.compose.material3.Icon
 
 
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
 
 val shortcuts = listOf(
-    BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
-    BottomNavItems(AppScreens.LOGIN, Icons.Default.AddCircle, R.string.login)
+    BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
+    BottomNavItems(AppScreens.TYPE_OF_AD, Icons.Default.AddCircle, R.string.post_ad),
+    BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile)
 )
 
 @Composable

@@ -13,6 +13,9 @@ import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import com.example.moveapp.ui.screens.ad.Type_of_ad
+import com.example.moveapp.ui.screens.messages.All_messages
+import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
 
 @Composable
@@ -50,6 +53,17 @@ fun AppNavigation () {
 
             composable(AppScreens.REGISTER.name) {
                 Register(navController)
+            }
+
+            composable(AppScreens.TYPE_OF_AD.name) {
+                Type_of_ad(navController)
+            }
+            composable(AppScreens.PROFILE.name) {
+                Profile(navController)
+            }
+
+            composable(AppScreens.ALL_MESSAGES.name) {
+                All_messages(navController)
             }
 
 

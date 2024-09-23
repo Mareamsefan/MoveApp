@@ -2,6 +2,8 @@ package com.example.moveapp.ui.navigation.navBars
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,6 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
+import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.ui.screens.home.HomeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,8 +36,17 @@ fun TopBar(navController: NavController, route: String? = null) {
             )
         },
 
+        actions = {
+            IconButton( onClick = {  } ) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = stringResource(R.string.filter)
+                )
+            }
+        },
+
         navigationIcon = {
-            if (!isMainScreen) {
+            if (currentScreen != AppScreens.HOME.name) {
                 IconButton(onClick = {
                     if (route != null) {
                         navController.navigate(route)
@@ -46,15 +59,6 @@ fun TopBar(navController: NavController, route: String? = null) {
                         contentDescription = stringResource(R.string.back_button)
                     )
                 }
-            }
-        },
-
-        actions = {
-            IconButton( onClick = {  } ) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(R.string.dropdown_menu_button)
-                )
             }
         },
 
