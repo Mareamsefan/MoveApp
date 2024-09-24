@@ -1,4 +1,4 @@
-package com.example.moveapp.ui.screens.login
+package com.example.moveapp.ui.screens.register
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +19,8 @@ import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun Register(navController: NavController) {
+    val username = remember { mutableStateOf("")}
     val email = remember { mutableStateOf("")}
     val password = remember { mutableStateOf("")}
 
@@ -32,30 +33,26 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
+                value = username.value,
+                onValueChange = { username.value = it },
+                label = {Text(text = stringResource(R.string.username))}
+            )
+            OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
-                label = { Text(text = stringResource(R.string.email)) }
+                label = {Text(text = stringResource(R.string.email))}
             )
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text(text = stringResource(R.string.password)) }
+                label = {Text(text = stringResource(R.string.password))}
             )
             Button(
                 onClick = { navController.navigate(AppScreens.HOME.name) }
-            ) {
-                Text(text = stringResource(R.string.login))
-            }
-            Button(
-                onClick = { navController.navigate(AppScreens.HOME.name) }
-            ) {
-                Text(text = stringResource(R.string.login_as_guest))
-            }
-            Button(
-                onClick = { navController.navigate(AppScreens.REGISTER.name) }
             ) {
                 Text(text = stringResource(R.string.register))
             }
         }
     }
+
 }
