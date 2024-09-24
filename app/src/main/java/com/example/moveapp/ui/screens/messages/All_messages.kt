@@ -17,7 +17,7 @@ fun All_messages(navController: NavController) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
 
-    ) { Text(text = stringResource(R.string.what_do_you_Want_to_sell))
+    ) { Text(text = stringResource(R.string.messages))
 
     }
 
