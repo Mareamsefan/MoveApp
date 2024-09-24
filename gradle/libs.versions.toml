@@ -13,6 +13,7 @@ navigationCompose = "2.8.1"
 firebaseFirestoreKtxVersion = "25.1.0"
 junitKtx = "1.2.1"
 firebaseDatabaseKtx = "21.0.0"
+firebaseAuthKtx = "23.0.0"
 
 
 [libraries]
@@ -36,6 +37,7 @@ firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx"
 firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.0.0" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
