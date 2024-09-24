@@ -25,12 +25,12 @@ fun AppNavigation () {
 
     Scaffold(
         topBar = {
-            if (currentScreen == AppScreens.HOME.name) {
+            if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
                 TopBar(navController)
             }
         },
         bottomBar = {
-            if (currentScreen == AppScreens.HOME.name) {
+            if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
                 BottomNavBar(navController)
             }
         },

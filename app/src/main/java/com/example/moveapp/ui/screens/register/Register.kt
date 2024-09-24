@@ -12,8 +12,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
@@ -33,22 +35,22 @@ fun Register(navController: NavController) {
             OutlinedTextField(
                 value = username.value,
                 onValueChange = { username.value = it },
-                label = { Text("Username") }
+                label = {Text(text = stringResource(R.string.username))}
             )
             OutlinedTextField(
                 value = email.value,
                 onValueChange = { email.value = it },
-                label = { Text("Email") }
+                label = {Text(text = stringResource(R.string.email))}
             )
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = { Text("Password") }
+                label = {Text(text = stringResource(R.string.password))}
             )
             Button(
                 onClick = { navController.navigate(AppScreens.HOME.name) }
             ) {
-                Text(text = "Register")
+                Text(text = stringResource(R.string.register))
             }
         }
     }

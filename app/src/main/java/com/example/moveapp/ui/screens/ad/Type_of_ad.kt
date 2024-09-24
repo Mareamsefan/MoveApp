@@ -6,7 +6,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.example.moveapp.R
 
 @Composable
 fun Type_of_ad(navController: NavController) {
@@ -15,7 +17,7 @@ fun Type_of_ad(navController: NavController) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
 
-    ) { Text(text = "What do you want to sell?")
+    ) { Text(text = stringResource(R.string.what_do_you_Want_to_sell))
 
     }
 
