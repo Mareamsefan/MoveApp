@@ -11,8 +11,12 @@ import com.example.moveapp.ui.screens.login.LoginScreen
 import androidx.navigation.compose.composable
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
+import com.example.moveapp.ui.navigation.navBars.FilterBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.navigation.NavController
 import com.example.moveapp.ui.screens.ad.Type_of_ad
 import com.example.moveapp.ui.screens.messages.All_messages
 import com.example.moveapp.ui.screens.profile.Profile
@@ -30,7 +34,7 @@ fun AppNavigation () {
             }
         },
         bottomBar = {
-            if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
+            if (currentScreen == AppScreens.HOME.name) {
                 BottomNavBar(navController)
             }
         },

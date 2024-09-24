@@ -14,4 +14,14 @@
     <string name="login_as_guest">Login as guest</string>
     <string name="register">Register</string>
     <string name="what_do_you_Want_to_sell">What do you want to sell?</string>
+    <string name="location">Location</string>
+    <string name="category">Category</string>
+    <string name="min_price">min price</string>
+    <string name="max_price">max price</string>
+    <string name="market_near_you">The market near you</string>
+    <string name="search">Search</string>
+    <string name="unwanted_items">Unwanted items</string>
+    <string name="rent_out_truck_or_trailer">Rent out a truck or trailer</string>
+    <string name="ship_items_from_a_to_b">Ship items from A to B</string>
+
 </resources>
