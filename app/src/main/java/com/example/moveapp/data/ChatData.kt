@@ -1,5 +1,6 @@
 package com.example.moveapp.data
 
+
 import com.google.firebase.firestore.IgnoreExtraProperties
 import java.util.Date
 

@@ -4,4 +4,14 @@
     <string name="login">Login</string>
     <string name="back_button">Back button</string>
     <string name="dropdown_menu_button">Dropdown menu button</string>
+    <string name="post_ad">Post ad</string>
+    <string name="my_profile">My profile</string>
+    <string name="messages">Messages</string>
+    <string name="filter">Filter</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="login_as_guest">Login as guest</string>
+    <string name="register">Register</string>
+    <string name="what_do_you_Want_to_sell">What do you want to sell?</string>
 </resources>

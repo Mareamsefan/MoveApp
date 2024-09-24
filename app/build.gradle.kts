@@ -68,6 +68,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.firebase.database.ktx)
 
     testImplementation(libs.junit)
     testImplementation("org.mockito:mockito-core:4.6.1")
