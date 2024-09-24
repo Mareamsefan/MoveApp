@@ -17,7 +17,7 @@ class UserRepo {
             // Set ensures that if a document ith the same userId exists
             // it will overwrite the existing one
             // await ensures that it completes before moving forward in the function
-            FirestoreService.getUsersCollection().document(user.userId).set(user).await()
+           // FirestoreService.getUsersCollection().document(user.userId).set(user).await()
             true  // Return true if successful
         } catch (e: Exception) {
             e.printStackTrace()  // Log the error

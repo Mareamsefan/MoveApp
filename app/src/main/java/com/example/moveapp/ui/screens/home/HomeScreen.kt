@@ -13,16 +13,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.ui.screens.login.LoginScreen
+import com.example.moveapp.utility.FireAuthService
 
 @Composable
 fun HomeScreen(navController: NavController) {
 
+    // Get the current user
+    val currentUser = FireAuthService.getCurrentUser()
+    // Get the user's email if they are logged in
+    val userEmail = currentUser?.email ?: "Not Logged In"
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-
-    ) { Text(text = "The market near you")
-
+    ) {
+        // Display a welcome message and the user's email
+        Text(text = "Welcome! Your email: $userEmail")
     }
 
 }
