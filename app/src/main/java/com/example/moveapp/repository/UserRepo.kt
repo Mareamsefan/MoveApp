@@ -31,19 +31,35 @@ class UserRepo {
         }
     }
 
-    suspend fun updateUserPassword(userId: String, newPassword: String): Boolean {
-        // Hashes the new password
-        val hashed = HelpFunctions.passwordEncryptor(newPassword)
-        // Returns true if the password field in succesfully updated
-        return try{
-            FirestoreService.getUsersCollection().document(userId).update("password", hashed).await()
-            true
+    suspend fun updateUserPassword(userEmail: String, newPassword: String): Boolean {
+        return try {
+            // Hash the new password
+            val hashed = HelpFunctions.passwordEncryptor(newPassword)
+
+            // Get the Firestore collection reference
+            val userCollection = FirestoreService.getUsersCollection()
+
+            // Perform the query to get the user by email
+            val querySnapshot = userCollection.whereEqualTo("email", userEmail).get().await()
+
+            // Check if any documents were returned
+            if (!querySnapshot.isEmpty) {
+                // There should be only one document (since emails are unique)
+                val document = querySnapshot.documents.first()
+
+                // Update the password field in the document
+                userCollection.document(document.id).update("password", hashed).await()
+
+                // Return true if the update was successful
+                true
+            } else {
+                // Return false if no user was found
+                false
+            }
         } catch (e: Exception) {
-            // Returns false if it fails
             e.printStackTrace()
             false
-        }
-    }
+        }}
 
     suspend fun fetchUserPassword(userId: String): String? {
         return try {
