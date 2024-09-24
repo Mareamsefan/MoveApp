@@ -68,6 +68,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database.ktx)
 
     testImplementation(libs.junit)
