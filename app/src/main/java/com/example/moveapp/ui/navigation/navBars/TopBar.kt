@@ -12,6 +12,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -27,7 +30,24 @@ import com.example.moveapp.ui.screens.home.HomeScreen
 fun TopBar(navController: NavController, route: String? = null) {
     val currentScreen = getCurrentScreen(navController)
     val isMainScreen = shortcuts.any { it.route.name == currentScreen }
+    val isFilterBarVisible = remember { mutableStateOf(false) }
+    val location = remember { mutableStateOf("") }
+    val category = remember { mutableStateOf("") }
+    val minPrice = remember { mutableStateOf("") }
+    val maxPrice = remember { mutableStateOf("") }
 
+
+
+    DisposableEffect(currentScreen) {
+        if (currentScreen != AppScreens.HOME.name) {
+            isFilterBarVisible.value = false
+            location.value = ""
+            category.value = ""
+            minPrice.value = ""
+            maxPrice.value = ""
+        }
+        onDispose {}
+    }
     CenterAlignedTopAppBar(
         title = {
             Text(
@@ -37,12 +57,15 @@ fun TopBar(navController: NavController, route: String? = null) {
         },
 
         actions = {
-            IconButton( onClick = {  } ) {
-                Icon(
-                    imageVector = Icons.Filled.Menu,
-                    contentDescription = stringResource(R.string.filter)
-                )
-            }
+            if(currentScreen == AppScreens.HOME.name)
+                IconButton( onClick = {
+                    isFilterBarVisible.value = !isFilterBarVisible.value
+                } ) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = stringResource(R.string.filter),
+                    )
+                }
         },
 
         navigationIcon = {
@@ -68,6 +91,7 @@ fun TopBar(navController: NavController, route: String? = null) {
 
 
     )
+    FilterBar(isVisible = isFilterBarVisible.value, navController = navController, location, category, minPrice, maxPrice)
 }
 
 @Preview
