@@ -10,6 +10,6 @@ data class MessageData (
     var receiverId: String,
     var messageText: String,
     var messageTimestamp: Timestamp,
-    var messageImageUrl: String,
+    var messageImageUrl: String?,  // ? -> you likely will not need an img for every message.
 )
 {}
