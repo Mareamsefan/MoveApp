@@ -10,6 +10,7 @@ import java.util.Date
 // They will simply be ignored
 @IgnoreExtraProperties
 data class ChatData (
+    var chatId: String,
     // List containing the userId of the users in the chat
     var users: List<String> = emptyList(),
     // Timestamp of the last message sent between the two users

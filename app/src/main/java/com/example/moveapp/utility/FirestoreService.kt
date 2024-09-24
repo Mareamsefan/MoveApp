@@ -25,4 +25,7 @@ object FirestoreService {
 
     // Helper function to recieve a reference to the pictures collection
     fun getPicturesCollection() = db.collection("pictures")
+
+    // Helper function to recieve a reference to the chat collection
+    fun getChatsCollection() = db.collection("chats")
 }
