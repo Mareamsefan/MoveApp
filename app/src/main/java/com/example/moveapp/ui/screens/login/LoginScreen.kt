@@ -49,7 +49,7 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = { navController.navigate(AppScreens.HOME.name) }
             ) {
-                Text(text = stringResource(R.string.logni_as_guest))
+                Text(text = stringResource(R.string.login_as_guest))
             }
             Button(
                 onClick = { navController.navigate(AppScreens.REGISTER.name) }
