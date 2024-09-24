@@ -34,7 +34,7 @@ fun AppNavigation () {
             }
         },
         bottomBar = {
-            if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
+            if (currentScreen == AppScreens.HOME.name) {
                 BottomNavBar(navController)
             }
         },
