@@ -14,4 +14,8 @@
     <string name="login_as_guest">Login as guest</string>
     <string name="register">Register</string>
     <string name="what_do_you_Want_to_sell">What do you want to sell?</string>
+    <string name="location">Location</string>
+    <string name="category">Category</string>
+    <string name="min_price">min_price</string>
+    <string name="max_price">max_price</string>
 </resources>
