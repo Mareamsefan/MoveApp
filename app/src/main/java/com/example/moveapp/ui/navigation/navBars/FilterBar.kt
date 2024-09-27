@@ -1,14 +1,13 @@
 package com.example.moveapp.ui.navigation.navBars
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,13 +19,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 
@@ -66,6 +62,15 @@ fun FilterBar(
                 onValueChange = { tempLocation = it },
                 label = { Text(text = stringResource(R.string.location)) }
             )
+            IconButton(onClick = {
+                navController.navigate(AppScreens.MAP.name)
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Place,
+                    contentDescription = stringResource(R.string.map)
+                )
+            }
+
             OutlinedTextField(
                 value = tempCategory,
                 onValueChange = { tempCategory = it },
@@ -98,6 +103,17 @@ fun FilterBar(
                 }
             ) {
                 Text(text = stringResource(R.string.filter))
+            }
+            Button(
+                onClick = {
+                    location.value = ""
+                    category.value = ""
+                    minPrice.value = ""
+                    maxPrice.value = ""
+
+                }
+            ) {
+                Text(text = stringResource(R.string.reset_filter))
             }
         }
         }

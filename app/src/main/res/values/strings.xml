@@ -23,5 +23,7 @@
     <string name="unwanted_items">Unwanted items</string>
     <string name="rent_out_truck_or_trailer">Rent out a truck or trailer</string>
     <string name="ship_items_from_a_to_b">Ship items from A to B</string>
+    <string name="reset_filter">Reset filter</string>
+    <string name="map">Map</string>
 
 </resources>
