@@ -2,6 +2,7 @@ package com.example.moveapp.utility
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
 
 import kotlinx.coroutines.tasks.await
 
@@ -84,6 +85,7 @@ object FireAuthService {
             }
             // Update the email for the current user
             currentUser.verifyBeforeUpdateEmail(newEmail).await()
+            updateUserDatabaseEmail(currentUser.uid, newEmail)
             true // Return true if the update is successful
 
         } catch (e: Exception) {
