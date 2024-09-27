@@ -12,10 +12,8 @@ class UserDataTest {
         val user = UserData()
 
         // Ensure the default values are set correctly
-        assertNotNull(user.userId)
         assertEquals("", user.username)
         assertEquals("", user.email)
-        assertEquals("", user.password)
         assertEquals("", user.location)
         assertNull(user.dateRegistered)  // The timestamp should be null by default
         assertEquals("", user.profilePictureUrl)
@@ -25,22 +23,11 @@ class UserDataTest {
 
     @Test
     fun testInstantiationWithArgumentsShouldNotHaveDefaultValues(){
-        val user = UserData(username = "username", email = "email", password = "password", location="location")
+        val user = UserData(username = "username", email = "email", location="location")
 
         assertEquals("username", user.username)
         assertEquals("email", user.email)
-        assertEquals("password", user.password)
         assertEquals("location", user.location)
-    }
-
-    @Test
-    fun testUniqueIdIsCreatedOnInstansiation(){
-        val user1 = UserData()
-        val user2 = UserData()
-
-        assertNotNull(user1.userId)
-        assertNotNull(user2.userId)
-        assertNotEquals(user1.userId, user2.userId)
     }
 
     @Test

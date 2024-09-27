@@ -2,6 +2,7 @@ package com.example.moveapp.utility
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+
 import kotlinx.coroutines.tasks.await
 
 object FireAuthService {
@@ -110,6 +111,7 @@ object FireAuthService {
             false // Password update failed
         }
     }
+
 
     // Function to retrieve the users id
     // Use this to decide the Id of the user and send it to Firestore
