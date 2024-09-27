@@ -25,6 +25,7 @@ class UserRepo {
                                Tror ikke dette er i nærheten av "Best Practice"
              */
             FirestoreService.getUsersCollection().document(user.userId.toString()).set(user).await()
+           // FirestoreService.getUsersCollection().document(user.userId).set(user).await()
             true  // Return true if successful
         } catch (e: Exception) {
             e.printStackTrace()  // Log the error
