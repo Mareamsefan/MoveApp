@@ -26,9 +26,10 @@ fun HomeScreen(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ) {
+    ) { Text(text = stringResource(R.string.market_near_you))
         // Display a welcome message and the user's email
         Text(text = "Welcome! Your email: $userEmail")
+
     }
 
 }
