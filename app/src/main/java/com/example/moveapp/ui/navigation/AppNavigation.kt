@@ -11,16 +11,18 @@ import com.example.moveapp.ui.screens.login.LoginScreen
 import androidx.navigation.compose.composable
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
-import com.example.moveapp.ui.navigation.navBars.FilterBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.navigation.NavController
-import com.example.moveapp.ui.screens.ad.Type_of_ad
+import com.example.moveapp.ui.screens.post_ad.Rent_truck
+import com.example.moveapp.ui.screens.post_ad.Ship_items
+import com.example.moveapp.ui.screens.post_ad.Type_of_ad
+import com.example.moveapp.ui.screens.post_ad.Unwanted_items
 import com.example.moveapp.ui.screens.messages.All_messages
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
+import com.example.moveapp.ui.screens.map.Map
+import com.example.moveapp.ui.screens.messages.Specific_message
+import com.example.moveapp.ui.screens.ad.Specific_ad
 
 @Composable
 fun AppNavigation () {
@@ -68,6 +70,24 @@ fun AppNavigation () {
 
             composable(AppScreens.ALL_MESSAGES.name) {
                 All_messages(navController)
+            }
+            composable(AppScreens.RENT_TRUCK.name) {
+                Rent_truck(navController)
+            }
+            composable(AppScreens.SHIP_ITEMS.name) {
+                Ship_items(navController)
+            }
+            composable(AppScreens.UNWANTED_ITEMS.name) {
+                Unwanted_items(navController)
+            }
+            composable(AppScreens.MAP.name) {
+                Map(navController)
+            }
+            composable(AppScreens.SPESIFIC_AD.name) {
+                Specific_ad(navController)
+            }
+            composable(AppScreens.SPESIFIC_MESSAGE.name) {
+                Specific_message(navController)
             }
 
 
