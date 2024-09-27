@@ -13,7 +13,7 @@ import java.util.Date
 @IgnoreExtraProperties
 data class ReportData (
     // Id for the report
-    var id: String = "",
+    var reportId: String = "",
     // userId of the user that is being reported
     var userIdReported: String = "",
     // userId of the user that reported
@@ -28,7 +28,7 @@ data class ReportData (
     // userId of the moderator or admin that reviewed the report
     var reviewedBy: String = "",
     // Comments from the moderator or admin
-    var moderatorComments: String = "",
+    var moderatorComment: String = "",
     // A list of consequences taken
     var consequences: List<String> = emptyList(),
     // Enum representing the severity of the report

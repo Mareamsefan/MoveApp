@@ -33,6 +33,19 @@ class AdRepo {
         }
     }
 
+    suspend fun updateAdImagesInDatabase(adId: String, newImages: List<String>): Boolean {
+        return try {
+            // Retrieves the ad document by adId
+            val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
+            // Replaces old adImages with newImages
+            adDocumentReference.update("adImages", newImages).await()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
     suspend fun updateAdPriceInDatabase(adId: String, newPrice: Double): Boolean {
         return try {
             // Retrieves the ad document by adId
