@@ -9,6 +9,8 @@ import com.example.moveapp.repository.UserRepo.Companion.addUserToDatabase
 import com.example.moveapp.data.UserData
 import android.widget.Toast
 import com.example.moveapp.repository.UserRepo
+import com.example.moveapp.utility.FirestoreService
+import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
 
 
 class UserViewModel {
@@ -36,7 +38,7 @@ class UserViewModel {
             }
 
             return user
-            }
+        }
 
         suspend fun loginUser(context: Context, email: String, password: String): FirebaseUser? {
             val user = FireAuthService.signInUser(email, password)
@@ -47,9 +49,19 @@ class UserViewModel {
             }
 
             return user
-            
+
         }
+        suspend fun logoutUser(context: Context): FirebaseUser?{
+            val user = FireAuthService.getCurrentUser()
+            if(user == null) {
+               return null
+            }
+            FireAuthService.signOut()
+            return user
         }
+
+        }
+
 
 
     }
