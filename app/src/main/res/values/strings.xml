@@ -33,5 +33,7 @@
     <string name="upload_image">Upload image</string>
     <string name="address">Address</string>
     <string name="postal_code">Postal code</string>
+    <string name="truck">Truck</string>
+    <string name="trailer">Trailer</string>
 
 </resources>
