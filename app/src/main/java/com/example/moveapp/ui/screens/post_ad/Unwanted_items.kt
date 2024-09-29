@@ -1,6 +1,5 @@
 package com.example.moveapp.ui.screens.post_ad
 
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,14 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
-import java.io.InputStream
+import com.example.moveapp.ui.display.Image_swipe
+
+
+
 
 
 @Composable
@@ -29,16 +28,14 @@ fun Unwanted_items(navController: NavController) {
     val category = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
 
-    var selectedImage by remember { mutableStateOf<Uri?>(null) }
+    val uriList = remember { mutableStateListOf<Uri?>() }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            selectedImage = uri
+            uriList.add(uri)
         }
     )
-
-    val context = LocalContext.current
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -63,21 +60,8 @@ fun Unwanted_items(navController: NavController) {
                 Text(text = stringResource(R.string.upload_image))
             }
 
-            selectedImage?.let { uri ->
-                val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-                val bitmap = BitmapFactory.decodeStream(inputStream)
-
-                bitmap?.let {
-                    Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "Selected image",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(top = 8.dp)
-                    )
-                }
-            }
+            if(!uriList.isEmpty()){
+                Image_swipe(uriList = uriList)}
 
             OutlinedTextField(
                 value = price.value,
@@ -98,10 +82,8 @@ fun Unwanted_items(navController: NavController) {
 
             Button(
                 onClick = {
+                    // TODO: function that takes the input data and makes a row in the table
                 },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(top = 16.dp)
             ) {
                 Text(text = stringResource(R.string.post_ad))
             }
