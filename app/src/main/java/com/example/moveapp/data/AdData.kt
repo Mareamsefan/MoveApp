@@ -1,3 +1,4 @@
+import android.net.Uri
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
@@ -14,9 +15,13 @@ data class AdData(
     var adDescription: String,  // Detailed description of the ad
     var userId: String,         // ID of the user who posted the ad
     var isActive: Boolean = true, // The ad is only shown in the app if it is active.
+    // input data for location, so that you can use gps to find closes ad/plot in map
+    var country: String = "Norway",
+    var address: String,
+    var postalCode: String,
     @ServerTimestamp
     var timestamp: Date,        // Timestamp for when the ad was posted
-    var adImages: List<String>,  // List of image URLs for the ad (if any)
+    var adImages: List<Uri?>,  // List of image URLs for the ad (if any)
 ) {
     // Function to exclude any fields you don't want to send to Firebase
     @Exclude
