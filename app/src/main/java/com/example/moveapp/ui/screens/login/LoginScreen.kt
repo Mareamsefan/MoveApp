@@ -14,18 +14,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.viewModel.UserViewModel.Companion.loginUser
+import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val email = remember { mutableStateOf("")}
     val password = remember { mutableStateOf("")}
-
+    val context = LocalContext.current
+    val coroutineScope = MainScope()
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -52,7 +58,14 @@ fun LoginScreen(navController: NavController) {
                 label = { Text(text = stringResource(R.string.password)) }
             )
             Button(
-                onClick = { navController.navigate(AppScreens.HOME.name) }
+                onClick = {
+                    coroutineScope.launch() {
+                        val user = loginUser(context, email.value, password.value)
+                        if (user != null) {
+                            navController.navigate(AppScreens.HOME.name)
+                        }
+                    }
+                }
             ) {
                 Text(text = stringResource(R.string.login))
             }

@@ -14,11 +14,11 @@ import java.util.Date
 data class UserData (
     // Id of the user, retrieves the ID that was is stored in FirebaseAuth for this user
     // Using val instead of var to make userId immutable
-    val userId: String? = FireAuthService.getUserId(),
+    val userId: String = "",
     // The username the user is registred with
     var username: String = "",
     // The email the user is registred with in FirebaseAuth
-    var email: String? = FireAuthService.fetchUserEmail(),
+    var email: String = "",
     // Location of the user
     var location: String = "",
     // Date the user registered
