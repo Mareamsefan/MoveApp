@@ -37,9 +37,6 @@ fun FilterBar(
     maxPrice: MutableState<String>,
 ) {
     if (isVisible) {
-        val currentScreen = getCurrentScreen(navController)
-        val isMainScreen = shortcuts.any { it.route.name == currentScreen }
-
         var tempLocation by remember { mutableStateOf(location.value) }
         var tempCategory by remember { mutableStateOf(category.value) }
         var tempMinPrice by remember { mutableStateOf(minPrice.value) }
