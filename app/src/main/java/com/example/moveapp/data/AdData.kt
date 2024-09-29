@@ -1,4 +1,3 @@
-import android.net.Uri
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
@@ -21,7 +20,7 @@ data class AdData(
     var postalCode: String,
     @ServerTimestamp
     var timestamp: Date,        // Timestamp for when the ad was posted
-    var adImages: List<Uri?>,  // List of image URLs for the ad (if any)
+    var adImages: List<String?>,  // List of image URLs for the ad (if any)
 ) {
     // Function to exclude any fields you don't want to send to Firebase
     @Exclude
