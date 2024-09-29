@@ -1,6 +1,5 @@
 package com.example.moveapp.ui.screens.profile
 
-import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button

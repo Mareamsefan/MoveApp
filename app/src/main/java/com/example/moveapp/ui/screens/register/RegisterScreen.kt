@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,9 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.viewModel.UserViewModel.Companion.registeringUser
-import com.example.moveapp.utility.FirestoreService
 import kotlinx.coroutines.launch
 
 import kotlinx.coroutines.MainScope
