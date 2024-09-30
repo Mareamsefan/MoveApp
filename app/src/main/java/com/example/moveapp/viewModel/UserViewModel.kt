@@ -11,7 +11,7 @@ import android.widget.Toast
 import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
-
+import com.example.moveapp.utility.FireAuthService.register
 
 class UserViewModel {
     companion object {
@@ -20,7 +20,7 @@ class UserViewModel {
                 return null
             }
 
-            var user = FireAuthService.register(email, password)
+            var user = FireAuthService.register(email, password, username)
 
             if (user == null) {
                 Toast.makeText(context, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show()
@@ -39,6 +39,7 @@ class UserViewModel {
 
             return user
         }
+
 
         suspend fun loginUser(context: Context, email: String, password: String): FirebaseUser? {
             val user = FireAuthService.signInUser(email, password)

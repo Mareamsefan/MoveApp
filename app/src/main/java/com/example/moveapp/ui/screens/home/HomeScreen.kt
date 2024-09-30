@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.utility.FireAuthService
+import com.example.moveapp.utility.FireAuthService.getDisplayName
 
 
 @Composable
@@ -26,8 +27,11 @@ fun HomeScreen(navController: NavController) {
         contentAlignment = Alignment.Center
     ) { //Text(text = stringResource(R.string.market_near_you))
         // Display a welcome message and the user's email
-        Text(text = "Welcome! Your email: $userEmail")
-
+        //Text(text = "Welcome! Your email: $userEmail")
+        if (currentUser != null) {
+            val username = getDisplayName()
+            Text(text = "Welcome! Your username: $username")
+        }
     }
 
 }

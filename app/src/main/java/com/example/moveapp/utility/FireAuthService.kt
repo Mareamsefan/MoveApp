@@ -3,6 +3,8 @@ package com.example.moveapp.utility
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.userProfileChangeRequest
 
 import kotlinx.coroutines.tasks.await
 
@@ -28,17 +30,31 @@ object FireAuthService {
     }
 
     // Function for registering new user
-    suspend fun register(email: String, password: String): FirebaseUser? {
+    suspend fun register(email: String, password: String, userName: String): FirebaseUser? {
         return try {
             // FirebaseAuth automatically hashes the password for us
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             // Returns the user if was successfully created
-            authResult.user
+            val user = authResult.user
+            user?.let {
+                val profileUpdates = UserProfileChangeRequest.Builder()
+                    .setDisplayName(userName)
+                    .build()
+
+                it.updateProfile(profileUpdates).await() // Update the profile
+            }
+
+            // Return the user
+            return user
         } catch (e: Exception) {
-            // Return null if user couldnt be created
+            // Return null if user couldn't be created
             e.printStackTrace()
             null
         }
+    }
+
+    fun getDisplayName(): String? {
+        return auth.currentUser?.displayName
     }
 
     suspend fun sendEmailVerification(): Boolean {
@@ -72,6 +88,7 @@ object FireAuthService {
         val currentUser = auth.currentUser
         return currentUser?.email
     }
+
 
     // Function to update the current user's email
     suspend fun updateUserEmail(newEmail: String): Boolean {

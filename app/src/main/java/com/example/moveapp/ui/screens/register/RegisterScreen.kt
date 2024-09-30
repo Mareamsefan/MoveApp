@@ -57,7 +57,8 @@ fun Register(navController: NavController) {
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
-                label = {Text(text = stringResource(R.string.password))}
+                label = {Text(text = stringResource(R.string.password))},
+
             )
 
             if (isLoading) {
