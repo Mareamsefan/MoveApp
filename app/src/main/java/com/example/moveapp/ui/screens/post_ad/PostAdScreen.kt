@@ -23,7 +23,7 @@ import com.example.moveapp.ui.display.Image_swipe
 
 
 @Composable
-fun Unwanted_items(navController: NavController) {
+fun PostAdScreen(navController: NavController) {
     val scrollState = rememberScrollState()
 
     val title = remember { mutableStateOf("") }

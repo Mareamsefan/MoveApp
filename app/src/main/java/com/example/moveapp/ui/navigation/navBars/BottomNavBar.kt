@@ -26,7 +26,7 @@ data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringR
 
 val shortcuts = listOf(
     BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
-    BottomNavItems(AppScreens.TYPE_OF_AD, Icons.Default.AddCircle, R.string.post_ad),
+    BottomNavItems(AppScreens.POST_AD, Icons.Default.AddCircle, R.string.post_ad),
     BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile)
 )
 

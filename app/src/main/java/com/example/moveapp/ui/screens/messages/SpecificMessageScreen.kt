@@ -5,6 +5,6 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun Specific_message(navController: NavController){
+fun SpecificMessageScreen(navController: NavController){
 
 }

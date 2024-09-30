@@ -13,16 +13,13 @@ import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
-import com.example.moveapp.ui.screens.post_ad.Rent_truck
-import com.example.moveapp.ui.screens.post_ad.Ship_items
-import com.example.moveapp.ui.screens.post_ad.Type_of_ad
-import com.example.moveapp.ui.screens.post_ad.Unwanted_items
-import com.example.moveapp.ui.screens.messages.All_messages
+import com.example.moveapp.ui.screens.post_ad.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.ui.screens.map.Map
-import com.example.moveapp.ui.screens.messages.Specific_message
-import com.example.moveapp.ui.screens.ad.Specific_ad
+import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
+import com.example.moveapp.ui.screens.ad.SpecificAdScreen
+import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 
 @Composable
 fun AppNavigation () {
@@ -61,33 +58,24 @@ fun AppNavigation () {
                 Register(navController)
             }
 
-            composable(AppScreens.TYPE_OF_AD.name) {
-                Type_of_ad(navController)
-            }
             composable(AppScreens.PROFILE.name) {
                 Profile(navController)
             }
 
             composable(AppScreens.ALL_MESSAGES.name) {
-                All_messages(navController)
+                AllMessagesScreen(navController)
             }
-            composable(AppScreens.RENT_TRUCK.name) {
-                Rent_truck(navController)
-            }
-            composable(AppScreens.SHIP_ITEMS.name) {
-                Ship_items(navController)
-            }
-            composable(AppScreens.UNWANTED_ITEMS.name) {
-                Unwanted_items(navController)
+            composable(AppScreens.POST_AD.name) {
+                PostAdScreen(navController)
             }
             composable(AppScreens.MAP.name) {
                 Map(navController)
             }
-            composable(AppScreens.SPESIFIC_AD.name) {
-                Specific_ad(navController)
+            composable(AppScreens.SPECIFIC_AD.name) {
+                SpecificAdScreen(navController)
             }
-            composable(AppScreens.SPESIFIC_MESSAGE.name) {
-                Specific_message(navController)
+            composable(AppScreens.SPECIFIC_MESSAGE.name) {
+                SpecificMessageScreen(navController)
             }
 
 
