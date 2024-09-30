@@ -34,7 +34,7 @@ fun Profile(navController: NavController) {
     var username = remember { mutableStateOf(getUsername() ?: "") }
     var updatedUsername = remember { mutableStateOf("") }
     var errorMessage = remember { mutableStateOf("") }
-    var updatedPassword = remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
