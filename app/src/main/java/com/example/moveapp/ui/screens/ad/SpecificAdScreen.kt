@@ -5,6 +5,6 @@ import androidx.navigation.NavController
 
 
 @Composable
-fun Specific_ad(navController: NavController){
+fun SpecificAdScreen(navController: NavController){
 
 }

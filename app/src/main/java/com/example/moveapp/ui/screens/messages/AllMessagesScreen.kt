@@ -11,7 +11,7 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 
 @Composable
-fun All_messages(navController: NavController) {
+fun AllMessagesScreen(navController: NavController) {
 
     Box(
         modifier = Modifier.fillMaxSize(),

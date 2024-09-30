@@ -6,11 +6,8 @@ enum class AppScreens {
     REGISTER,
     ALL_MESSAGES,
     PROFILE,
-    TYPE_OF_AD,
-    RENT_TRUCK,
-    SHIP_ITEMS,
-    UNWANTED_ITEMS,
+    POST_AD,
     MAP,
-    SPESIFIC_AD,
-    SPESIFIC_MESSAGE
+    SPECIFIC_AD,
+    SPECIFIC_MESSAGE
 }
