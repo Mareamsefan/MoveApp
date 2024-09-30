@@ -13,7 +13,7 @@ import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
-import com.example.moveapp.ui.screens.post_ad.PostAdScreen
+import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.ui.screens.map.Map

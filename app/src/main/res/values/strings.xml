@@ -34,7 +34,8 @@
     <string name="upload_image">Upload image</string>
     <string name="address">Address</string>
     <string name="postal_code">Postal code</string>
-    <string name="truck">Truck</string>
-    <string name="trailer">Trailer</string>
-
+    <string name="Rent_vehicle">Rent vehicle</string>
+    <string name="Deliver_A_to_B">Deliver A to B"</string>
+    <string name="Select_an_ad_type">Select an ad type</string>
+    <string name="Options">Options</string>
 </resources>
