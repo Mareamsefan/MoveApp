@@ -5,13 +5,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.moveapp.R
 import com.example.moveapp.utility.FireAuthService
-import com.example.moveapp.utility.FireAuthService.getDisplayName
+import com.example.moveapp.utility.FireAuthService.getUsername
 
 
 @Composable
@@ -29,7 +27,7 @@ fun HomeScreen(navController: NavController) {
         // Display a welcome message and the user's email
         //Text(text = "Welcome! Your email: $userEmail")
         if (currentUser != null) {
-            val username = getDisplayName()
+            val username = getUsername()
             Text(text = "Welcome! Your username: $username")
         }
     }

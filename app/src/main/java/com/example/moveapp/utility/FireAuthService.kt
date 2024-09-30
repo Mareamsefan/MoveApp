@@ -4,7 +4,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.auth.userProfileChangeRequest
 
 import kotlinx.coroutines.tasks.await
 
@@ -53,8 +52,22 @@ object FireAuthService {
         }
     }
 
-    fun getDisplayName(): String? {
+    fun getUsername(): String? {
         return auth.currentUser?.displayName
+    }
+    suspend fun updateUsername(newUsername: String): Boolean {
+        return try {
+            val user = FirebaseAuth.getInstance().currentUser
+            val profileUpdates = UserProfileChangeRequest.Builder()
+                .setDisplayName(newUsername)
+                .build()
+
+            user?.updateProfile(profileUpdates)?.await()
+            true // Return true if the update is successful
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false // Return false if an error occurs
+        }
     }
 
     suspend fun sendEmailVerification(): Boolean {
