@@ -6,6 +6,7 @@ enum class AppScreens {
     REGISTER,
     ALL_MESSAGES,
     PROFILE,
+    PROFILE_SETTINGS,
     POST_AD,
     MAP,
     SPECIFIC_AD,

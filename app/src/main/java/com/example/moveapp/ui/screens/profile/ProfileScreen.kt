@@ -1,7 +1,6 @@
 package com.example.moveapp.ui.screens.profile
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -10,9 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -21,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,42 +36,50 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.display.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.ui.navigation.navBars.getCurrentScreen
+import com.example.moveapp.ui.navigation.navBars.shortcuts
 import com.example.moveapp.utility.FireAuthService.getUsername
-import com.example.moveapp.utility.FireAuthService.updateUsername
-import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
-import com.google.android.gms.cast.framework.media.ImagePicker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Profile(navController: NavController) {
     val context = LocalContext.current
     val coroutineScope = MainScope()
-
-    // Use mutableStateOf for username to allow recomposition
-    var username = remember { mutableStateOf(getUsername() ?: "") }
-    var updatedUsername = remember { mutableStateOf("") }
+    val username = remember { mutableStateOf(getUsername() ?: "") }
     var errorMessage = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String?>() }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            adImages.add(uri.toString())
+            uri?.let {
+                if (adImages.isEmpty()) { // Allow only one image
+                    adImages.add(it.toString())
+                }
+            }
         }
     )
+
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp)
         ) {
+
+            val formattedUsername = username.value.replaceFirstChar { it.uppercase() }
             Text(
-                text = username.value,
+                text = formattedUsername,
                 fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(vertical = 16.dp)
             )
+
             Button(
                 onClick = {
                     launcher.launch("image/*")
@@ -74,50 +89,9 @@ fun Profile(navController: NavController) {
                 Text(text = stringResource(R.string.upload_image))
             }
 
-            Image_swipe(imageList = adImages)
-
-
-
-            OutlinedTextField(
-                value = updatedUsername.value,
-                onValueChange = { updatedUsername.value = it },
-                label = { Text(text = "Update your username...") }
-            )
-
-            // Update username Button
-            Button(onClick = {
-                coroutineScope.launch {
-                    if (updatedUsername.value.isNotEmpty()) {
-                        val updateSuccess = updateUsername(updatedUsername.value)
-                        errorMessage.value =
-                            if (updateSuccess) {
-                                // Update the displayed username
-                                username.value = updatedUsername.value
-                                "Username was updated successfully"
-                            } else {
-                                "Something went wrong while updating your username.."
-                            }
-                    } else {
-                        errorMessage.value = "Username cannot be empty."
-                    }
-                }
-            }) {
-                Text(text = "Change username")
-            }
-
-            // Display error message
-            Text(text = errorMessage.value)
-
-            // Logout Button
-            Button(onClick = {
-                coroutineScope.launch {
-                    val user = logoutUser(context)
-                    if (user != null) {
-                        navController.navigate(AppScreens.LOGIN.name)
-                    }
-                }
-            }) {
-                Text(text = stringResource(R.string.logout))
+            // Display the uploaded image
+            if (adImages.isNotEmpty()) {
+                Image_swipe(imageList = adImages)
             }
         }
     }
