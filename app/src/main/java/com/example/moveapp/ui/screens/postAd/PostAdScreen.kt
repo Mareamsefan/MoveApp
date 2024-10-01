@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
-import com.example.moveapp.ui.display.Image_swipe
+import com.example.moveapp.ui.composables.Image_swipe
 import androidx.compose.material3.TextField
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
