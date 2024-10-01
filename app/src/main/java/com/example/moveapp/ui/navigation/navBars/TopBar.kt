@@ -45,9 +45,13 @@ fun TopBar(navController: NavController, route: String? = null) {
     }
     CenterAlignedTopAppBar(
         title = {
-            if(currentScreen != AppScreens.HOME.name)
             Text(
-                text = stringResource(R.string.app_name),
+                text = when (currentScreen) {
+                    AppScreens.PROFILE.name -> stringResource(R.string.my_profile)
+                    AppScreens.ALL_MESSAGES.name -> stringResource(R.string.messages)
+                    AppScreens.POST_AD.name -> stringResource(R.string.post_ad)
+                    else -> ""
+                },
                 textAlign = TextAlign.Center
             )
         },

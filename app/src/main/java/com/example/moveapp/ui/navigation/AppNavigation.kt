@@ -62,6 +62,10 @@ fun AppNavigation () {
                 Profile(navController)
             }
 
+            composable(AppScreens.PROFILE_SETTINGS.name) {
+                Profile(navController)
+            }
+
             composable(AppScreens.ALL_MESSAGES.name) {
                 AllMessagesScreen(navController)
             }

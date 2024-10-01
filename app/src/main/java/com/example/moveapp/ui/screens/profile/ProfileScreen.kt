@@ -10,10 +10,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,38 +29,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.display.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.ui.navigation.navBars.getCurrentScreen
+import com.example.moveapp.ui.navigation.navBars.shortcuts
 import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
-import com.google.android.gms.cast.framework.media.ImagePicker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Profile(navController: NavController) {
     val context = LocalContext.current
     val coroutineScope = MainScope()
-
-    // Use mutableStateOf for username to allow recomposition
     var username = remember { mutableStateOf(getUsername() ?: "") }
     var updatedUsername = remember { mutableStateOf("") }
     var errorMessage = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String?>() }
+    val isFilterBarVisible = remember { mutableStateOf(false) }
+    val currentScreen = getCurrentScreen(navController)
+    val isMainScreen = shortcuts.any { it.route.name == currentScreen }
 
+    DisposableEffect(currentScreen) {
+        if (currentScreen != AppScreens.PROFILE.name) {
+            isFilterBarVisible.value = false
+        }
+        onDispose {}
+    }
+
+    // Moved launcher outside of the TopAppBar
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            adImages.add(uri.toString())
+            uri?.let { adImages.add(it.toString()) }
         }
     )
+
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -76,22 +99,18 @@ fun Profile(navController: NavController) {
 
             Image_swipe(imageList = adImages)
 
-
-
             OutlinedTextField(
                 value = updatedUsername.value,
                 onValueChange = { updatedUsername.value = it },
                 label = { Text(text = "Update your username...") }
             )
 
-            // Update username Button
             Button(onClick = {
                 coroutineScope.launch {
                     if (updatedUsername.value.isNotEmpty()) {
                         val updateSuccess = updateUsername(updatedUsername.value)
                         errorMessage.value =
                             if (updateSuccess) {
-                                // Update the displayed username
                                 username.value = updatedUsername.value
                                 "Username was updated successfully"
                             } else {
