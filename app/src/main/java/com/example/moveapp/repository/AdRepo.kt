@@ -3,6 +3,7 @@ package com.example.moveapp.repository
 import AdData
 import com.example.moveapp.utility.FirestoreService
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class AdRepo {
 
@@ -11,7 +12,11 @@ class AdRepo {
     companion object{
         suspend fun addAdToDatabase(ad: AdData): Boolean {
             return try {
-                ad.adId?.let { FirestoreService.getAdsCollection().document(it).set(ad).await() }
+
+                val adId = ad.adId ?: UUID.randomUUID().toString()
+                ad.adId = adId
+
+                FirestoreService.getAdsCollection().document(adId).set(ad).await()
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
