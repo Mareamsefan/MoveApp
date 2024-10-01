@@ -57,25 +57,13 @@ fun Profile(navController: NavController) {
     var errorMessage = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String?>() }
     val isFilterBarVisible = remember { mutableStateOf(false) }
-    val currentScreen = getCurrentScreen(navController)
-    val isMainScreen = shortcuts.any { it.route.name == currentScreen }
 
-    DisposableEffect(currentScreen) {
-        if (currentScreen != AppScreens.PROFILE.name) {
-            isFilterBarVisible.value = false
-        }
-        onDispose {}
-    }
-
-    // Moved launcher outside of the TopAppBar
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             uri?.let { adImages.add(it.toString()) }
         }
     )
-
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -99,45 +87,9 @@ fun Profile(navController: NavController) {
 
             Image_swipe(imageList = adImages)
 
-            OutlinedTextField(
-                value = updatedUsername.value,
-                onValueChange = { updatedUsername.value = it },
-                label = { Text(text = "Update your username...") }
-            )
 
-            Button(onClick = {
-                coroutineScope.launch {
-                    if (updatedUsername.value.isNotEmpty()) {
-                        val updateSuccess = updateUsername(updatedUsername.value)
-                        errorMessage.value =
-                            if (updateSuccess) {
-                                username.value = updatedUsername.value
-                                "Username was updated successfully"
-                            } else {
-                                "Something went wrong while updating your username.."
-                            }
-                    } else {
-                        errorMessage.value = "Username cannot be empty."
-                    }
-                }
-            }) {
-                Text(text = "Change username")
-            }
 
-            // Display error message
-            Text(text = errorMessage.value)
 
-            // Logout Button
-            Button(onClick = {
-                coroutineScope.launch {
-                    val user = logoutUser(context)
-                    if (user != null) {
-                        navController.navigate(AppScreens.LOGIN.name)
-                    }
-                }
-            }) {
-                Text(text = stringResource(R.string.logout))
-            }
         }
     }
 }

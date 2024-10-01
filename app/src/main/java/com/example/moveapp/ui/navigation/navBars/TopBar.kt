@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +57,7 @@ fun TopBar(navController: NavController, route: String? = null) {
                     AppScreens.PROFILE.name -> stringResource(R.string.my_profile)
                     AppScreens.ALL_MESSAGES.name -> stringResource(R.string.messages)
                     AppScreens.POST_AD.name -> stringResource(R.string.post_ad)
+                    AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
                     else -> ""
                 },
                 textAlign = TextAlign.Center
@@ -82,6 +84,18 @@ fun TopBar(navController: NavController, route: String? = null) {
                         contentDescription = stringResource(R.string.filter),
                     )
                 }
+
+        // Add gear icon for settings
+            if (currentScreen == AppScreens.PROFILE.name) {
+                IconButton(onClick = {
+                    navController.navigate(AppScreens.PROFILE_SETTINGS.name)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
+                }
+            }
         },
 
         navigationIcon = {
