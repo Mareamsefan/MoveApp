@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirestoreService.getAdsCollection()
-            .limit(1) // Just fetching one document to trigger Firestore initialization
+            .limit(1)
             .get()
             .addOnSuccessListener {
                 Log.d("MainActivity", "Successfully connected to Firestore!")
