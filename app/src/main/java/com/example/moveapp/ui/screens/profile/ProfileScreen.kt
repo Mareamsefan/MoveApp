@@ -1,7 +1,6 @@
 package com.example.moveapp.ui.screens.profile
 
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,11 +16,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
@@ -42,8 +39,6 @@ import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.ui.navigation.navBars.getCurrentScreen
 import com.example.moveapp.ui.navigation.navBars.shortcuts
 import com.example.moveapp.utility.FireAuthService.getUsername
-import com.example.moveapp.utility.FireAuthService.updateUsername
-import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -52,30 +47,39 @@ import kotlinx.coroutines.launch
 fun Profile(navController: NavController) {
     val context = LocalContext.current
     val coroutineScope = MainScope()
-    var username = remember { mutableStateOf(getUsername() ?: "") }
-    var updatedUsername = remember { mutableStateOf("") }
+    val username = remember { mutableStateOf(getUsername() ?: "") }
     var errorMessage = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String?>() }
-    val isFilterBarVisible = remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            uri?.let { adImages.add(it.toString()) }
+            uri?.let {
+                if (adImages.isEmpty()) { // Allow only one image
+                    adImages.add(it.toString())
+                }
+            }
         }
     )
+
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(16.dp)
         ) {
+
+            val formattedUsername = username.value.replaceFirstChar { it.uppercase() }
             Text(
-                text = username.value,
+                text = formattedUsername,
                 fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(vertical = 16.dp)
             )
+
             Button(
                 onClick = {
                     launcher.launch("image/*")
@@ -85,11 +89,10 @@ fun Profile(navController: NavController) {
                 Text(text = stringResource(R.string.upload_image))
             }
 
-            Image_swipe(imageList = adImages)
-
-
-
-
+            // Display the uploaded image
+            if (adImages.isNotEmpty()) {
+                Image_swipe(imageList = adImages)
+            }
         }
     }
 }
