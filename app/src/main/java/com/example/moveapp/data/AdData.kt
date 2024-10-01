@@ -1,3 +1,6 @@
+package com.example.moveapp.data
+
+
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
