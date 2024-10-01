@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -22,6 +23,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,11 +64,15 @@ fun TopBar(navController: NavController, route: String? = null) {
 
         actions = {
             if(currentScreen == AppScreens.HOME.name)
-                OutlinedTextField(
-                    value = searchQuery.value,
-                    onValueChange = { searchQuery.value = it },
-                    label = { Text(text = stringResource(R.string.search)) }
-                )
+                Box(modifier = Modifier.padding(top=2.dp, bottom = 15.dp)) {
+                    OutlinedTextField(
+                        modifier = Modifier.height(56.dp),
+                        value = searchQuery.value,
+                        onValueChange = { searchQuery.value = it },
+                        label = { Text(text = stringResource(R.string.search)) }
+
+                    )
+                }
             if(currentScreen == AppScreens.HOME.name)
                 IconButton( onClick = {
                     isFilterBarVisible.value = !isFilterBarVisible.value
@@ -93,6 +103,7 @@ fun TopBar(navController: NavController, route: String? = null) {
 
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = Color.LightGray
+
         )
 
 
