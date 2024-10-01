@@ -1,6 +1,6 @@
 package com.example.moveapp.repository
 
-import AdData
+import com.example.moveapp.data.AdData
 import com.example.moveapp.utility.FirestoreService
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
