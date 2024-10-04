@@ -1,6 +1,7 @@
 package com.example.moveapp.repository
 
 import com.example.moveapp.data.AdData
+import com.example.moveapp.data.UserData
 import com.example.moveapp.utility.FirestoreService
 import kotlinx.coroutines.tasks.await
 import java.util.UUID
@@ -16,7 +17,7 @@ class AdRepo {
                 val adId = ad.adId ?: UUID.randomUUID().toString()
                 ad.adId = adId
 
-                FirestoreService.getAdsCollection().document(adId).set(ad).await()
+                FirestoreService.createDocument("ads", ad)
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -28,11 +29,18 @@ class AdRepo {
 
         suspend fun updateAdTitleInDatabase(adId: String, newTitle: String): Boolean {
             return try {
-                // Retrieves the ad document by adId
-                val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
-                // Replaces old adTitle with newTitle
-                adDocumentReference.update("adTitle", newTitle).await()
-                true
+                // Retrieve the ad from the collection
+                // It will return an AdData object
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+                // If ad is not null
+                ad?.let {
+                    // Update the title of the AdData object
+                    it.adTitle = newTitle
+                    // Send in the entire object to the collection
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                // If ad is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -41,11 +49,22 @@ class AdRepo {
 
         suspend fun updateAdImagesInDatabase(adId: String, newImages: List<String>): Boolean {
             return try {
-                // Retrieves the ad document by adId
-                val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
-                // Replaces old adImages with newImages
-                adDocumentReference.update("adImages", newImages).await()
-                true
+                // Retrieve the ad from the collection
+                // It will return an AdData object
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+                // If ad is not null
+                ad?.let {
+                    // Makes a copy of the existing list and makes it mutable
+                    val updatedImages = it.adImages.toMutableList()
+                    // Adds all the new images to the new list
+                    updatedImages.addAll(newImages)
+                    // Update the adImages field with the new list
+                    it.adImages = updatedImages
+                    // Send in the entire object to the collection
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                    // If ad is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -54,11 +73,18 @@ class AdRepo {
 
         suspend fun updateAdPriceInDatabase(adId: String, newPrice: Double): Boolean {
             return try {
-                // Retrieves the ad document by adId
-                val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
-                // Replaces old adPrice with newPrice
-                adDocumentReference.update("adPrice", newPrice).await()
-                true
+                // Retrieve the ad from the collection
+                // It will return an AdData object
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+                // If ad is not null
+                ad?.let {
+                    // Update the title of the AdData object
+                    it.adPrice = newPrice
+                    // Send in the entire object to the collection
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                    // If ad is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -67,11 +93,18 @@ class AdRepo {
 
         suspend fun updateAdCategoryInDatabase(adId: String, newCategory: String): Boolean {
             return try {
-                // Retrieves the ad document by adId
-                val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
-                // Replaces old adCategory with newCategory
-                adDocumentReference.update("adCategory", newCategory).await()
-                true
+                // Retrieve the ad from the collection
+                // It will return an AdData object
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+                // If ad is not null
+                ad?.let {
+                    // Update the title of the AdData object
+                    it.adCategory = newCategory
+                    // Send in the entire object to the collection
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                    // If ad is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -80,11 +113,18 @@ class AdRepo {
 
         suspend fun updateAdDescriptionInDatabase(adId: String, newDescription: String): Boolean {
             return try {
-                // Retrieves the ad document by adId
-                val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
-                // Replaces old adDescription with newDescription
-                adDocumentReference.update("adDescription", newDescription).await()
-                true
+                // Retrieve the ad from the collection
+                // It will return an AdData object
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+                // If ad is not null
+                ad?.let {
+                    // Update the title of the AdData object
+                    it.adDescription = newDescription
+                    // Send in the entire object to the collection
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                    // If ad is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -95,11 +135,18 @@ class AdRepo {
 
         suspend fun setAddInactive(adId: String): Boolean {
             return try {
-                // Retrieves the ad document by adId
-                val adDocumentReference = FirestoreService.getAdsCollection().document(adId)
-                // sets isActive to be false
-                adDocumentReference.update("isActive", false).await()
-                true
+                // Retrieve the ad from the collection
+                // It will return an AdData object
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+                // If ad is not null
+                ad?.let {
+                    // Update the title of the AdData object
+                    it.isActive = false
+                    // Send in the entire object to the collection
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                    // If ad is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false

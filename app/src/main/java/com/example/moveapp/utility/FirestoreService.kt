@@ -18,21 +18,6 @@ object FirestoreService {
         FirebaseFirestore.getInstance()
     }
 
-    // Helper function to recieve a reference to the users collection
-    fun getUsersCollection() = db.collection("users")
-
-    // Helper function to recieve a reference to the ads collection
-    fun getAdsCollection() = db.collection("ads")
-
-    // Helper function to recieve a reference to the reports collection
-    fun getReportsCollection() = db.collection("reports")
-
-    // Helper function to recieve a reference to the pictures collection
-    fun getPicturesCollection() = db.collection("pictures")
-
-    // Helper function to recieve a reference to the chat collection
-    fun getChatsCollection() = db.collection("chats")
-
     fun getCollection(collection: String): Task<QuerySnapshot> {
         return db.collection(collection).get()
     }

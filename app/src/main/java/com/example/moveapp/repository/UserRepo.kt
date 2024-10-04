@@ -15,11 +15,7 @@ class UserRepo {
     companion object {
         suspend fun addUserToDatabase(user: UserData): Boolean {
             return try {
-                // Add user to the "users" collection using their userId as the document ID
-                // Set ensures that if a document ith the same userId exists
-                // it will overwrite the existing one
-                // await ensures that it completes before moving forward in the function
-                FirestoreService.getUsersCollection().document(user.userId).set(user).await()
+                FirestoreService.createDocument("users", user)
                 true  // Return true if successful
             } catch (e: Exception) {
                 e.printStackTrace()  // Log the error
@@ -30,10 +26,12 @@ class UserRepo {
         // Dont call this method manually
         suspend fun updateUserUsername(userId: String, username: String): Boolean {
             return try {
-
-                FirestoreService.getUsersCollection().document(userId)
-                    .update("username", username).await()
-                true
+                var user = FirestoreService.readDocument("users", userId, UserData::class.java)
+                user?.let {
+                    it.username = username
+                    FirestoreService.updateDocument("users", userId, it)
+                    true
+                } ?: false // If user is null, return false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -43,10 +41,12 @@ class UserRepo {
         // This function is called by another function is FireAuthService that handles changing email
         suspend fun updateUserDatabaseEmail(userId: String, email: String): Boolean {
             return try {
-
-                FirestoreService.getUsersCollection().document(userId)
-                    .update("email", email).await()
-                true
+                var user = FirestoreService.readDocument("users", userId, UserData::class.java)
+                user?.let {
+                    it.email = email
+                    FirestoreService.updateDocument("users", userId, it)
+                    true
+                } ?: false // If user is null, return false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -56,10 +56,12 @@ class UserRepo {
         // Dont call this method manually
         suspend fun updateUserLocation(userId: String, location: String): Boolean {
             return try {
-
-                FirestoreService.getUsersCollection().document(userId)
-                    .update("location", location).await()
-                true
+                var user = FirestoreService.readDocument("users", userId, UserData::class.java)
+                user?.let {
+                    it.location = location
+                    FirestoreService.updateDocument("users", userId, it)
+                    true
+                } ?: false // If user is null, return false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
@@ -69,9 +71,26 @@ class UserRepo {
         // Call this function when the user uploads a new picture
         suspend fun updateUserPicture(userId: String, url: String): Boolean {
             return try {
+                // Retrieve the correct user. This returns a UserData class object
+                var user = FirestoreService.readDocument("users", userId, UserData::class.java)
+                // If user is not null
+                user?.let {
+                    // Update the profile picture field with the new url
+                    it.profilePictureUrl = url
+                    // Send in the new user to overwrite the document
+                    FirestoreService.updateDocument("users", userId, it)
+                    true
+                // If user is null, return false
+                } ?: false
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
 
-                FirestoreService.getUsersCollection().document(userId)
-                    .update("profilePictureUrl", url).await()
+        suspend fun deleteUser(userId: String): Boolean {
+            return try {
+                FirestoreService.deleteDocument("users", userId)
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -83,10 +102,21 @@ class UserRepo {
         // Call this function when the user presses "Add to favorites" when they are on an adpage
         suspend fun addToFavorites(userId: String, adId: String): Boolean {
             return try {
+                var user = FirestoreService.readDocument("users", userId, UserData::class.java)
+                // If user is not null
+                user?.let {
+                    // Create a mutable copy because List is immutable
+                    val updatedFavorites = it.favorites.toMutableList()
+                    // Add the new adId to the copy
+                    updatedFavorites.add(adId)
+                    // Update the favorites field with the modified list
+                    it.favorites = updatedFavorites
 
-                FirestoreService.getUsersCollection().document(userId)
-                    .update("favorites", FieldValue.arrayUnion(adId)).await()
-                true
+                    // Update the document in Firestore
+                    FirestoreService.updateDocument("users", userId, it)
+                    true
+                // If user is null, return false
+                } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
                 false
