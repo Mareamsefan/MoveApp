@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -22,6 +23,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.filled.Settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,20 +52,29 @@ fun TopBar(navController: NavController, route: String? = null) {
     }
     CenterAlignedTopAppBar(
         title = {
-            if(currentScreen != AppScreens.HOME.name)
             Text(
-                text = stringResource(R.string.app_name),
+                text = when (currentScreen) {
+                    AppScreens.PROFILE.name -> stringResource(R.string.my_profile)
+                    AppScreens.ALL_MESSAGES.name -> stringResource(R.string.messages)
+                    AppScreens.POST_AD.name -> stringResource(R.string.post_ad)
+                    AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
+                    else -> ""
+                },
                 textAlign = TextAlign.Center
             )
         },
 
         actions = {
             if(currentScreen == AppScreens.HOME.name)
-                OutlinedTextField(
-                    value = searchQuery.value,
-                    onValueChange = { searchQuery.value = it },
-                    label = { Text(text = stringResource(R.string.search)) }
-                )
+                Box(modifier = Modifier.padding(top=2.dp, bottom = 15.dp)) {
+                    OutlinedTextField(
+                        modifier = Modifier.height(56.dp),
+                        value = searchQuery.value,
+                        onValueChange = { searchQuery.value = it },
+                        label = { Text(text = stringResource(R.string.search)) }
+
+                    )
+                }
             if(currentScreen == AppScreens.HOME.name)
                 IconButton( onClick = {
                     isFilterBarVisible.value = !isFilterBarVisible.value
@@ -68,6 +84,18 @@ fun TopBar(navController: NavController, route: String? = null) {
                         contentDescription = stringResource(R.string.filter),
                     )
                 }
+
+        // Add gear icon for settings
+            if (currentScreen == AppScreens.PROFILE.name) {
+                IconButton(onClick = {
+                    navController.navigate(AppScreens.PROFILE_SETTINGS.name)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.settings)
+                    )
+                }
+            }
         },
 
         navigationIcon = {
@@ -89,6 +117,7 @@ fun TopBar(navController: NavController, route: String? = null) {
 
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = Color.LightGray
+
         )
 
 
