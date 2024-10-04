@@ -153,10 +153,9 @@ class AdRepo {
             }
         }
         suspend fun getAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit) {
-            val adsDb = FirestoreService.getAdsCollection()
-                .get()
-                .addOnSuccessListener { result ->
-                    val ads = result.map { document ->
+            try {
+                    val adsCollection = FirestoreService.getCollection("ads").await()
+                    val ads = adsCollection.map { document ->
                         AdData(
                             adId = document.getString("adId") ?: "",
                             userId = document.getString("userId") ?: "",
@@ -170,10 +169,10 @@ class AdRepo {
                         )
                     }
                     onSuccess(ads)
-                }
-                .addOnFailureListener { exception ->
-                    onFailure(exception)
-                }
+            }
+            catch (e:Exception){
+                onFailure(e)
+            }
         }
 
     }
