@@ -12,7 +12,7 @@ import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.FireStorageService
 import android.net.Uri
-import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
+//import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
 import com.example.moveapp.utility.FireAuthService.register
 
 class UserViewModel {
