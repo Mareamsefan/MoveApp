@@ -9,7 +9,7 @@ class AdRepo {
 
     // FUNCTION TO CREATE INITIAL AD
 
-    companion object{
+    companion object {
         suspend fun addAdToDatabase(ad: AdData): Boolean {
             return try {
 
@@ -105,6 +105,30 @@ class AdRepo {
                 false
             }
         }
+        suspend fun getAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit) {
+            val adsDb = FirestoreService.getAdsCollection()
+                .get()
+                .addOnSuccessListener { result ->
+                    val ads = result.map { document ->
+                        AdData(
+                            adId = document.getString("adId") ?: "",
+                            userId = document.getString("userId") ?: "",
+                            adTitle = document.getString("adTitle") ?: "",
+                            adDescription = document.getString("adDescription") ?: "",
+                            adPrice = document.getDouble("adPrice") ?: 0.0,
+                            adImages = document.get("adImages") as? List<String> ?: emptyList(),
+                            adCategory = document.getString("adCategory") ?: "",
+                            address = document.getString("address") ?: "",
+                            postalCode = document.getString("postalCode") ?: ""
+                        )
+                    }
+                    onSuccess(ads)
+                }
+                .addOnFailureListener { exception ->
+                    onFailure(exception)
+                }
+        }
+
     }
 
 
