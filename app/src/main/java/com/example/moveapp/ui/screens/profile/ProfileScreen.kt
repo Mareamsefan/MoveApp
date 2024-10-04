@@ -1,8 +1,10 @@
 package com.example.moveapp.ui.screens.profile
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,10 +26,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
+import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.ui.composables.Image_swipe
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.getUsername
+import com.example.moveapp.utility.FirestoreService.readDocument
+import com.example.moveapp.viewModel.UserViewModel.Companion.uploadAndSetUserProfilePicture
 import kotlinx.coroutines.MainScope
-
+import kotlinx.coroutines.launch
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Profile(navController: NavController) {
@@ -35,14 +43,37 @@ fun Profile(navController: NavController) {
     val coroutineScope = MainScope()
     val username = remember { mutableStateOf(getUsername() ?: "") }
     var errorMessage = remember { mutableStateOf("") }
-    val adImages = remember { mutableStateListOf<String?>() }
+    val profileImageUrl = remember { mutableStateOf<String>("") }
+    val currentUser = getCurrentUser()
+    val userId = currentUser?.uid
 
+    if (currentUser != null){
+        coroutineScope.launch {
+            // Bruk readDocument for å hente brukerdata
+            val userData: UserData? = userId?.let {
+                readDocument("users",
+                    it, UserData::class.java)
+            }
+            if (userData != null) {
+                profileImageUrl.value = userData.profilePictureUrl
+            } // Oppdater profilbilde-URL
+        }
+    }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             uri?.let {
-                if (adImages.isEmpty()) { // Allow only one image
-                    adImages.add(it.toString())
+                coroutineScope.launch {
+                    if (userId != null) {
+                        val success = uploadAndSetUserProfilePicture(userId, it)
+                        if (success) {
+                            errorMessage.value = "Image uploaded successfully."
+                        } else {
+                            errorMessage.value = "Failed to upload image."
+                        }
+                    } else {
+                        errorMessage.value = "User is not logged in."
+                    }
                 }
             }
         }
@@ -75,9 +106,15 @@ fun Profile(navController: NavController) {
                 Text(text = stringResource(R.string.upload_image))
             }
 
-            // Display the uploaded image
-            if (adImages.isNotEmpty()) {
-                Image_swipe(imageList = adImages)
+            // Vis bildet fra URL-en som er hentet fra databasen
+            profileImageUrl.value?.let { imageUrl ->
+                Image_swipe(imageList = listOf(imageUrl)) // Bruk URL-en her
+            }
+
+
+            // Display error message if any
+            if (errorMessage.value.isNotEmpty()) {
+                Text(text = errorMessage.value, color = MaterialTheme.colorScheme.error)
             }
         }
     }
