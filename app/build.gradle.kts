@@ -49,7 +49,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
+
+
 
 dependencies {
 
@@ -85,4 +88,8 @@ dependencies {
 
     implementation("io.coil-kt:coil:2.7.0")
     implementation("io.coil-kt:coil-compose:2.7.0")
+
+    implementation(libs.osmdroid.android)
+
+
 }
