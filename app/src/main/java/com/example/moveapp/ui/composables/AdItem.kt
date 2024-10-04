@@ -20,7 +20,7 @@ import coil.compose.rememberImagePainter
 fun AdItem(ad: AdData) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(1.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -28,7 +28,7 @@ fun AdItem(ad: AdData) {
             painter = rememberAsyncImagePainter(model = ad.adImages),
             contentDescription = ad.adTitle,
             modifier = Modifier
-                .height(150.dp)
+                .height(1.dp)
                 .fillMaxWidth(),
             contentScale = ContentScale.Crop
         )
