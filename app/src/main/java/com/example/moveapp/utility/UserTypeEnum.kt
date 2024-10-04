@@ -3,6 +3,7 @@ package com.example.moveapp.utility
 enum class UserTypeEnum(val type: String) {
     // Admin user, can do everything
     ADMIN("Admin"),
+
     // Moderator, have certain admin powers
     MODERATOR("Moderator"),
     // Regular user, have no admin or mod powers

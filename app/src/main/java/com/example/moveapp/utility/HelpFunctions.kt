@@ -2,6 +2,7 @@ package com.example.moveapp.utility
 import java.security.MessageDigest
 import android.content.Context
 import android.widget.Toast
+import com.example.moveapp.utility.FirestoreService.getCollection
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.tasks.await
@@ -33,22 +34,23 @@ class HelpFunctions {
             // Nice password :)
             return true
         }
-
+        /* Not in use for now
         suspend fun checkIfUserExist(email: String): Boolean {
-            val usersCollection = FirestoreService.getUsersCollection()
-
             return try {
-                val querySnapshot = usersCollection
+                // Use the generic getCollection to retrieve the "users" collection
+                val querySnapshot = getCollection("users").await()
                     .whereEqualTo("email", email)
                     .get()
-                    .await() // Gjør spørringen til en suspend operasjon
+                    .await() // Wait for the query to complete
 
-                return !querySnapshot.isEmpty // Returnerer true hvis brukeren eksisterer
+                // Return true if the user exists (i.e., the query is not empty)
+                !querySnapshot.isEmpty
             } catch (e: Exception) {
                 println("Error by request: ${e.message}")
-                false // Returner false ved feil
+                false // Return false if an exception occurs
             }
-        }
+        }*/
+
 
 
     }

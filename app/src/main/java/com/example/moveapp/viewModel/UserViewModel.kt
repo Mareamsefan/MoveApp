@@ -10,7 +10,7 @@ import com.example.moveapp.data.UserData
 import android.widget.Toast
 import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.utility.FirestoreService
-import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
+
 import com.example.moveapp.utility.FireAuthService.register
 
 class UserViewModel {

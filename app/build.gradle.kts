@@ -90,6 +90,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     implementation(libs.osmdroid.android)
+    implementation("androidx.compose.foundation:foundation:1.4.0-alpha01")
 
 
 }
