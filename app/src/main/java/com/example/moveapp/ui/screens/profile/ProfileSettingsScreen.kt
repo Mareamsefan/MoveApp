@@ -8,6 +8,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -18,7 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireAuthService.getLocation
 import com.example.moveapp.utility.FireAuthService.getUsername
+import com.example.moveapp.utility.FireAuthService.updateLocation
 import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
 import kotlinx.coroutines.MainScope
@@ -31,6 +34,17 @@ fun ProfileSettingsScreen(navController: NavController) {
     val username = remember { mutableStateOf(getUsername() ?: "") }
     val updatedUsername = remember { mutableStateOf("") }
     val errorMessage = remember { mutableStateOf("") }
+    // Kan ikke hente location til å begynne med pga. det er async
+    // Man kan ikke sette mutableStateOf med noe som er async
+    val location = remember { mutableStateOf<String?>(null)}
+    val updatedLocation = remember { mutableStateOf("")}
+
+    // Henter location her
+    LaunchedEffect(Unit) {
+        getLocation { fetchedLocation ->
+            location.value = fetchedLocation
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -40,6 +54,11 @@ fun ProfileSettingsScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            // Display error message
+            // Flyttet Error Message øverst slik at vi ikke behøver å vise den flere ganger
+            Text(text = errorMessage.value)
+
             // Display the current username
             Text(text = "Current Username: ${username.value}")
 
@@ -49,8 +68,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                 label = { Text(text = "Update your username...") }
             )
 
-            // Display error message
-            Text(text = errorMessage.value)
+
 
             Button(onClick = {
                 coroutineScope.launch {
@@ -69,6 +87,41 @@ fun ProfileSettingsScreen(navController: NavController) {
                 }
             }) {
                 Text(text = "Change Username")
+            }
+
+            // Update Location
+            // Display the current Location
+            if (location.value != null){
+                Text(text = "Current Location: ${location.value}")
+            } else {
+                Text(text = "Current Location: Unknown")
+            }
+
+
+            OutlinedTextField(
+                value = updatedLocation.value,
+                onValueChange = { updatedLocation.value = it },
+                label = { Text(text = "Update your location...") }
+            )
+
+            Button(onClick = {
+                coroutineScope.launch {
+                    if (updatedLocation.value.isNotEmpty()) {
+                        // Call updateLocation and handle the result in the callback
+                        updateLocation(updatedLocation.value) { updateSuccess ->
+                            if (updateSuccess) {
+                                location.value = updatedLocation.value
+                                errorMessage.value = "Location was updated successfully"
+                            } else {
+                                errorMessage.value = "Something went wrong while updating your Location."
+                            }
+                        }
+                    } else {
+                        errorMessage.value = "Location cannot be empty."
+                    }
+                }
+            }) {
+                Text(text = "Change Location")
             }
 
             // Logout Button
