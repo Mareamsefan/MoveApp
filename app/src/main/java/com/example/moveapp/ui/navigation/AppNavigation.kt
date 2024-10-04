@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.padding
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
-import com.example.moveapp.ui.screens.map.Map
+import com.example.moveapp.ui.screens.map.MapScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
 import com.example.moveapp.ui.screens.ad.SpecificAdScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
@@ -69,7 +69,7 @@ fun AppNavigation () {
                 PostAdScreen(navController)
             }
             composable(AppScreens.MAP.name) {
-                Map(navController)
+                MapScreen(navController)
             }
             composable(AppScreens.SPECIFIC_AD.name) {
                 SpecificAdScreen(navController)
