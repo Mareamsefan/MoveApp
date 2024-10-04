@@ -47,7 +47,7 @@ class AdRepo {
             }
         }
 
-        suspend fun updateAdImagesInDatabase(adId: String, newImages: List<String>): Boolean {
+        suspend fun updateAdImagesInDatabase(adId: String, newImage: String): Boolean {
             return try {
                 // Retrieve the ad from the collection
                 // It will return an AdData object
@@ -55,9 +55,9 @@ class AdRepo {
                 // If ad is not null
                 ad?.let {
                     // Makes a copy of the existing list and makes it mutable
-                    val updatedImages = it.adImages.toMutableList()
-                    // Adds all the new images to the new list
-                    updatedImages.addAll(newImages)
+                    val updatedImages = it.adImages?.toMutableList() ?: mutableListOf()
+                    // Adds the new image to the list of images
+                    updatedImages.add(newImage)
                     // Update the adImages field with the new list
                     it.adImages = updatedImages
                     // Send in the entire object to the collection
