@@ -3,7 +3,9 @@ package com.example.moveapp.utility
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
+import com.example.moveapp.utility.FirestoreService.db
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 
 import kotlinx.coroutines.tasks.await
 
@@ -55,6 +57,55 @@ object FireAuthService {
     fun getUsername(): String? {
         return auth.currentUser?.displayName
     }
+
+    fun getLocation(onComplete: (String?) -> Unit) {
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            // Henter firebase document til currentUser
+            val userDocRef = db.collection("users").document(userId)
+
+            userDocRef.get()
+                .addOnSuccessListener { documentSnapshot ->
+                    if (documentSnapshot.exists()) {
+                        // Henter currentUser sin Location
+                        val location = documentSnapshot.getString("location")
+                        onComplete(location)
+                    } else {
+                        onComplete(null)
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    onComplete(null)
+                    exception.printStackTrace()
+                }
+        } else {
+            onComplete(null)
+        }
+    }
+
+    fun updateLocation(newLocation: String, onComplete: (Boolean) -> Unit) {
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
+
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            // Henter firebase document til currentUser
+            val userDocRef = db.collection("users").document(userId)
+
+            // Oppdater Location med newLocation
+            userDocRef.update("location", newLocation)
+                .addOnSuccessListener {
+                    onComplete(true)
+                }
+                .addOnFailureListener { exception ->
+                    onComplete(false)
+                    exception.printStackTrace()
+                }
+        } else {
+            onComplete(false)
+        }
+    }
+
     suspend fun updateUsername(newUsername: String): Boolean {
         return try {
             val user = FirebaseAuth.getInstance().currentUser
