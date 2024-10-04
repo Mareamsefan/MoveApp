@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.firebase.firestore.ktx)
+    implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation(libs.androidx.junit.ktx)
