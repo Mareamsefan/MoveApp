@@ -25,9 +25,7 @@ class LocationUtil {
                 Manifest.permission.ACCESS_FINE_LOCATION,
             )
         )
-
-        LaunchedEffect(Unit) {
-            // Launch permission request
+        LaunchedEffect(permissionState) {
             if (!permissionState.allPermissionsGranted) {
                 permissionState.launchMultiplePermissionRequest()
             }

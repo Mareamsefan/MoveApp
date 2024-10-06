@@ -31,10 +31,16 @@ import com.example.moveapp.utility.LocationUtil
 @Composable
 fun HomeScreen(navController: NavController) {
 
+    val locationUtil = LocationUtil()
+
+    // asking for location before going to map
+    locationUtil.RequestUserLocation()
+
     // Fetching ads
     var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+
 
     // Fetch ads from Firestore
     LaunchedEffect(Unit) {
@@ -53,10 +59,6 @@ fun HomeScreen(navController: NavController) {
     val currentUser = FireAuthService.getCurrentUser()
     // Get the user's email if they are logged in
     val userEmail = currentUser?.email ?: "Not Logged In"
-    val locationUtil = LocationUtil()
-
-    // asking for location before going to map
-    locationUtil.RequestUserLocation()
 
     Box(
         modifier = Modifier.fillMaxSize(),

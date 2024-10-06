@@ -32,7 +32,6 @@ fun MapScreen(navController: NavController) {
 
 
 
-
     locationUtil.getUserLocation(context) { location ->
         location?.let {
             userLocation = it
