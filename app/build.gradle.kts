@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.firebase.firestore.ktx)
+    implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation(libs.androidx.junit.ktx)
@@ -90,6 +91,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
 
     implementation(libs.osmdroid.android)
+    implementation("androidx.compose.foundation:foundation:1.4.0-alpha01")
 
     implementation("androidx.activity:activity-ktx:1.7.2")
     implementation("androidx.appcompat:appcompat:1.6.1")

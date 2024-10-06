@@ -12,15 +12,6 @@ import android.util.Log
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FirestoreService.getAdsCollection()
-            .limit(1)
-            .get()
-            .addOnSuccessListener {
-                Log.d("MainActivity", "Successfully connected to Firestore!")
-            }
-            .addOnFailureListener {
-                Log.e("MainActivity", "Failed to connect to Firestore", it)
-            }
 
         enableEdgeToEdge()
         setContent {
