@@ -4,13 +4,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import android.net.Uri
+import android.util.Log
 
 object FireStorageService {
     val storage: FirebaseStorage by lazy {
         FirebaseStorage.getInstance()
     }
-
-    // Function to upload a file (image) to Firebase Storage
     suspend fun uploadFileToStorage(fileUri: Uri, storagePath: String): String? {
         return try {
             val storageRef = storage.reference.child(storagePath)
@@ -22,6 +21,7 @@ object FireStorageService {
             null
         }
     }
+
 
     // Function to delete a file from Firebase Storage
     suspend fun deleteFileFromStorage(storagePath: String): Boolean {
