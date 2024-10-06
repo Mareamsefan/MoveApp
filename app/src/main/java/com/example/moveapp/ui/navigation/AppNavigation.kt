@@ -20,6 +20,7 @@ import com.example.moveapp.ui.screens.map.MapScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
 import com.example.moveapp.ui.screens.ad.SpecificAdScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
+import com.example.moveapp.ui.screens.profile.ChangePasswordScreen
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 
 @Composable
@@ -82,7 +83,6 @@ fun AppNavigation () {
             composable(AppScreens.SPECIFIC_MESSAGE.name) {
                 SpecificMessageScreen(navController)
             }
-
 
         }
 

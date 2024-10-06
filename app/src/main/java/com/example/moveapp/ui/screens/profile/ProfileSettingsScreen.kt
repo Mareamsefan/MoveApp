@@ -19,8 +19,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import com.example.moveapp.utility.FireAuthService.getLocation
+import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
+import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
 import com.example.moveapp.utility.FireAuthService.updateLocation
 import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
@@ -38,11 +39,18 @@ fun ProfileSettingsScreen(navController: NavController) {
     // Man kan ikke sette mutableStateOf med noe som er async
     val location = remember { mutableStateOf<String?>(null)}
     val updatedLocation = remember { mutableStateOf("")}
+    val userEmail = remember { mutableStateOf<String?>(null)}
 
-    // Henter location her
+    // Henter location og email
     LaunchedEffect(Unit) {
-        getLocation { fetchedLocation ->
+        getDataFromUserTable("location") { fetchedLocation ->
             location.value = fetchedLocation
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        getDataFromUserTable("email") { fetchedEmail ->
+            userEmail.value = fetchedEmail
         }
     }
 
@@ -123,6 +131,21 @@ fun ProfileSettingsScreen(navController: NavController) {
             }) {
                 Text(text = "Change Location")
             }
+
+            // Send Password Reset Email
+            Button(onClick = {
+                val email = userEmail.value
+
+                if (!email.isNullOrEmpty()){
+                    sendUserPasswordResetEmail(email)
+                    errorMessage.value = "Email sent! If you do not see the email shortly, please check your spam folder."
+                } else {
+                    errorMessage.value = "Something went wrong. Please wait a few seconds and try again."
+                }
+            }) {
+                Text(text = stringResource(R.string.send_password_reset_email))
+            }
+
 
             // Logout Button
             Button(onClick = {

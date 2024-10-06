@@ -4,7 +4,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
 import com.example.moveapp.utility.FirestoreService.db
+import com.google.firebase.Firebase
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
 
 import kotlinx.coroutines.tasks.await
@@ -58,8 +60,21 @@ object FireAuthService {
         return auth.currentUser?.displayName
     }
 
-    fun getLocation(onComplete: (String?) -> Unit) {
+    fun getDataFromUserTable(field: (String), onComplete: (String?) -> Unit) {
+        // Sjekker om field input er valid
+        val validFields = setOf(
+            "dateRegistered", "email", "favorites", "location",
+            "profilePictureUrl", "userId", "userType", "username",
+        )
+
+        if (field !in validFields) {
+            onComplete(null)  // Invalid field, return null immediately
+            return
+        }
+
+        // Finner current user
         val userId = auth.currentUser?.uid
+        // Om den finner en currentUser så henter den data fra spesifisert felt
         if (userId != null) {
             // Henter firebase document til currentUser
             val userDocRef = db.collection("users").document(userId)
@@ -68,7 +83,7 @@ object FireAuthService {
                 .addOnSuccessListener { documentSnapshot ->
                     if (documentSnapshot.exists()) {
                         // Henter currentUser sin Location
-                        val location = documentSnapshot.getString("location")
+                        val location = documentSnapshot.getString(field)
                         onComplete(location)
                     } else {
                         onComplete(null)
@@ -82,6 +97,12 @@ object FireAuthService {
             onComplete(null)
         }
     }
+
+    fun sendUserPasswordResetEmail(email: String){
+        // https://firebase.google.com/docs/auth/android/manage-users
+        Firebase.auth.sendPasswordResetEmail(email)
+    }
+
 
     fun updateLocation(newLocation: String, onComplete: (Boolean) -> Unit) {
         val auth = FirebaseAuth.getInstance()
