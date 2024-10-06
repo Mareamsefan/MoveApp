@@ -84,10 +84,6 @@ fun AppNavigation () {
                 SpecificMessageScreen(navController)
             }
 
-            composable(AppScreens.CHANGE_PASSWORD.name) {
-                ChangePasswordScreen(navController)
-            }
-
         }
 
     }

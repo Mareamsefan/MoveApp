@@ -11,5 +11,4 @@ enum class AppScreens {
     MAP,
     SPECIFIC_AD,
     SPECIFIC_MESSAGE,
-    CHANGE_PASSWORD,
 }
