@@ -30,16 +30,14 @@ import com.example.moveapp.utility.LocationUtil
 
 @Composable
 fun HomeScreen(navController: NavController) {
-
-    val locationUtil = LocationUtil()
-
-    // asking for location before going to map
-    locationUtil.RequestUserLocation()
-
     // Fetching ads
     var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+
+    val locationUtil = LocationUtil()
+
+    locationUtil.RequestUserLocation()
 
 
     // Fetch ads from Firestore

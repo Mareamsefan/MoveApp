@@ -19,12 +19,14 @@ class LocationUtil {
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     fun RequestUserLocation() {
+
         val permissionState = rememberMultiplePermissionsState(
             listOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
         )
+
         LaunchedEffect(permissionState) {
             if (!permissionState.allPermissionsGranted) {
                 permissionState.launchMultiplePermissionRequest()
