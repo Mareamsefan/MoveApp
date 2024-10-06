@@ -25,14 +25,22 @@ import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.repository.AdRepo.Companion.getAds
 import com.example.moveapp.ui.composables.AdItem
 import kotlinx.coroutines.MainScope
+import com.example.moveapp.utility.LocationUtil
+
 
 @Composable
 fun HomeScreen(navController: NavController) {
+
+    val locationUtil = LocationUtil()
+
+    // asking for location before going to map
+    locationUtil.RequestUserLocation()
 
     // Fetching ads
     var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+
 
     // Fetch ads from Firestore
     LaunchedEffect(Unit) {
@@ -47,6 +55,10 @@ fun HomeScreen(navController: NavController) {
             }
         )
     }
+    // Get the current user
+    val currentUser = FireAuthService.getCurrentUser()
+    // Get the user's email if they are logged in
+    val userEmail = currentUser?.email ?: "Not Logged In"
 
     Box(
         modifier = Modifier.fillMaxSize(),

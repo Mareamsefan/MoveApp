@@ -93,5 +93,12 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation("androidx.compose.foundation:foundation:1.4.0-alpha01")
 
+    implementation("androidx.activity:activity-ktx:1.7.2")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    implementation("com.google.accompanist:accompanist-permissions:0.31.0-alpha")
+
 
 }
