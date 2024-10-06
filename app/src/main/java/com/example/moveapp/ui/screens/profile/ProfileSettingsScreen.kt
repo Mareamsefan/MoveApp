@@ -124,6 +124,15 @@ fun ProfileSettingsScreen(navController: NavController) {
                 Text(text = "Change Location")
             }
 
+            // Navigate to "Change Password" screen
+            Button(onClick = {
+                navController.navigate(AppScreens.CHANGE_PASSWORD.name)
+            }) {
+                Text(text = stringResource(R.string.change_password))
+            }
+
+
+
             // Logout Button
             Button(onClick = {
                 coroutineScope.launch {

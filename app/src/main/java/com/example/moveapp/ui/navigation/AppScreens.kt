@@ -10,5 +10,6 @@ enum class AppScreens {
     POST_AD,
     MAP,
     SPECIFIC_AD,
-    SPECIFIC_MESSAGE
+    SPECIFIC_MESSAGE,
+    CHANGE_PASSWORD,
 }
