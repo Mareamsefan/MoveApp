@@ -10,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getUsername
+import com.example.moveapp.utility.LocationUtil
 
 
 @Composable
@@ -19,6 +20,10 @@ fun HomeScreen(navController: NavController) {
     val currentUser = FireAuthService.getCurrentUser()
     // Get the user's email if they are logged in
     val userEmail = currentUser?.email ?: "Not Logged In"
+    val locationUtil = LocationUtil()
+
+    // asking for location before going to map
+    locationUtil.RequestUserLocation()
 
     Box(
         modifier = Modifier.fillMaxSize(),

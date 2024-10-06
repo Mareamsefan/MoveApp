@@ -25,6 +25,7 @@ import org.osmdroid.views.overlay.Marker
 @Composable
 fun MapScreen(navController: NavController) {
     val context = LocalContext.current
+    // default location oslo
     var userLocation by remember { mutableStateOf<GeoPoint?>(GeoPoint(59.9139, 10.7522)) }
     val locationUtil = LocationUtil()
     var hasLocationPermission by remember { mutableStateOf(false) }
