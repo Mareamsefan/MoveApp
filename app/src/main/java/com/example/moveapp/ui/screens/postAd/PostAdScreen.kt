@@ -25,8 +25,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
+import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.viewModel.AdViewModel.Companion.createAd
+import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStorage
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
@@ -42,12 +45,13 @@ fun PostAdScreen(navController: NavController) {
     val description = remember { mutableStateOf("") }
     val address = remember { mutableStateOf("") }
     var postalCode = remember { mutableStateOf("") }
-    val adImages = remember { mutableStateListOf<String?>() }
+    val adImages = remember { mutableStateListOf<String>() }
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(R.string.Select_an_ad_type) }
     var adType = remember { mutableStateOf("") }
     val options = listOf(R.string.Rent_vehicle, R.string.Deliver_A_to_B, R.string.unwanted_items)
     val coroutineScope = rememberCoroutineScope()
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? -> uri?.let { adImages.add(it.toString()) } }
@@ -122,7 +126,7 @@ fun PostAdScreen(navController: NavController) {
                 Text(text = stringResource(R.string.upload_image))
             }
 
-            Image_swipe(imageList = adImages)
+            Image_swipe(imageList = adImages.map {it.toString()})
 
             OutlinedTextField(
                 value = price.value,
@@ -142,12 +146,21 @@ fun PostAdScreen(navController: NavController) {
                 onClick = {
                     if (currentUser != null) {
                         coroutineScope.launch {
-                            createAd(context, title.value, price.value.toDouble(), adType.value, // Use adType.value
-                                description.value, currentUser.uid, address.value, postalCode.value)
+                            val ad =  createAd(context, title.value, price.value.toDouble(), adType.value, // Use adType.value
+                                description.value, currentUser.uid, address.value, postalCode.value, adImages)
+                            val adId = ad?.adId
+                            if (adId != null) {
+                                val uriImagesList = adImages.map {it.toUri()}
+                                uploadAdImagesToStorage(adId, uriImagesList)
+                            }
+
                         }
+
                     }
+                    navController.navigate(AppScreens.HOME.name)
                     // TODO: handle navigation or other logic
                 }
+
             ) {
                 Text(text = stringResource(R.string.post_ad))
             }

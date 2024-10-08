@@ -3,6 +3,7 @@ import com.example.moveapp.data.AdData
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.utility.FireStorageService
@@ -13,22 +14,45 @@ class AdViewModel {
 
     companion object {
 
-        suspend fun createAd(context: Context, adTitle: String, adPrice: Double, adCategory: String, adDescription: String, userId: String, address: String, postalCode: String): Boolean {
-            return try {
-                val ad = AdData(adTitle=adTitle, adPrice=adPrice, adCategory= adCategory, adDescription=adDescription, userId = userId, address= address, postalCode = postalCode)
 
+        suspend fun createAd(
+            context: Context,
+            adTitle: String,
+            adPrice: Double,
+            adCategory: String,
+            adDescription: String,
+            userId: String,
+            address: String,
+            postalCode: String,
+            adImages: List<String>
+        ): AdData? {
+            return try {
+                // Create the ad object
+                val ad = AdData(
+                    adTitle = adTitle,
+                    adPrice = adPrice,
+                    adCategory = adCategory,
+                    adDescription = adDescription,
+                    userId = userId,
+                    address = address,
+                    postalCode = postalCode,
+                    adImages = adImages
+
+                )
+
+                // Attempt to add the ad to the database
                 val success = AdRepo.addAdToDatabase(ad)
 
                 if (!success) {
                     Toast.makeText(context, "Adding the ad to the database failed!", Toast.LENGTH_SHORT).show()
-                    return false
+                    return null // Return null on failure
                 }
 
-                true
+                ad // Return the created ad on success
             } catch (e: Exception) {
+                // Handle any exceptions and show a failure message
                 Toast.makeText(context, "Ad creation failed, please try again!", Toast.LENGTH_SHORT).show()
-                false
-
+                null // Return null if an error occurs
             }
         }
 
