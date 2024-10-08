@@ -22,7 +22,7 @@ import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
-import com.example.moveapp.utility.FireAuthService.updateLocation
+import com.example.moveapp.utility.FireAuthService.updateDataInUserTable
 import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
 import kotlinx.coroutines.MainScope
@@ -37,20 +37,25 @@ fun ProfileSettingsScreen(navController: NavController) {
     val errorMessage = remember { mutableStateOf("") }
     // Kan ikke hente location til å begynne med pga. det er async
     // Man kan ikke sette mutableStateOf med noe som er async
-    val location = remember { mutableStateOf<String?>(null)}
-    val updatedLocation = remember { mutableStateOf("")}
-    val userEmail = remember { mutableStateOf<String?>(null)}
+    val location = remember { mutableStateOf<String?>(null) }
+    val updatedLocation = remember { mutableStateOf("") }
+    val userEmail = remember { mutableStateOf<String?>(null) }
+    val updatedEmail = remember { mutableStateOf("") }
+    val guestEmail = "jo.hovet@hotmail.com"
 
-    // Henter location og email
+    // Henter location
     LaunchedEffect(Unit) {
         getDataFromUserTable("location") { fetchedLocation ->
             location.value = fetchedLocation
         }
     }
 
+    // Henter email
     LaunchedEffect(Unit) {
         getDataFromUserTable("email") { fetchedEmail ->
-            userEmail.value = fetchedEmail
+            if (!fetchedEmail.isNullOrEmpty()) {
+                userEmail.value = fetchedEmail
+            }
         }
     }
 
@@ -62,13 +67,12 @@ fun ProfileSettingsScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // Display error message
-            // Flyttet Error Message øverst slik at vi ikke behøver å vise den flere ganger
+            // --- Display error message ---
             Text(text = errorMessage.value)
 
-            // Display the current username
+            // --- Oppdater Username ---
             Text(text = "Current Username: ${username.value}")
+
 
             OutlinedTextField(
                 value = updatedUsername.value,
@@ -77,34 +81,34 @@ fun ProfileSettingsScreen(navController: NavController) {
             )
 
 
-
-            Button(onClick = {
-                coroutineScope.launch {
-                    if (updatedUsername.value.isNotEmpty()) {
-                        val updateSuccess = updateUsername(updatedUsername.value)
-                        errorMessage.value =
-                            if (updateSuccess) {
-                                username.value = updatedUsername.value
-                                "Username was updated successfully"
-                            } else {
-                                "Something went wrong while updating your username."
-                            }
-                    } else {
-                        errorMessage.value = "Username cannot be empty."
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        if (updatedUsername.value.isNotEmpty()) {
+                            val updateSuccess = updateUsername(updatedUsername.value)
+                            errorMessage.value =
+                                if (updateSuccess) {
+                                    username.value = updatedUsername.value
+                                    "Username was updated successfully"
+                                } else {
+                                    "Something went wrong while updating your username."
+                                }
+                        } else {
+                            errorMessage.value = "Username cannot be empty."
+                        }
                     }
-                }
-            }) {
+                },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+            ) {
                 Text(text = "Change Username")
             }
 
-            // Update Location
-            // Display the current Location
+            // --- Oppdater Location ---
             if (location.value != null){
                 Text(text = "Current Location: ${location.value}")
             } else {
                 Text(text = "Current Location: Unknown")
             }
-
 
             OutlinedTextField(
                 value = updatedLocation.value,
@@ -116,7 +120,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                 coroutineScope.launch {
                     if (updatedLocation.value.isNotEmpty()) {
                         // Call updateLocation and handle the result in the callback
-                        updateLocation(updatedLocation.value) { updateSuccess ->
+                        updateDataInUserTable("location", updatedLocation.value) { updateSuccess ->
                             if (updateSuccess) {
                                 location.value = updatedLocation.value
                                 errorMessage.value = "Location was updated successfully"
@@ -128,11 +132,54 @@ fun ProfileSettingsScreen(navController: NavController) {
                         errorMessage.value = "Location cannot be empty."
                     }
                 }
-            }) {
+            },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+            ) {
                 Text(text = "Change Location")
             }
 
-            // Send Password Reset Email
+            // --- Oppdater Email ---
+            if (userEmail.value != null) {
+                Text(text = "Current Email: ${userEmail.value}")
+            } else {
+                Text(text = "Current Email: Unknown")
+            }
+
+            OutlinedTextField(
+                value = updatedEmail.value,
+                onValueChange = { updatedEmail.value = it },
+                label = { Text(text = "Update your email...") }
+            )
+
+            Button(onClick = {
+                coroutineScope.launch {
+                    val emailRegex = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+
+                    if (updatedEmail.value.isNotEmpty()) {
+                        if (emailRegex.matches(updatedEmail.value)) {
+                            updateDataInUserTable("email", updatedEmail.value) { updateSuccess ->
+                                if (updateSuccess) {
+                                    userEmail.value = updatedEmail.value
+                                    errorMessage.value = "Email was updated successfully"
+                                } else {
+                                    errorMessage.value = "Something went wrong while updating your Email."
+                                }
+                            }
+                        } else {
+                            errorMessage.value = "Please enter a valid email address."
+                        }
+                    } else {
+                        errorMessage.value = "Email cannot be empty."
+                    }
+                }
+            },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+            ) {
+                Text(text = "Change Email")
+            }
+
+
+            // --- Send Password Reset Email ---
             Button(onClick = {
                 val email = userEmail.value
 
@@ -142,7 +189,9 @@ fun ProfileSettingsScreen(navController: NavController) {
                 } else {
                     errorMessage.value = "Something went wrong. Please wait a few seconds and try again."
                 }
-            }) {
+            },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+                ) {
                 Text(text = stringResource(R.string.send_password_reset_email))
             }
 
