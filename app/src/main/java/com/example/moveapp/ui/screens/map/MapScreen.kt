@@ -12,6 +12,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import com.example.moveapp.data.AdData
+import com.example.moveapp.repository.AdRepo.Companion.getAds
 import com.example.moveapp.utility.LocationUtil
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -28,8 +30,19 @@ fun MapScreen(navController: NavController) {
     var userLocation by remember { mutableStateOf<GeoPoint?>(null) }
     val locationUtil = LocationUtil()
     var hasLocationPermission by remember { mutableStateOf(false) }
+    var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
+    var errorMessage by remember { mutableStateOf("") }
 
-
+    LaunchedEffect(Unit) {
+        getAds(
+            onSuccess = {
+                ads = it
+            },
+            onFailure = {
+                errorMessage = it.message ?: "Error fetching ads"
+            }
+        )
+    }
 
     locationUtil.getUserLocation(context) { location ->
         location?.let {
@@ -52,7 +65,7 @@ fun MapScreen(navController: NavController) {
 }
 
 @Composable
-fun Map(geoPoint: GeoPoint, hasLocationPermission: Boolean) {
+fun Map(geoPoint: GeoPoint, hasLocationPermission: Boolean, ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
