@@ -37,20 +37,24 @@ fun ProfileSettingsScreen(navController: NavController) {
     val errorMessage = remember { mutableStateOf("") }
     // Kan ikke hente location til å begynne med pga. det er async
     // Man kan ikke sette mutableStateOf med noe som er async
-    val location = remember { mutableStateOf<String?>(null)}
-    val updatedLocation = remember { mutableStateOf("")}
-    val userEmail = remember { mutableStateOf<String?>(null)}
+    val location = remember { mutableStateOf<String?>(null) }
+    val updatedLocation = remember { mutableStateOf("") }
+    val userEmail = remember { mutableStateOf<String?>(null) }
+    val guestEmail = "jo.hovet@hotmail.com"
 
-    // Henter location og email
+    // Henter location
     LaunchedEffect(Unit) {
         getDataFromUserTable("location") { fetchedLocation ->
             location.value = fetchedLocation
         }
     }
 
+    // Henter email
     LaunchedEffect(Unit) {
         getDataFromUserTable("email") { fetchedEmail ->
-            userEmail.value = fetchedEmail
+            if (!fetchedEmail.isNullOrEmpty()) {
+                userEmail.value = fetchedEmail
+            }
         }
     }
 
@@ -62,13 +66,12 @@ fun ProfileSettingsScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             // Display error message
-            // Flyttet Error Message øverst slik at vi ikke behøver å vise den flere ganger
             Text(text = errorMessage.value)
 
             // Display the current username
             Text(text = "Current Username: ${username.value}")
+
 
             OutlinedTextField(
                 value = updatedUsername.value,
@@ -78,22 +81,25 @@ fun ProfileSettingsScreen(navController: NavController) {
 
 
 
-            Button(onClick = {
-                coroutineScope.launch {
-                    if (updatedUsername.value.isNotEmpty()) {
-                        val updateSuccess = updateUsername(updatedUsername.value)
-                        errorMessage.value =
-                            if (updateSuccess) {
-                                username.value = updatedUsername.value
-                                "Username was updated successfully"
-                            } else {
-                                "Something went wrong while updating your username."
-                            }
-                    } else {
-                        errorMessage.value = "Username cannot be empty."
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        if (updatedUsername.value.isNotEmpty()) {
+                            val updateSuccess = updateUsername(updatedUsername.value)
+                            errorMessage.value =
+                                if (updateSuccess) {
+                                    username.value = updatedUsername.value
+                                    "Username was updated successfully"
+                                } else {
+                                    "Something went wrong while updating your username."
+                                }
+                        } else {
+                            errorMessage.value = "Username cannot be empty."
+                        }
                     }
-                }
-            }) {
+                },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+            ) {
                 Text(text = "Change Username")
             }
 
@@ -128,7 +134,9 @@ fun ProfileSettingsScreen(navController: NavController) {
                         errorMessage.value = "Location cannot be empty."
                     }
                 }
-            }) {
+            },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+            ) {
                 Text(text = "Change Location")
             }
 
@@ -142,7 +150,9 @@ fun ProfileSettingsScreen(navController: NavController) {
                 } else {
                     errorMessage.value = "Something went wrong. Please wait a few seconds and try again."
                 }
-            }) {
+            },
+                enabled = (userEmail.value != null && userEmail.value != guestEmail)
+                ) {
                 Text(text = stringResource(R.string.send_password_reset_email))
             }
 
