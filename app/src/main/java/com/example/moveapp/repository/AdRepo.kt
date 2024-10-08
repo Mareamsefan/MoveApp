@@ -152,6 +152,11 @@ class AdRepo {
                 false
             }
         }
+
+        suspend fun getAd(adId: String): AdData? {
+            return FirestoreService.readDocument("ads", adId, AdData::class.java)
+        }
+
         suspend fun getAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit) {
             try {
                     val adsCollection = FirestoreService.getCollection("ads").await()
