@@ -1,5 +1,6 @@
 package com.example.moveapp.repository
 
+import android.util.Log
 import com.example.moveapp.data.UserData
 import kotlinx.coroutines.tasks.await
 import com.example.moveapp.utility.FirestoreService
@@ -15,7 +16,8 @@ class UserRepo {
     companion object {
         suspend fun addUserToDatabase(user: UserData): Boolean {
             return try {
-                FirestoreService.createDocument("users", user)
+                val userId = user.userId
+                FirestoreService.createDocument("users", userId, user)
                 true  // Return true if successful
             } catch (e: Exception) {
                 e.printStackTrace()  // Log the error
@@ -68,25 +70,29 @@ class UserRepo {
             }
         }
 
-        // Call this function when the user uploads a new picture
         suspend fun updateUserPicture(userId: String, url: String): Boolean {
             return try {
-                // Retrieve the correct user. This returns a UserData class object
-                var user = FirestoreService.readDocument("users", userId, UserData::class.java)
-                // If user is not null
+                // Retrieve the user document (no need for .await() since readDocument already handles it)
+                val user = FirestoreService.readDocument("users", userId, UserData::class.java)
+
                 user?.let {
-                    // Update the profile picture field with the new url
+                    // Update the profile picture URL
                     it.profilePictureUrl = url
-                    // Send in the new user to overwrite the document
+                    // Update the document in Firestore (again no need for .await())
                     FirestoreService.updateDocument("users", userId, it)
+                    Log.d("UserRepo", "Profile picture updated successfully for userId: $userId")
                     true
-                // If user is null, return false
-                } ?: false
+                } ?: run {
+                    Log.e("UserRepo", "User with userId: $userId not found.")
+                    false
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("UserRepo", "Error updating user picture: ${e.message}", e)
                 false
             }
         }
+
+
 
         suspend fun deleteUser(userId: String): Boolean {
             return try {

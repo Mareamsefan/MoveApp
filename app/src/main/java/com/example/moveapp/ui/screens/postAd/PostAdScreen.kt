@@ -47,7 +47,7 @@ fun PostAdScreen(navController: NavController) {
     var selectedOption by remember { mutableStateOf(R.string.Select_an_ad_type) }
     var adType = remember { mutableStateOf("") }
     val options = listOf(R.string.Rent_vehicle, R.string.Deliver_A_to_B, R.string.unwanted_items)
-    val coroutineScope = MainScope()
+    val coroutineScope = rememberCoroutineScope()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? -> uri?.let { adImages.add(it.toString()) } }
