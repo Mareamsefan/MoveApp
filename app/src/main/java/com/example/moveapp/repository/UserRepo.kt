@@ -17,7 +17,7 @@ class UserRepo {
         suspend fun addUserToDatabase(user: UserData): Boolean {
             return try {
                 val userId = user.userId
-                FirestoreService.createDocument("users", userId, user)
+                FirestoreService.createDocument("users", userId, user )
                 true  // Return true if successful
             } catch (e: Exception) {
                 e.printStackTrace()  // Log the error
@@ -80,17 +80,13 @@ class UserRepo {
                     it.profilePictureUrl = url
                     // Update the document in Firestore (again no need for .await())
                     FirestoreService.updateDocument("users", userId, it)
-                    Log.d("UserRepo", "Profile picture updated successfully for userId: $userId")
                     true
-                } ?: run {
-                    Log.e("UserRepo", "User with userId: $userId not found.")
-                    false
-                }
+                } ?: false
             } catch (e: Exception) {
-                Log.e("UserRepo", "Error updating user picture: ${e.message}", e)
                 false
             }
         }
+
 
 
 

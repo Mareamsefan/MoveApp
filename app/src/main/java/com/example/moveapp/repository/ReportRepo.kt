@@ -11,7 +11,8 @@ class ReportRepo {
     companion object {
         suspend fun addReportToDatabase(report: ReportData): Boolean {
             return try {
-                FirestoreService.createDocument("reports", report)
+                val reportId = report.reportId
+                FirestoreService.createDocument("reports", reportId, report)
                 true  // Return true if successful
             } catch (e: Exception) {
                 e.printStackTrace()  // Log the error

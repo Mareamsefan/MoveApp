@@ -82,21 +82,16 @@ class UserViewModel {
         suspend fun uploadAndSetUserProfilePicture(userId: String, fileUri: Uri): Boolean {
             return try {
                 val storagePath = "images/users/$userId/profile.jpg"
-                Log.d("Upload", "Uploading to path: $storagePath")
 
                 val downloadUrl = FireStorageService.uploadFileToStorage(fileUri, storagePath)
 
                 if (downloadUrl != null) {
-                    Log.d("Upload", "Upload successful. Download URL: $downloadUrl")
                     val updateSuccess = UserRepo.updateUserPicture(userId, downloadUrl)
-                    Log.d("Upload", "Profile update success: $updateSuccess")
                     updateSuccess
                 } else {
-                    Log.e("Upload", "Download URL is null.")
                     false
                 }
             } catch (e: Exception) {
-                Log.e("Upload", "Exception during upload: ${e.message}", e)
                 false
             }
         }

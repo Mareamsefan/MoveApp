@@ -27,26 +27,10 @@ object FirestoreService {
         db.collection(collection).document(documentId).set(data).await()
     }
 
-
     suspend fun <T> readDocument(collection: String, documentId: String, className: Class<T>): T? {
-        return try {
-            Log.d("FirestoreService", "Fetching document from collection: $collection, documentId: $documentId")
-
-            val snapshot = db.collection(collection).document(documentId).get().await()
-
-            if (snapshot.exists()) {
-                Log.d("FirestoreService", "Document found: ${snapshot.data}")
-                return snapshot.toObject(className)
-            } else {
-                Log.e("FirestoreService", "Document with ID: $documentId not found in collection: $collection")
-                return null
-            }
-        } catch (e: Exception) {
-            Log.e("FirestoreService", "Error fetching document: ${e.message}", e)
-            return null
-        }
+        val snapshot = db.collection(collection).document(documentId).get().await()
+        return snapshot.toObject(className)
     }
-
 
     suspend fun <T : Any> updateDocument(collection: String, documentId: String, data: T) {
         db.collection(collection).document(documentId).set(data).await()

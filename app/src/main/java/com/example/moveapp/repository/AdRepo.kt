@@ -17,7 +17,7 @@ class AdRepo {
                 val adId = ad.adId ?: UUID.randomUUID().toString()
                 ad.adId = adId
 
-                FirestoreService.createDocument("ads", ad)
+                FirestoreService.createDocument("ads", adId, ad)
                 true
             } catch (e: Exception) {
                 e.printStackTrace()
