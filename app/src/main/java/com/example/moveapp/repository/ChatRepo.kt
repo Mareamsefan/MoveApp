@@ -11,7 +11,8 @@ class ChatRepo {
     companion object {
         suspend fun addChatToDatabase(chat: ChatData): Boolean {
             return try {
-                FirestoreService.createDocument("chats", chat)
+                val chatId = chat.chatId
+                FirestoreService.createDocument("chats", chatId, chat)
                 true
             } catch (e: Exception) {
                 e.printStackTrace()

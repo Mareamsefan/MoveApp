@@ -17,6 +17,7 @@ firebaseAuthKtx = "23.0.0"
 osmAndroidCompose = "0.0.5"
 osmdroidAndroid = "6.1.16"
 playServicesCastFramework = "21.5.0"
+media3CommonKtx = "1.4.1"
 
 
 [libraries]
@@ -44,6 +45,7 @@ firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx",
 osm-android-compose = { module = "tech.utsmankece:osm-android-compose", version.ref = "osmAndroidCompose" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
+androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-ktx", version.ref = "media3CommonKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

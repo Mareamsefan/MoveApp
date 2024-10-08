@@ -24,14 +24,16 @@ fun AdItem(ad: AdData) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = rememberAsyncImagePainter(model = ad.adImages),
-            contentDescription = ad.adTitle,
-            modifier = Modifier
-                .height(1.dp)
-                .fillMaxWidth(),
-            contentScale = ContentScale.Crop
-        )
+        if(ad.adImages.isNotEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(model = ad.adImages.first()),
+                contentDescription = ad.adTitle,
+                modifier = Modifier
+                    .height(150.dp)
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Crop
+            )
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = ad.adTitle)
         Text(text = ad.adDescription, maxLines = 2)
