@@ -89,7 +89,7 @@ object FireAuthService {
                         onComplete(null)
                     }
                 }
-                .addOnFailureListener { exception ->
+                .addOnFailureListener { _ ->
                     onComplete(null)
                 }
         } else {
@@ -103,9 +103,21 @@ object FireAuthService {
     }
 
 
-    fun updateLocation(newLocation: String, onComplete: (Boolean) -> Unit) {
+    fun updateDataInUserTable(field: String, newValue: String, onComplete: (Boolean) -> Unit) {
         val auth = FirebaseAuth.getInstance()
         val db = FirebaseFirestore.getInstance()
+
+        val validFields = setOf(
+            "dateRegistered", "email", "favorites", "location",
+            "profilePictureUrl", "userId", "userType", "username",
+        )
+
+        if (field !in validFields) {
+            println("ProfileSettings Invalid field requested: $field")
+            onComplete(false)
+            return
+        }
+
 
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -113,7 +125,7 @@ object FireAuthService {
             val userDocRef = db.collection("users").document(userId)
 
             // Oppdater Location med newLocation
-            userDocRef.update("location", newLocation)
+            userDocRef.update(field, newValue)
                 .addOnSuccessListener {
                     onComplete(true)
                 }
