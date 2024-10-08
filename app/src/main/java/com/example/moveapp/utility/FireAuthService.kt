@@ -60,38 +60,37 @@ object FireAuthService {
         return auth.currentUser?.displayName
     }
 
-    fun getDataFromUserTable(field: (String), onComplete: (String?) -> Unit) {
-        // Sjekker om field input er valid
+    fun getDataFromUserTable(field: String, onComplete: (String?) -> Unit) {
         val validFields = setOf(
             "dateRegistered", "email", "favorites", "location",
             "profilePictureUrl", "userId", "userType", "username",
         )
 
         if (field !in validFields) {
-            onComplete(null)  // Invalid field, return null immediately
+            println("ProfileSettings Invalid field requested: $field")
+            onComplete(null)
             return
         }
 
-        // Finner current user
-        val userId = auth.currentUser?.uid
-        // Om den finner en currentUser så henter den data fra spesifisert felt
-        if (userId != null) {
-            // Henter firebase document til currentUser
-            val userDocRef = db.collection("users").document(userId)
-
-            userDocRef.get()
-                .addOnSuccessListener { documentSnapshot ->
-                    if (documentSnapshot.exists()) {
-                        // Henter currentUser sin Location
-                        val location = documentSnapshot.getString(field)
-                        onComplete(location)
+        // Find current user
+        val currentUserId = auth.currentUser?.uid
+        if (currentUserId != null) {
+            db.collection("users")
+                .whereEqualTo("userId", currentUserId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        for (document in querySnapshot.documents) {
+                            val fieldValue = document.getString(field)
+                            onComplete(fieldValue)
+                            return@addOnSuccessListener
+                        }
                     } else {
                         onComplete(null)
                     }
                 }
-                .addOnFailureListener { exception ->
+                .addOnFailureListener { _ ->
                     onComplete(null)
-                    exception.printStackTrace()
                 }
         } else {
             onComplete(null)
@@ -104,9 +103,21 @@ object FireAuthService {
     }
 
 
-    fun updateLocation(newLocation: String, onComplete: (Boolean) -> Unit) {
+    fun updateDataInUserTable(field: String, newValue: String, onComplete: (Boolean) -> Unit) {
         val auth = FirebaseAuth.getInstance()
         val db = FirebaseFirestore.getInstance()
+
+        val validFields = setOf(
+            "dateRegistered", "email", "favorites", "location",
+            "profilePictureUrl", "userId", "userType", "username",
+        )
+
+        if (field !in validFields) {
+            println("ProfileSettings Invalid field requested: $field")
+            onComplete(false)
+            return
+        }
+
 
         val userId = auth.currentUser?.uid
         if (userId != null) {
@@ -114,7 +125,7 @@ object FireAuthService {
             val userDocRef = db.collection("users").document(userId)
 
             // Oppdater Location med newLocation
-            userDocRef.update("location", newLocation)
+            userDocRef.update(field, newValue)
                 .addOnSuccessListener {
                     onComplete(true)
                 }
