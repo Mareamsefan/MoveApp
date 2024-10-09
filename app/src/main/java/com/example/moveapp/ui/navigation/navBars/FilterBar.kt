@@ -96,6 +96,7 @@ fun FilterBar(
                     category.value = tempCategory
                     minPrice.value = tempMinPrice
                     maxPrice.value = tempMaxPrice
+                    // TODO: filter method
 
                 }
             ) {
