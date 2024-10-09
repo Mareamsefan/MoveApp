@@ -34,17 +34,18 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     ){
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (ad != null) {
-                ad?.let { Text(it.adTitle) }
-                ad?.let { Image_swipe(imageList = it.adImages) }
-                ad?.let { Text(it.adDescription) }
-                ad?.let { Text(it.adCategory) }
-                ad?.let { Text(it.adPrice.toString()) }
-                ad?.let { Text(it.address) }
-                ad?.let { Text(it.postalCode) }
-            }
-            else{
+                Text(text = ad!!.adTitle)
+                Image_swipe(imageList = ad!!.adImages)
+                Text(text = ad!!.adDescription)
+                Text(text = stringResource(R.string.category) + R.string.space + ad!!.adCategory)
+                Text(text = stringResource(R.string.price) + R.string.space + ad!!.adPrice.toString() + stringResource(R.string.kr))
+                Text(text = stringResource(R.string.address) + R.string.space + ad!!.address)
+                Text(text = stringResource(R.string.postal_code) + R.string.space + ad!!.postalCode)
+            } else {
                 Text(text = "ad not found")
             }
+
+
             Button(
                 onClick = {
                     // TODO: open message with seller and current user
