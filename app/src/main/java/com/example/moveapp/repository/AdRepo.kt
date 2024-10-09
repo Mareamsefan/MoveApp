@@ -70,6 +70,7 @@ class AdRepo {
                     // Send in the entire object to the collection
                     FirestoreService.updateDocument("ads", adId, it)
                     true
+                    // If ad is null, return false
                 } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()

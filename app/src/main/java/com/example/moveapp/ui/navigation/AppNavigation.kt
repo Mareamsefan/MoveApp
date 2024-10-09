@@ -26,6 +26,7 @@ import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 fun AppNavigation () {
     val navController = rememberNavController()
     val currentScreen = getCurrentScreen(navController)
+    val spesificAd = ""
 
     Scaffold(
         topBar = {
@@ -77,7 +78,7 @@ fun AppNavigation () {
                 MapScreen(navController)
             }
             composable(AppScreens.SPECIFIC_AD.name) {
-                SpecificAdScreen(navController)
+                SpecificAdScreen(navController, spesificAd)
             }
             composable(AppScreens.SPECIFIC_MESSAGE.name) {
                 SpecificMessageScreen(navController)
