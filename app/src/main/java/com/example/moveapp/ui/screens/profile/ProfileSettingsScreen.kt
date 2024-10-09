@@ -23,6 +23,7 @@ import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
 import com.example.moveapp.utility.FireAuthService.updateDataInUserTable
+import com.example.moveapp.utility.FireAuthService.updateUserEmail
 import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
 import kotlinx.coroutines.MainScope
@@ -41,7 +42,7 @@ fun ProfileSettingsScreen(navController: NavController) {
     val updatedLocation = remember { mutableStateOf("") }
     val userEmail = remember { mutableStateOf<String?>(null) }
     val updatedEmail = remember { mutableStateOf("") }
-    val guestEmail = "jo.hovet@hotmail.com"
+    val guestEmail = "guest@guest.com"
 
     // Henter location
     LaunchedEffect(Unit) {
@@ -154,17 +155,36 @@ fun ProfileSettingsScreen(navController: NavController) {
             Button(onClick = {
                 coroutineScope.launch {
                     val emailRegex = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+                    val newEmail = updatedEmail.value
+
+                    /* TODO:
+                        Problem:
+                            Her vises Current Email som hentes fra tabellen i Firestore Database
+                            (se over button, rett under kommentaren // ---Oppdater Email---)
+                            Dette er ikke nødvendigvis emailen du bruker.
+                            Denne koden sender en verification email for å bytte email,
+                            men bytter samtidig emailen i Firestore Database umiddelbart,
+                            FØR brukeren faktisk har trykket på "verified" eposten de får.
+                        Hva kan gjøres:
+                            1. Fjerne email fra "Firestore Database", slik at det kun eksisterer i
+                               "Firestore Authentication". Da kan du fjerne updateDataInUserTable() herfra
+                            eller
+                            2. Legge til en sjekk som venter på at brukeren trykker verify før den
+                               oppdaterer epost verdi i Firestore Database.
+                     */
 
                     if (updatedEmail.value.isNotEmpty()) {
                         if (emailRegex.matches(updatedEmail.value)) {
-                            updateDataInUserTable("email", updatedEmail.value) { updateSuccess ->
+                            if ( updateUserEmail(newEmail) ){
+                                updateDataInUserTable("email", updatedEmail.value) { updateSuccess ->
                                 if (updateSuccess) {
                                     userEmail.value = updatedEmail.value
-                                    errorMessage.value = "Email was updated successfully"
+                                    errorMessage.value = "Check your email: ${newEmail}, to verify the change."
                                 } else {
                                     errorMessage.value = "Something went wrong while updating your Email."
                                 }
-                            }
+                            }}
+                            errorMessage.value = "Email updated!"
                         } else {
                             errorMessage.value = "Please enter a valid email address."
                         }
