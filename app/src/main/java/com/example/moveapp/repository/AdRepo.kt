@@ -153,8 +153,21 @@ class AdRepo {
             }
         }
 
-        suspend fun getAd(adId: String): AdData? {
-            return FirestoreService.readDocument("ads", adId, AdData::class.java)
+        suspend fun getAd(adId: String?): AdData? {
+            val ad = adId?.let { FirestoreService.readDocument("ads", it, AdData::class.java) }
+            return ad?.let {
+                AdData(
+                    adId = it.adId,
+                    adTitle = it.adTitle,
+                    adPrice = it.adPrice,
+                    adCategory = it.adCategory,
+                    adDescription = it.adDescription,
+                    userId = it.userId,
+                    adImages = it.adImages,
+                    address = it.address,
+                    postalCode = it.postalCode
+                )
+            }
         }
 
         suspend fun getAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit) {
