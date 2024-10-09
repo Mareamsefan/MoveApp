@@ -1,18 +1,17 @@
 package com.example.moveapp.viewModel
 
-import com.example.moveapp.utility.HelpFunctions
+//import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
 import android.content.Context
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.UserRepo
+import com.example.moveapp.repository.UserRepo.Companion.addUserToDatabase
 import com.example.moveapp.utility.FireAuthService
+import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.HelpFunctions.Companion.validatePassword
 import com.google.firebase.auth.FirebaseUser
-import com.example.moveapp.repository.UserRepo.Companion.addUserToDatabase
-import com.example.moveapp.data.UserData
-import android.widget.Toast
-import com.example.moveapp.repository.UserRepo
-import com.example.moveapp.utility.FireStorageService
-import android.net.Uri
-//import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
-import com.example.moveapp.utility.FireAuthService.register
 
 class UserViewModel {
     companion object {
@@ -80,24 +79,23 @@ class UserViewModel {
             return user
         }
 
-        // Function to upload the user's profile picture and update their profile
         suspend fun uploadAndSetUserProfilePicture(userId: String, fileUri: Uri): Boolean {
             return try {
-                // Define the storage path for the user's profile picture
                 val storagePath = "images/users/$userId/profile.jpg"
 
-                // Upload the image to Firebase Storage and get the download URL
                 val downloadUrl = FireStorageService.uploadFileToStorage(fileUri, storagePath)
 
-                // If the upload was successful and we have a download URL
-                downloadUrl?.let {
-                    // Now call the updateUserPicture function from UserRepo and pass the URL
-                    UserRepo.updateUserPicture(userId, it)
-                } ?: false // If downloadUrl is null, return false
+                if (downloadUrl != null) {
+                    val updateSuccess = UserRepo.updateUserPicture(userId, downloadUrl)
+                    updateSuccess
+                } else {
+                    false
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
                 false
             }
         }
+
     }
-    }
+
+}

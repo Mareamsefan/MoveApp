@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,7 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun Profile(navController: NavController) {
     val context = LocalContext.current
-    val coroutineScope = MainScope()
+    val coroutineScope = rememberCoroutineScope()
     val username = remember { mutableStateOf(getUsername() ?: "") }
     var errorMessage = remember { mutableStateOf("") }
     val profileImageUrl = remember { mutableStateOf<String>("") }
@@ -107,9 +108,7 @@ fun Profile(navController: NavController) {
             }
 
             // Vis bildet fra URL-en som er hentet fra databasen
-            profileImageUrl.value?.let { imageUrl ->
-                Image_swipe(imageList = listOf(imageUrl)) // Bruk URL-en her
-            }
+            Image_swipe(imageList = listOf(profileImageUrl.value))
 
 
             // Display error message if any
