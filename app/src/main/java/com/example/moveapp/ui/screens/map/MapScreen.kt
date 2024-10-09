@@ -43,6 +43,7 @@ fun MapScreen(navController: NavController) {
             }
         )
     }
+    // TODO: add the ads to the map
 
     locationUtil.getUserLocation(context) { location ->
         location?.let {
