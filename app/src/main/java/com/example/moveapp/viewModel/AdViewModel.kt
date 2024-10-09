@@ -23,8 +23,7 @@ class AdViewModel {
             adDescription: String,
             userId: String,
             address: String,
-            postalCode: String,
-            adImages: List<String>
+            postalCode: String
         ): AdData? {
             return try {
                 // Create the ad object
@@ -36,8 +35,6 @@ class AdViewModel {
                     userId = userId,
                     address = address,
                     postalCode = postalCode,
-                    adImages = adImages
-
                 )
 
                 // Attempt to add the ad to the database
@@ -55,36 +52,34 @@ class AdViewModel {
                 null // Return null if an error occurs
             }
         }
-
         // Function to upload the ad pictures to storage
-        suspend fun uploadAdImagesToStorage(adId: String, adImages: List<Uri>): Boolean {
+        suspend fun uploadAdImagesToStorage(adId: String, adImages: List<Uri>): List<String?> {
+            val downloadUrls = mutableListOf<String?>()
+
             return try {
                 // Iterate over all the images in the list
                 for (imageUri in adImages) {
                     // Define the storage path for the ad picture
                     val storagePath = "images/ads/$adId/${imageUri.lastPathSegment}"
-                    //Tries to upload the image to storage with that path
+                    // Try to upload the image to storage with that path
                     val downloadUrl = FireStorageService.uploadFileToStorage(imageUri, storagePath)
 
-                    // If the upload failed and we dont have a downloadUrl
-                    if (downloadUrl == null) {
-                        return false
-                    }
-                    // Call the function to update the ad images in the database
-                    val success = AdRepo.updateAdImagesInDatabase(adId, downloadUrl)
+                    // Add the downloadUrl to the list
+                    downloadUrls.add(downloadUrl)
 
-                    // If updating the database failed, return false
-                    if (!success) {
-                        return false
+                    // If the upload failed and we don't have a downloadUrl, return empty list
+                    if (downloadUrl == null) {
+                        return emptyList()
                     }
                 }
-                // If uploading all the images works, return true
-                true
+                // Return the list of download URLs
+                downloadUrls
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                false
+                emptyList()
             }
         }
+
     }
 }

@@ -1,31 +1,44 @@
 package com.example.moveapp.data
 
-
+import androidx.compose.runtime.Stable
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 import java.util.UUID
-
-// https://chatgpt.com/share/66ed2f68-aa84-8013-97f4-b3ced9078b42
-
+@Stable
 @IgnoreExtraProperties
 data class AdData(
     var adId: String? = UUID.randomUUID().toString(),           // Unique identifier for the ad
-    var adTitle: String,        // Title or description of the ad
-    var adPrice: Double,        // Price for the item or service
-    var adCategory: String,     // Category (e.g., 'Truck Rental', 'Item Sale', 'Moving Service')
-    var adDescription: String,  // Detailed description of the ad
-    var userId: String,         // ID of the user who posted the ad
-    var isActive: Boolean = true, // The ad is only shown in the app if it is active.
-    // input data for location, so that you can use gps to find closes ad/plot in map
-    var country: String = "Norway",
-    var address: String,
-    var postalCode: String,
+    var adTitle: String = "",                                   // Title or description of the ad
+    var adPrice: Double = 0.0,                                 // Price for the item or service
+    var adCategory: String = "",                                // Category (e.g., 'Truck Rental', 'Item Sale', 'Moving Service')
+    var adDescription: String = "",                             // Detailed description of the ad
+    var userId: String = "",                                   // ID of the user who posted the ad
+    var isActive: Boolean = true,                               // The ad is only shown in the app if it is active.
+    var country: String = "Norway",                            // Default country
+    var address: String = "",                                   // Address where the ad is located
+    var postalCode: String = "",                                // Postal code of the ad's location
     @ServerTimestamp
-    var timestamp: Date? = null,        // Timestamp for when the ad was posted
-    var adImages: List<String> = emptyList(),  // List of image URLs for the ad (if any)
+    var timestamp: Date? = null,                               // Timestamp for when the ad was posted
+    var adImages: List<String> = emptyList()                   // List of image URLs for the ad (if any)
 ) {
+    // Default constructor required for Firestore
+    constructor() : this(
+        adId = UUID.randomUUID().toString(),
+        adTitle = "",
+        adPrice = 0.0,
+        adCategory = "",
+        adDescription = "",
+        userId = "",
+        isActive = true,
+        country = "Norway",
+        address = "",
+        postalCode = "",
+        timestamp = null,
+        adImages = emptyList()
+    )
+
     // Function to exclude any fields you don't want to send to Firebase
     @Exclude
     fun getAdDataMap(): Map<String, Any?> {
