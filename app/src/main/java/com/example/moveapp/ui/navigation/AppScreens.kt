@@ -11,4 +11,5 @@ enum class AppScreens {
     MAP,
     SPECIFIC_AD,
     SPECIFIC_MESSAGE,
+    START_NEW_CHAT,
 }

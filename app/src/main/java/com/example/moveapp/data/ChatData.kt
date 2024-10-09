@@ -14,7 +14,7 @@ data class ChatData (
     // List containing the userId of the users in the chat
     var users: List<String> = emptyList(),
     // Timestamp of the last message sent between the two users
-    var lastMessageTimestamp: Date? = null,
+    var lastMessageTimestamp: Long,
     // List containing alle the MessageObjects sent between the two users
     var messages: List<MessageData> = emptyList()
 ){

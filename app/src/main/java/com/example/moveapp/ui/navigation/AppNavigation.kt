@@ -13,6 +13,8 @@ import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
@@ -20,6 +22,7 @@ import com.example.moveapp.ui.screens.map.MapScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
 import com.example.moveapp.ui.screens.ad.SpecificAdScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
+import com.example.moveapp.ui.screens.messages.StartNewChatScreen
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 
 @Composable
@@ -79,8 +82,16 @@ fun AppNavigation () {
             composable(AppScreens.SPECIFIC_AD.name) {
                 SpecificAdScreen(navController)
             }
-            composable(AppScreens.SPECIFIC_MESSAGE.name) {
-                SpecificMessageScreen(navController)
+            composable(
+                route = "${AppScreens.SPECIFIC_MESSAGE.name}/{chatId}",
+                arguments = listOf(navArgument("chatId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                // Get chatId from the arguments
+                val chatId = backStackEntry.arguments?.getString("chatId") ?: ""
+                SpecificMessageScreen(navController, chatId)
+            }
+            composable(AppScreens.START_NEW_CHAT.name) {
+                StartNewChatScreen(navController)
             }
 
         }
