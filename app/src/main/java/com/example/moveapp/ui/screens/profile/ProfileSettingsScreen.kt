@@ -42,7 +42,7 @@ fun ProfileSettingsScreen(navController: NavController) {
     val updatedLocation = remember { mutableStateOf("") }
     val userEmail = remember { mutableStateOf<String?>(null) }
     val updatedEmail = remember { mutableStateOf("") }
-    val guestEmail = "guest@guest.com"
+    val guestEmail = "guest@guest.com" // do not change from guest@guest.com
 
     // Henter location
     LaunchedEffect(Unit) {
