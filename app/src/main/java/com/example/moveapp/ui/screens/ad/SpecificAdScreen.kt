@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.ad
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
@@ -27,9 +29,10 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     LaunchedEffect(Unit) {
          ad = getAd(adId)
     }
-    Box(modifier = Modifier.fillMaxSize()
+    Box(modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ){
-        Column {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (ad != null) {
                 ad?.let { Text(it.adTitle) }
                 ad?.let { Image_swipe(imageList = it.adImages) }
@@ -44,6 +47,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
             }
             Button(
                 onClick = {
+                    // TODO: open message with seller and current user
                 }
             ) {
                 Text(text = stringResource(R.string.contact_seller))
