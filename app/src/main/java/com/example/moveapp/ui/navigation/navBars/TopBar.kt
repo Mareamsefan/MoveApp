@@ -59,6 +59,7 @@ fun TopBar(navController: NavController, route: String? = null) {
                     AppScreens.ALL_MESSAGES.name -> stringResource(R.string.messages)
                     AppScreens.POST_AD.name -> stringResource(R.string.post_ad)
                     AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
+                    AppScreens.GUEST_DENIED.name -> stringResource(R.string.guest_denied)
                     else -> ""
                 },
                 textAlign = TextAlign.Center
