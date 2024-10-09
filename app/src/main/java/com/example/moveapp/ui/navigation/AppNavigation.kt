@@ -77,8 +77,11 @@ fun AppNavigation () {
             composable(AppScreens.MAP.name) {
                 MapScreen(navController)
             }
-            composable(AppScreens.SPECIFIC_AD.name) {
-                SpecificAdScreen(navController, spesificAd)
+            composable("specific_ad/{adId}") { backStackEntry ->
+                val adId = backStackEntry.arguments?.getString("adId")
+                if (adId != null) {
+                    SpecificAdScreen(navController, adId)
+                }
             }
             composable(AppScreens.SPECIFIC_MESSAGE.name) {
                 SpecificMessageScreen(navController)

@@ -156,7 +156,8 @@ fun HomeScreen(navController: NavController) {
                     state = listState
                 ) {
                     items(ads) { ad ->
-                        AdItem(ad = ad)
+                        AdItem(navController, ad = ad)
+
                     }
                     if (isLoadingMore) {
                         item {
