@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.postAd
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -26,8 +27,10 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
+import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.viewModel.AdViewModel.Companion.createAd
 import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStorage
 import kotlinx.coroutines.MainScope
@@ -143,27 +146,56 @@ fun PostAdScreen(navController: NavController) {
             Text(text = adType.value) // Display the selected ad type
 
             Button(
+
                 onClick = {
                     if (currentUser != null) {
                         coroutineScope.launch {
-                            val ad =  createAd(context, title.value, price.value.toDouble(), adType.value, // Use adType.value
-                                description.value, currentUser.uid, address.value, postalCode.value, adImages)
+                            // Create an ad and retrieve the adId
+                            val ad = createAd(
+                                context,
+                                title.value,
+                                price.value.toDouble(),
+                                adType.value,
+                                description.value,
+                                currentUser.uid,
+                                address.value,
+                                postalCode.value
+                            )
                             val adId = ad?.adId
                             if (adId != null) {
-                                val uriImagesList = adImages.map {it.toUri()}
-                                uploadAdImagesToStorage(adId, uriImagesList)
+                                val uriImagesList = adImages.map { it.toUri() }
+                                // Upload the images and get the URLs
+                                val uploadedImageUrls = uploadAdImagesToStorage(adId, uriImagesList)
+
+                                // Ensure you only update with non-empty URLs
+                                if (uploadedImageUrls.isNotEmpty()) {
+
+                                    //Deleting the localUris:
+                                    adImages.map{FireStorageService.deleteFileFromStorage(it)}
+                                    // Update ad with the list of uploaded image URLs
+                                    val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
+                                    // Log the update success
+                                    if (updateSuccess) {
+                                        Log.d("PostAdScreen", "Ad images updated successfully.")
+                                    } else {
+                                        Log.e("PostAdScreen", "Failed to update ad images.")
+                                    }
+                                } else {
+                                    Log.e("PostAdScreen", "No URLs returned from upload.")
+                                }
+
+                                // Navigate after everything is completed
+                                navController.navigate(AppScreens.HOME.name)
                             }
-
                         }
-
                     }
-                    navController.navigate(AppScreens.HOME.name)
-                    // TODO: handle navigation or other logic
                 }
 
-            ) {
-                Text(text = stringResource(R.string.post_ad))
-            }
+                ) {
+                    Text(text = stringResource(R.string.post_ad))
+                }
+
+
         }
     }
 }

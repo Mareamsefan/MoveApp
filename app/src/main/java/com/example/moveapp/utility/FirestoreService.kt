@@ -39,4 +39,6 @@ object FirestoreService {
     suspend fun deleteDocument(collection: String, documentId: String) {
         db.collection(collection).document(documentId).delete().await()
     }
+
+
 }
