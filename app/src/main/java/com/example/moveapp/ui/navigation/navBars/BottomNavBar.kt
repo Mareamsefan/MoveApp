@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import androidx.compose.material3.Icon
+import com.example.moveapp.utility.FireAuthService.fetchUserEmail
 
 
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
@@ -45,7 +46,13 @@ fun BottomNavBar(navController: NavController) {
                 icon = { Icon(shortcut.icon, contentDescription = stringResource(shortcut.label)) },
                 label = { Text(stringResource(shortcut.label)) },
                 selected = getCurrentScreen(navController) == shortcut.route.name,
-                onClick = { navController.navigate(shortcut.route.name) }
+                onClick = {
+                    if ("guest@guest.com" == fetchUserEmail() && shortcut.route.name != AppScreens.HOME.name) {
+                        navController.navigate(AppScreens.GUEST_DENIED.name)
+                    } else {
+                        navController.navigate(shortcut.route.name)
+                    }
+                }
 
             )
         }
