@@ -26,8 +26,13 @@ import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 fun AppNavigation () {
     val navController = rememberNavController()
     val currentScreen = getCurrentScreen(navController)
-    val spesificAd = ""
 
+    val bottomNavScreens = listOf(
+        AppScreens.HOME.name,
+        AppScreens.ALL_MESSAGES.name,
+        AppScreens.POST_AD.name,
+        AppScreens.PROFILE.name
+    )
     Scaffold(
         topBar = {
             if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
@@ -35,7 +40,7 @@ fun AppNavigation () {
             }
         },
         bottomBar = {
-            if (currentScreen == AppScreens.HOME.name) {
+            if (currentScreen in bottomNavScreens) {
                 BottomNavBar(navController)
             }
         },

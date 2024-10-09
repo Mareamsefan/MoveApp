@@ -24,22 +24,29 @@ import androidx.compose.material3.Icon
 
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
 
+
 val shortcuts = listOf(
+    BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
     BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
     BottomNavItems(AppScreens.POST_AD, Icons.Default.AddCircle, R.string.post_ad),
     BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile)
+
+
 )
 
 @Composable
 fun BottomNavBar(navController: NavController) {
 
-    NavigationBar () {
+    NavigationBar (
+
+    ) {
         shortcuts.forEach { shortcut ->
             NavigationBarItem(
                 icon = { Icon(shortcut.icon, contentDescription = stringResource(shortcut.label)) },
                 label = { Text(stringResource(shortcut.label)) },
                 selected = getCurrentScreen(navController) == shortcut.route.name,
                 onClick = { navController.navigate(shortcut.route.name) }
+
             )
         }
     }
