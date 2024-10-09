@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.MaterialTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +119,8 @@ fun TopBar(navController: NavController, route: String? = null) {
         },
 
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.LightGray
+        // TODO: Fix the color so it matches BottomNavBar
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
 
         )
 
