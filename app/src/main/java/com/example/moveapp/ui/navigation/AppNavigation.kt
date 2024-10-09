@@ -21,6 +21,7 @@ import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
 import com.example.moveapp.ui.screens.ad.SpecificAdScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
+import com.example.moveapp.ui.screens.guest.GuestDenied
 
 @Composable
 fun AppNavigation () {
@@ -31,7 +32,8 @@ fun AppNavigation () {
         AppScreens.HOME.name,
         AppScreens.ALL_MESSAGES.name,
         AppScreens.POST_AD.name,
-        AppScreens.PROFILE.name
+        AppScreens.PROFILE.name,
+        AppScreens.GUEST_DENIED.name
     )
     Scaffold(
         topBar = {
@@ -81,6 +83,9 @@ fun AppNavigation () {
             }
             composable(AppScreens.MAP.name) {
                 MapScreen(navController)
+            }
+            composable(AppScreens.GUEST_DENIED.name) {
+                GuestDenied(navController)
             }
             composable("specific_ad/{adId}") { backStackEntry ->
                 val adId = backStackEntry.arguments?.getString("adId")
