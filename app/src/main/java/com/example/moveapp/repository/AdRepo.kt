@@ -70,6 +70,7 @@ class AdRepo {
                     // Send in the entire object to the collection
                     FirestoreService.updateDocument("ads", adId, it)
                     true
+                    // If ad is null, return false
                 } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -169,6 +170,23 @@ class AdRepo {
             } catch (e: Exception) {
                 // Handle the exception if Flow collection fails
                 onFailure(e)
+            }
+        }
+
+        suspend fun getAd(adId: String?): AdData? {
+            val ad = adId?.let { FirestoreService.readDocument("ads", it, AdData::class.java) }
+            return ad?.let {
+                AdData(
+                    adId = it.adId,
+                    adTitle = it.adTitle,
+                    adPrice = it.adPrice,
+                    adCategory = it.adCategory,
+                    adDescription = it.adDescription,
+                    userId = it.userId,
+                    adImages = it.adImages,
+                    address = it.address,
+                    postalCode = it.postalCode
+                )
             }
         }
 

@@ -75,11 +75,11 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     coroutineScope.launch() {
-                        // Dette er en bruker jeg laget som skal være guest bruker.
-                        // Vurderinger:
-                        // - Email er min personlige for testing -> endre senere ? 08/10/2024
-                        // - Kanskje vurdere å putte passordet et annet sted. 08/10/2024
-                        val user = loginUser(context, "jo.hovet@hotmail.com", "}'D%B{8oK\\pDOEgg+lwt'r\$|dxf@Rb")
+                         /* Dette er en bruker jeg laget som skal være guest bruker.
+                            Vurderinger:
+                            - Kanskje vurdere å putte passordet et annet sted. 08/10/2024
+                         */
+                        val user = loginUser(context, "guest@guest.com", "D%B{8oK\\pDOEgg+lwt'r\$|dxf@Rb")
                         if (user != null) {
                             navController.navigate(AppScreens.HOME.name)
                         }

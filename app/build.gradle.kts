@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.database.ktx)
     implementation(libs.play.services.cast.framework)
+    implementation(libs.androidx.ui.text.google.fonts)
 
 
     testImplementation(libs.junit)
