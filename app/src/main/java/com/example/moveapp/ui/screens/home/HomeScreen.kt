@@ -36,6 +36,7 @@ import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.utility.FireAuthService
+import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.launch
 
@@ -51,6 +52,11 @@ fun HomeScreen(navController: NavController) {
     var lastVisibleAd by remember { mutableStateOf<DocumentSnapshot?>(null) }
     var isLoadingMore by remember { mutableStateOf(false) }
     val userId = user?.uid
+
+    // asking for user location:
+    val locationUtil = LocationUtil()
+    locationUtil.RequestUserLocation()
+
 
     // Initial ads fetch using real-time listener
     LaunchedEffect(userId) {

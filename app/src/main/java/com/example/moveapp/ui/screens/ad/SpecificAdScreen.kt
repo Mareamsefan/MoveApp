@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,13 +35,13 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     ){
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (ad != null) {
-                Text(text = ad!!.adTitle)
+                Text(text = ad!!.adTitle, style = MaterialTheme.typography.titleLarge)
                 Image_swipe(imageList = ad!!.adImages)
                 Text(text = ad!!.adDescription)
-                Text(text = stringResource(R.string.category) + R.string.space + ad!!.adCategory)
-                Text(text = stringResource(R.string.price) + R.string.space + ad!!.adPrice.toString() + stringResource(R.string.kr))
-                Text(text = stringResource(R.string.address) + R.string.space + ad!!.address)
-                Text(text = stringResource(R.string.postal_code) + R.string.space + ad!!.postalCode)
+                Text(text = stringResource(R.string.category) + ": " + ad!!.adCategory)
+                Text(text = stringResource(R.string.price) + ": " + ad!!.adPrice.toString() + stringResource(R.string.kr))
+                Text(text = stringResource(R.string.address) + ": " + ad!!.address)
+                Text(text = stringResource(R.string.postal_code) + ": "  + ad!!.postalCode)
             } else {
                 Text(text = "ad not found")
             }
