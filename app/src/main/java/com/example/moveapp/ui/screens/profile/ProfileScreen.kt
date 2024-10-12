@@ -47,16 +47,17 @@ fun Profile(navController: NavController) {
     val profileImageUrl = remember { mutableStateOf<String>("") }
     val currentUser = getCurrentUser()
     val userId = currentUser?.uid
+    var userData = remember { mutableStateOf<UserData?>(null) }
 
     if (currentUser != null){
         coroutineScope.launch {
             // Bruk readDocument for å hente brukerdata
-            val userData: UserData? = userId?.let {
+            userData.value = userId?.let {
                 readDocument("users",
                     it, UserData::class.java)
             }
-            if (userData != null) {
-                profileImageUrl.value = userData.profilePictureUrl
+            if (userData.value != null) {
+                profileImageUrl.value = userData.value!!.profilePictureUrl
             } // Oppdater profilbilde-URL
         }
     }
@@ -98,18 +99,22 @@ fun Profile(navController: NavController) {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
 
+            // Vis bildet fra URL-en som er hentet fra databasen
+            Image_swipe(imageList = listOf(profileImageUrl.value))
+
             Button(
                 onClick = {
                     launcher.launch("image/*")
                 },
                 modifier = Modifier.padding(bottom = 16.dp)
             ) {
-                Text(text = stringResource(R.string.upload_image))
+                if(profileImageUrl.value.isEmpty()){
+                    Text(text = stringResource(R.string.upload_image))
+                }else {
+                    Text(text = stringResource(R.string.update_image))
+                }
+
             }
-
-            // Vis bildet fra URL-en som er hentet fra databasen
-            Image_swipe(imageList = listOf(profileImageUrl.value))
-
 
             // Display error message if any
             if (errorMessage.value.isNotEmpty()) {

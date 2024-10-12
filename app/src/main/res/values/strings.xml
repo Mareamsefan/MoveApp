@@ -32,6 +32,7 @@
     <string name="price">Price</string>
     <string name="description">Description</string>
     <string name="upload_image">Upload image</string>
+    <string name="update_image">Update image</string>
     <string name="address">Address</string>
     <string name="postal_code">Postal code</string>
     <string name="Rent_vehicle">Rent vehicle</string>
