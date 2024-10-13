@@ -21,15 +21,19 @@ import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
 import com.example.moveapp.ui.composables.Image_swipe
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 
 @Composable
 fun SpecificAdScreen(navController: NavController, adId: String?) {
     var ad by remember { mutableStateOf<AdData?>(null) }
-
+    val currentUser = getCurrentUser()
     LaunchedEffect(Unit) {
          ad = getAd(adId)
     }
+    // Sjekker om annonsen tilhører den innloggede brukeren
+    val isOwner = currentUser != null && ad?.userId == currentUser.uid
+
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ){
@@ -53,6 +57,17 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 }
             ) {
                 Text(text = stringResource(R.string.contact_seller))
+            }
+            // Vis "Rediger annonse"-knappen hvis brukeren er eieren
+            if (isOwner) {
+                Button(
+                    onClick = {
+                        // Naviger til redigeringsskjerm med annonsens ID
+                        navController.navigate("editAd/${ad!!.adId}")
+                    }
+                ) {
+                    Text(text = stringResource(R.string.edit_ad))
+                }
             }
         }
     }
