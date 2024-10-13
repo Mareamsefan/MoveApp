@@ -58,6 +58,23 @@ object FireStorageService {
             }
         awaitClose { registration.remove() }
     }
+    // Function to get a collection snapshot as a Flow for real-time updates
+    fun getUserAdsFlow(userId: String): Flow<List<AdData>> = callbackFlow {
+        val registration: ListenerRegistration = db.collection("ads")
+            .whereEqualTo("userId", userId) // Filter by the userId field
+            .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                    Log.e("FirestoreService", "Error fetching ads: ${error.message}", error)
+                    return@addSnapshotListener
+                }
+                val ads = snapshots?.documents?.mapNotNull { document ->
+                    document.toObject(AdData::class.java)
+                } ?: emptyList()
+                trySend(ads).isSuccess
+            }
+        awaitClose { registration.remove() }
+    }
+
 
     // Function to get paginated ads
     suspend fun getPaginatedAds(lastVisible: DocumentSnapshot?, pageSize: Int = 10): Pair<List<AdData>, DocumentSnapshot?> {
