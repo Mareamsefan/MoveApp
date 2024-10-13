@@ -48,4 +48,5 @@
     <string name="my_ads">My posted ads</string>
     <string name="no_ads">You have no ads posted at this moment</string>
     <string name="take_photo">Take a photo</string>
+    <string name="edit_ad">Edit</string>
 </resources>
