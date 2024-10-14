@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.moveapp.ui.screens.ad.EditAdScreen
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.register.Register
@@ -24,12 +25,20 @@ import com.example.moveapp.ui.screens.ad.SpecificAdScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 import com.example.moveapp.ui.screens.messages.StartNewChatScreen
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
+import com.example.moveapp.ui.screens.guest.GuestDenied
 
 @Composable
 fun AppNavigation () {
     val navController = rememberNavController()
     val currentScreen = getCurrentScreen(navController)
 
+    val bottomNavScreens = listOf(
+        AppScreens.HOME.name,
+        AppScreens.ALL_MESSAGES.name,
+        AppScreens.POST_AD.name,
+        AppScreens.PROFILE.name,
+        AppScreens.GUEST_DENIED.name
+    )
     Scaffold(
         topBar = {
             if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
@@ -37,7 +46,7 @@ fun AppNavigation () {
             }
         },
         bottomBar = {
-            if (currentScreen == AppScreens.HOME.name) {
+            if (currentScreen in bottomNavScreens) {
                 BottomNavBar(navController)
             }
         },
@@ -79,8 +88,20 @@ fun AppNavigation () {
             composable(AppScreens.MAP.name) {
                 MapScreen(navController)
             }
-            composable(AppScreens.SPECIFIC_AD.name) {
-                SpecificAdScreen(navController)
+            composable(AppScreens.GUEST_DENIED.name) {
+                GuestDenied(navController)
+            }
+            composable("specific_ad/{adId}") { backStackEntry ->
+                val adId = backStackEntry.arguments?.getString("adId")
+                if (adId != null) {
+                    SpecificAdScreen(navController, adId)
+                }
+            }
+            composable("editAd/{adId}") { backStackEntry ->
+                val adId = backStackEntry.arguments?.getString("adId")
+                if (adId != null) {
+                    EditAdScreen(navController, adId)
+                }
             }
             composable(
                 route = "${AppScreens.SPECIFIC_MESSAGE.name}/{chatId}",

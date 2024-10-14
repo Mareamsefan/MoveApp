@@ -2,6 +2,7 @@ package com.example.moveapp.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,11 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.data.AdData
+import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
-fun AdItem(ad: AdData) {
+fun AdItem(navcontroller: NavController, ad: AdData) {
     // Wrapping the ad content in a card for better visuals
     Card(
         modifier = Modifier
@@ -54,6 +57,12 @@ fun AdItem(ad: AdData) {
             // Optional: If you want to display a short description (limit to 2 lines)
             Spacer(modifier = Modifier.height(4.dp))
             //Text(text = ad.adDescription, maxLines = 2) // Limit description to 2 lines
+            Button(onClick = {
+                navcontroller.navigate("specific_ad/${ad.adId}")
+            }) {
+                Text("View Ad") // Optional: Add a label to your button
+            }
+
         }
     }
 }

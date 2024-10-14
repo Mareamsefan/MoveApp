@@ -32,14 +32,22 @@
     <string name="price">Price</string>
     <string name="description">Description</string>
     <string name="upload_image">Upload image</string>
+    <string name="update_image">Update image</string>
     <string name="address">Address</string>
     <string name="postal_code">Postal code</string>
     <string name="Rent_vehicle">Rent vehicle</string>
-    <string name="Deliver_A_to_B">Deliver A to B"</string>
+    <string name="Deliver_A_to_B">Deliver A to B</string>
     <string name="Select_an_ad_type">Select an ad type</string>
     <string name="Options">Options</string>
     <string name="settings">Settings</string>
     <string name="send_password_reset_email">Send me a password reset email</string>
     <string name="get_my_location">Get my location</string>
+    <string name="contact_seller">Contact seller</string>
+    <string name="guest_denied">Please sign up to view.</string>
+    <string name="kr">Kr</string>
+    <string name="my_ads">My posted ads</string>
+    <string name="no_ads">You have no ads posted at this moment</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="edit_ad">Edit</string>
 
 </resources>
