@@ -5,6 +5,8 @@ import com.example.moveapp.data.UserData
 import kotlinx.coroutines.tasks.await
 import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.FireAuthService.getUserId
+import com.example.moveapp.utility.FirestoreService.readDocument
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 
 
@@ -17,7 +19,7 @@ class UserRepo {
         suspend fun addUserToDatabase(user: UserData): Boolean {
             return try {
                 val userId = user.userId
-                FirestoreService.createDocument("users", userId, user )
+                FirestoreService.createDocument("users", userId, user)
                 true  // Return true if successful
             } catch (e: Exception) {
                 e.printStackTrace()  // Log the error
@@ -88,8 +90,6 @@ class UserRepo {
         }
 
 
-
-
         suspend fun deleteUser(userId: String): Boolean {
             return try {
                 FirestoreService.deleteDocument("users", userId)
@@ -117,7 +117,7 @@ class UserRepo {
                     // Update the document in Firestore
                     FirestoreService.updateDocument("users", userId, it)
                     true
-                // If user is null, return false
+                    // If user is null, return false
                 } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -157,6 +157,44 @@ class UserRepo {
             return isSuccess
         }
 
-    }
+        suspend fun findUserIdByEmailOrUsername(input: String): String? {
+            return try {
+                // Query Firestore to find the user by email or username
+                val userQuerySnapshot = FirestoreService.db.collection("users")
+                    .whereEqualTo("email", input)
+                    .get()
+                    .await()
 
+                // Check if the user was found by email
+                if (!userQuerySnapshot.isEmpty) {
+                    val userDocument = userQuerySnapshot.documents[0]
+                    val user = userDocument.toObject(UserData::class.java)
+                    return user?.userId
+                } else {
+                    // If no user is found by email, try querying by username
+                    val usernameQuerySnapshot = FirestoreService.db.collection("users")
+                        .whereEqualTo("username", input)
+                        .get()
+                        .await()
+
+                    if (!usernameQuerySnapshot.isEmpty) {
+                        val userDocument = usernameQuerySnapshot.documents[0]
+                        val user = userDocument.toObject(UserData::class.java)
+                        return user?.userId
+                    }
+                }
+                null // Return null if no user is found
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
+
+        suspend fun getUserNameById(userId: String): String? {
+            // Use the readDocument function to fetch user data
+            val user: UserData? = readDocument("users", userId, UserData::class.java)
+            return user?.username
+        }
+    }
 }
