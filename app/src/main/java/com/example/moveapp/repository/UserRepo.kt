@@ -5,6 +5,8 @@ import com.example.moveapp.data.UserData
 import kotlinx.coroutines.tasks.await
 import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.FireAuthService.getUserId
+import com.example.moveapp.utility.FirestoreService.readDocument
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 
 
@@ -17,7 +19,7 @@ class UserRepo {
         suspend fun addUserToDatabase(user: UserData): Boolean {
             return try {
                 val userId = user.userId
-                FirestoreService.createDocument("users", userId, user )
+                FirestoreService.createDocument("users", userId, user)
                 true  // Return true if successful
             } catch (e: Exception) {
                 e.printStackTrace()  // Log the error
@@ -115,7 +117,7 @@ class UserRepo {
                     // Update the document in Firestore
                     FirestoreService.updateDocument("users", userId, it)
                     true
-                // If user is null, return false
+                    // If user is null, return false
                 } ?: false
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -188,6 +190,11 @@ class UserRepo {
             }
         }
 
-    }
 
+        suspend fun getUserNameById(userId: String): String? {
+            // Use the readDocument function to fetch user data
+            val user: UserData? = readDocument("users", userId, UserData::class.java)
+            return user?.username
+        }
+    }
 }

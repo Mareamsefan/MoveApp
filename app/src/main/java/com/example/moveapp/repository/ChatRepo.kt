@@ -1,8 +1,11 @@
 package com.example.moveapp.repository
 
+import android.util.Log
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.MessageData
 import com.example.moveapp.utility.FirebaseRealtimeService
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
 class ChatRepo {
@@ -38,25 +41,16 @@ class ChatRepo {
             }
         }
 
-        suspend fun getUserChats(userId: String): List<ChatData> {
-            val userChats = mutableListOf<ChatData>()
-            try {
-                // Retrieve all chats from the database
-                val snapshot = FirebaseRealtimeService.getData("chats")?.children
-                snapshot?.forEach { chatSnapshot ->
-                    val chat = chatSnapshot.getValue(ChatData::class.java)
-                    chat?.let {
-                        // Check if the userId is part of the users list
-                        if (it.users.contains(userId)) {
-                            userChats.add(it)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+        fun getUserChatsFlow(userId: String): Flow<List<ChatData>> = FirebaseRealtimeService.getChatsFlow().map { chats ->
+            // Filter chats to only include those where the userId is present in the users list
+            val userChats = chats.filter { chat ->
+                chat.users.contains(userId)
             }
-            return userChats
+            Log.d("getUserChatsFlow", "Number of chats for userId $userId: ${userChats.size}")
+            userChats
         }
+
+
 
         suspend fun getChatById(chatId: String): ChatData? {
             return try {

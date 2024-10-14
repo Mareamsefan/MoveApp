@@ -43,6 +43,7 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
                 items(currentChat.messages.size) { index ->
                     val message = currentChat.messages[index]
                     MessageItem(message, currentUserId == message.senderId)

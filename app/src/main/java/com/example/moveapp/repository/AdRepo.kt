@@ -5,6 +5,7 @@ import com.example.moveapp.data.AdData
 import com.example.moveapp.data.UserData
 import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.FirestoreService
+
 import com.example.moveapp.utility.FirestoreService.db
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
@@ -164,7 +165,7 @@ class AdRepo {
         suspend fun getAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit) {
             try {
                 // Collect the Flow instead of returning ListenerRegistration
-                FireStorageService.getAdsFlow().collect { ads ->
+                FirestoreService.getAdsFlow().collect { ads ->
                     onSuccess(ads)
                 }
             } catch (e: Exception) {
@@ -177,7 +178,7 @@ class AdRepo {
         suspend fun getUserAds(userId: String, onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit) {
             try {
                 // Collect the Flow filtered by userId instead of returning ListenerRegistration
-                FireStorageService.getUserAdsFlow(userId).collect { ads ->
+                FirestoreService.getUserAdsFlow(userId).collect { ads ->
                     onSuccess(ads)
                 }
             } catch (e: Exception) {
@@ -231,7 +232,7 @@ class AdRepo {
             onFailure: (Exception) -> Unit
         ) {
             try {
-                val (ads, lastSnapshot) = FireStorageService.getPaginatedAds(lastVisible, pageSize)
+                val (ads, lastSnapshot) = FirestoreService.getPaginatedAds(lastVisible, pageSize)
                 onSuccess(ads, lastSnapshot)
             } catch (e: Exception) {
                 onFailure(e)
