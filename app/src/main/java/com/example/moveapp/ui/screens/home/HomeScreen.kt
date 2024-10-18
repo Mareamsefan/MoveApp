@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.AdItem
+import com.example.moveapp.ui.navigation.navBars.TopBar
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.DocumentSnapshot
@@ -56,7 +57,6 @@ fun HomeScreen(navController: NavController) {
     // asking for user location:
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation()
-
 
     // Initial ads fetch using real-time listener
     LaunchedEffect(userId) {

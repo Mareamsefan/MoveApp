@@ -37,10 +37,10 @@ fun TopBar(navController: NavController, route: String? = null) {
     val currentScreen = getCurrentScreen(navController)
     val isMainScreen = shortcuts.any { it.route.name == currentScreen }
     val isFilterBarVisible = remember { mutableStateOf(false) }
-    val location = remember { mutableStateOf("") }
-    val category = remember { mutableStateOf("") }
-    val minPrice = remember { mutableStateOf("") }
-    val maxPrice = remember { mutableStateOf("") }
+    val location = remember { mutableStateOf<String?>(null) }
+    val category = remember { mutableStateOf<String?>(null) }
+    val minPrice = remember { mutableStateOf<Double?>(null) }
+    val maxPrice = remember { mutableStateOf<Double?>(null) }
     val searchQuery = remember { mutableStateOf("") }
 
 

@@ -31,10 +31,10 @@ import com.example.moveapp.ui.navigation.AppScreens
 fun FilterBar(
     isVisible: Boolean,
     navController: NavController,
-    location: MutableState<String>,
-    category: MutableState<String>,
-    minPrice: MutableState<String>,
-    maxPrice: MutableState<String>,
+    location: MutableState<String?>,
+    category: MutableState<String?>,
+    minPrice: MutableState<Double?>,
+    maxPrice: MutableState<Double?>,
 ) {
     if (isVisible) {
         var tempLocation by remember { mutableStateOf(location.value) }
@@ -55,8 +55,10 @@ fun FilterBar(
 
         ){
             OutlinedTextField(
-                value = tempLocation,
-                onValueChange = { tempLocation = it },
+                value = tempLocation ?: "",
+                onValueChange = { newValue ->
+                    tempLocation = newValue
+                },
                 label = { Text(text = stringResource(R.string.location)) }
             )
             IconButton(onClick = {
@@ -69,23 +71,27 @@ fun FilterBar(
             }
 
             OutlinedTextField(
-                value = tempCategory,
+                value = tempCategory ?: "",
                 onValueChange = { tempCategory = it },
                 label = { Text(text = stringResource(R.string.category)) }
             )
 
             OutlinedTextField(
-                value = tempMinPrice,
-                onValueChange = { tempMinPrice = it },
+                value = tempMinPrice?.toString() ?: "",
+                onValueChange = { input ->
+                    tempMinPrice = input.toDoubleOrNull()
+                },
                 label = { Text(text = stringResource(R.string.min_price)) },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 )
             )
             OutlinedTextField(
-                value = tempMaxPrice,
-                onValueChange = { tempMaxPrice = it },
-                label = { Text(text = stringResource(R.string.max_price)) },
+                value = tempMaxPrice?.toString() ?: "",
+                onValueChange = { input ->
+                    tempMaxPrice = input.toDoubleOrNull()
+                },
+                label = { Text(text = stringResource(R.string.min_price)) },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 )
@@ -104,10 +110,10 @@ fun FilterBar(
             }
             Button(
                 onClick = {
-                    location.value = ""
-                    category.value = ""
-                    minPrice.value = ""
-                    maxPrice.value = ""
+                    location.value = null
+                    category.value = null
+                    minPrice.value = null
+                    maxPrice.value = null
 
                 }
             ) {

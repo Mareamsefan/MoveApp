@@ -9,6 +9,7 @@ import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.FirestoreService.db
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -237,6 +238,11 @@ class AdRepo {
             } catch (e: Exception) {
                 onFailure(e)
             }
+        }
+
+        suspend fun filterAd(location: String, category: String, minprice: Double, maxprice: Double): QuerySnapshot? {
+            val ads = FirestoreService.filteredAdsFromDatabase(location, category, minprice, maxprice)
+            return ads
         }
 
     }
