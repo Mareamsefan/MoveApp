@@ -11,6 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -41,10 +42,10 @@ object FirestoreService {
     }
 
     suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?): QuerySnapshot? {
-        var query = db.collection("ads")
-        if (location!=null)
-            query = query.whereEqualTo("address", location) as CollectionReference
-        if (category!=null)
+        var query: Query = db.collection("ads")
+        if (location!=null && location!="")
+            query = query.whereEqualTo("address", location)
+        if (category!=null && category!="")
             query.whereEqualTo("adCategory", category)
         if (minPrice!=null)
             query.whereGreaterThan("adPrice", minPrice)

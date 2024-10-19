@@ -13,6 +13,8 @@ import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.moveapp.ui.screens.ad.EditAdScreen
@@ -32,6 +34,12 @@ fun AppNavigation () {
     val navController = rememberNavController()
     val currentScreen = getCurrentScreen(navController)
 
+    val location = remember { mutableStateOf<String?>(null) }
+    val category = remember { mutableStateOf<String?>(null) }
+    val minPrice = remember { mutableStateOf<Double?>(null) }
+    val maxPrice = remember { mutableStateOf<Double?>(null) }
+
+
     val bottomNavScreens = listOf(
         AppScreens.HOME.name,
         AppScreens.ALL_MESSAGES.name,
@@ -42,7 +50,12 @@ fun AppNavigation () {
     Scaffold(
         topBar = {
             if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
-                TopBar(navController)
+                TopBar(navController = navController, onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
+                    location.value = newLocation
+                    category.value = newCategory
+                    minPrice.value = newMinPrice
+                    maxPrice.value = newMaxPrice
+                })
             }
         },
         bottomBar = {
@@ -64,7 +77,7 @@ fun AppNavigation () {
             }
 
             composable(AppScreens.HOME.name) {
-                HomeScreen(navController)
+                HomeScreen(navController, location.value, category.value, minPrice.value, maxPrice.value)
             }
 
             composable(AppScreens.REGISTER.name) {

@@ -18,7 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, location: String?, category: String?, minPrice: Double?, maxPrice: Double?) {
     // Fetching ads
     var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -54,9 +54,27 @@ fun HomeScreen(navController: NavController) {
     var isLoadingMore by remember { mutableStateOf(false) }
     val userId = user?.uid
 
+    Log.d("home", "location saved $location")
+    Log.d("home", "category saved $category")
+    Log.d("home", "minprice saved $minPrice")
+    Log.d("home", "maxprice saved $maxPrice")
+
+    LaunchedEffect(location, category, minPrice, maxPrice) {
+        val filteredAds = AdRepo.filterAd(location, category, minPrice, maxPrice) ?: emptyList()
+        for (ad in filteredAds) {
+            Log.d("filtered ads", "filtered ${ad.adTitle}")
+        }
+    }
+
+
+
+
+
     // asking for user location:
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation()
+
+
 
     // Initial ads fetch using real-time listener
     LaunchedEffect(userId) {
@@ -184,10 +202,4 @@ fun HomeScreen(navController: NavController) {
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(rememberNavController())
 }

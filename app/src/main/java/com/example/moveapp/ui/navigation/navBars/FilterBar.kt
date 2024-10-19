@@ -31,17 +31,13 @@ import com.example.moveapp.ui.navigation.AppScreens
 fun FilterBar(
     isVisible: Boolean,
     navController: NavController,
-    location: MutableState<String?>,
-    category: MutableState<String?>,
-    minPrice: MutableState<Double?>,
-    maxPrice: MutableState<Double?>,
-) {
+    onApplyFilter: (String?, String?, Double?, Double?) -> Unit
+)  {
+    var tempLocation by remember { mutableStateOf<String?>(null) }
+    var tempCategory by remember { mutableStateOf<String?>(null) }
+    var tempMinPrice by remember { mutableStateOf<Double?>(null) }
+    var tempMaxPrice by remember { mutableStateOf<Double?>(null) }
     if (isVisible) {
-        var tempLocation by remember { mutableStateOf(location.value) }
-        var tempCategory by remember { mutableStateOf(category.value) }
-        var tempMinPrice by remember { mutableStateOf(minPrice.value) }
-        var tempMaxPrice by remember { mutableStateOf(maxPrice.value) }
-
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.7f)
@@ -61,6 +57,7 @@ fun FilterBar(
                 },
                 label = { Text(text = stringResource(R.string.location)) }
             )
+
             IconButton(onClick = {
                 navController.navigate(AppScreens.MAP.name)
             }) {
@@ -91,18 +88,14 @@ fun FilterBar(
                 onValueChange = { input ->
                     tempMaxPrice = input.toDoubleOrNull()
                 },
-                label = { Text(text = stringResource(R.string.min_price)) },
+                label = { Text(text = stringResource(R.string.max_price)) },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 )
             )
             Button(
                 onClick = {
-                    location.value = tempLocation
-                    category.value = tempCategory
-                    minPrice.value = tempMinPrice
-                    maxPrice.value = tempMaxPrice
-                    // TODO: filter method
+                    onApplyFilter(tempLocation, tempCategory, tempMinPrice, tempMaxPrice)
 
                 }
             ) {
@@ -110,10 +103,11 @@ fun FilterBar(
             }
             Button(
                 onClick = {
-                    location.value = null
-                    category.value = null
-                    minPrice.value = null
-                    maxPrice.value = null
+                    tempLocation = null
+                    tempCategory = null
+                    tempMinPrice = null
+                    tempMaxPrice = null
+                    onApplyFilter(null, null, null, null)
 
                 }
             ) {

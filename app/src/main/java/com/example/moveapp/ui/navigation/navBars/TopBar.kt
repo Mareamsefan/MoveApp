@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,10 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.MutableState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, route: String? = null) {
+fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (String?, String?, Double?, Double?) -> Unit){
     val currentScreen = getCurrentScreen(navController)
     val isMainScreen = shortcuts.any { it.route.name == currentScreen }
     val isFilterBarVisible = remember { mutableStateOf(false) }
@@ -42,6 +44,7 @@ fun TopBar(navController: NavController, route: String? = null) {
     val minPrice = remember { mutableStateOf<Double?>(null) }
     val maxPrice = remember { mutableStateOf<Double?>(null) }
     val searchQuery = remember { mutableStateOf("") }
+
 
 
 
@@ -126,11 +129,26 @@ fun TopBar(navController: NavController, route: String? = null) {
 
 
     )
-    FilterBar(isVisible = isFilterBarVisible.value, navController = navController, location, category, minPrice, maxPrice)
-}
+    FilterBar(
+        isVisible = isFilterBarVisible.value,
+        navController = navController,
+        onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
+            location.value = newLocation
+            category.value = newCategory
+            minPrice.value = newMinPrice
+            maxPrice.value = newMaxPrice
+        }
+    )
 
-@Preview
-@Composable
-fun TopBarPreview() {
-    TopBar(rememberNavController())
+    if (!isFilterBarVisible.value){
+        onApplyFilter(location.value, category.value, minPrice.value, maxPrice.value)
+    }
+
+    Log.d("topbar", "location saved $location")
+    Log.d("topbar", "category saved $category")
+    Log.d("topbar", "minprice saved $minPrice")
+    Log.d("topbar", "maxprice saved $maxPrice")
+
+
+
 }

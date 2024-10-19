@@ -2,18 +2,14 @@ package com.example.moveapp.repository
 
 import android.util.Log
 import com.example.moveapp.data.AdData
-import com.example.moveapp.data.UserData
-import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.FirestoreService
 
 import com.example.moveapp.utility.FirestoreService.db
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 class AdRepo {
@@ -240,9 +236,11 @@ class AdRepo {
             }
         }
 
-        suspend fun filterAd(location: String, category: String, minprice: Double, maxprice: Double): QuerySnapshot? {
-            val ads = FirestoreService.filteredAdsFromDatabase(location, category, minprice, maxprice)
-            return ads
+        suspend fun filterAd(location: String?, category: String?, minPrice: Double?, maxPrice: Double?): List<AdData>? {
+            val query = FirestoreService.filteredAdsFromDatabase(location, category, minPrice, maxPrice)
+            return query?.documents?.mapNotNull { document ->
+                document.toObject(AdData::class.java)
+            }
         }
 
     }
