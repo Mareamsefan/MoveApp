@@ -59,7 +59,7 @@ fun PostAdScreen(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(R.string.Select_an_ad_type) }
     val adType = remember { mutableStateOf("") }
-    val options = listOf(R.string.Rent_vehicle, R.string.Deliver_A_to_B, R.string.unwanted_items)
+    val options = listOf(R.string.Rent_vehicle, R.string.Delivery_service, R.string.unwanted_items)
 
     // Coroutine scope
     val coroutineScope = rememberCoroutineScope()

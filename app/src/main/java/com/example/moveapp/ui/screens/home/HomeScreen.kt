@@ -90,7 +90,6 @@ fun HomeScreen(navController: NavController, location: String?, category: String
     locationUtil.RequestUserLocation()
 
 
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
