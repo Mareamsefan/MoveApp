@@ -237,11 +237,34 @@ class AdRepo {
             }
         }
 
-        suspend fun filterAd(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?): List<AdData>? {
-            val query = FirestoreService.filteredAdsFromDatabase(location, category, minPrice, maxPrice, search)
-            return query?.documents?.mapNotNull { document ->
-                document.toObject(AdData::class.java)
+        suspend fun filterAd(
+            location: String?,
+            category: String?,
+            minPrice: Double?,
+            maxPrice: Double?,
+            search: String?,
+            onSuccess: (List<AdData>) -> Unit,
+            onFailure: (Exception) -> Unit) {
+            try {
+                val query = FirestoreService.filteredAdsFromDatabase(
+                    location,
+                    category,
+                    minPrice,
+                    maxPrice,
+                    search
+                )
+                val ads = query?.documents?.mapNotNull { document ->
+                    document.toObject(AdData::class.java)
+
+                }
+                if (ads != null) {
+                    onSuccess(ads)
+                }
+
+            } catch (e: Exception) {
+                onFailure(e)
             }
+
         }
 
     }
