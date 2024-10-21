@@ -46,11 +46,11 @@ object FirestoreService {
         if (location!=null && location!="")
             query = query.whereEqualTo("address", location)
         if (category!=null && category!="")
-            query.whereEqualTo("adCategory", category)
+            query = query.whereEqualTo("adCategory", category)
         if (minPrice!=null)
-            query.whereGreaterThan("adPrice", minPrice)
+            query = query.whereGreaterThan("adPrice", minPrice)
         if (maxPrice!=null)
-            query.whereLessThan("adPrice", maxPrice)
+            query = query.whereLessThan("adPrice", maxPrice)
         return query.get().await()
     }
 
