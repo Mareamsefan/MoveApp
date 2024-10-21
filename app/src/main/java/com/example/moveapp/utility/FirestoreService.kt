@@ -44,7 +44,7 @@ object FirestoreService {
     suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?): QuerySnapshot? {
         var query: Query = db.collection("ads")
         if (location!=null && location!="")
-            query = query.whereEqualTo("address", location)
+            query = query.whereEqualTo("city", location)
         if (category!=null && category!="")
             query = query.whereEqualTo("adCategory", category)
         if (minPrice!=null)
