@@ -34,6 +34,7 @@
     <string name="upload_image">Upload image</string>
     <string name="update_image">Update image</string>
     <string name="address">Address</string>
+    <string name="city">City</string>
     <string name="postal_code">Postal code</string>
     <string name="Rent_vehicle">Rent vehicle</string>
     <string name="Deliver_A_to_B">Deliver A to B</string>

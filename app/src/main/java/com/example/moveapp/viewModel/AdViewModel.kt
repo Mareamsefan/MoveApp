@@ -22,6 +22,7 @@ class AdViewModel {
             adCategory: String,
             adDescription: String,
             userId: String,
+            city: String,
             address: String,
             postalCode: String
         ): AdData? {
@@ -33,6 +34,7 @@ class AdViewModel {
                     adCategory = adCategory,
                     adDescription = adDescription,
                     userId = userId,
+                    city = city,
                     address = address,
                     postalCode = postalCode,
                 )

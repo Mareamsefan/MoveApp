@@ -2,8 +2,6 @@ package com.example.moveapp.repository
 
 import android.util.Log
 import com.example.moveapp.data.AdData
-import com.example.moveapp.data.UserData
-import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.FirestoreService
 
 import com.example.moveapp.utility.FirestoreService.db
@@ -12,7 +10,6 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 class AdRepo {
@@ -197,6 +194,7 @@ class AdRepo {
                     adDescription = it.adDescription,
                     userId = it.userId,
                     adImages = it.adImages,
+                    city = it.city,
                     address = it.address,
                     postalCode = it.postalCode
                 )
@@ -237,6 +235,36 @@ class AdRepo {
             } catch (e: Exception) {
                 onFailure(e)
             }
+        }
+
+        suspend fun filterAd(
+            location: String?,
+            category: String?,
+            minPrice: Double?,
+            maxPrice: Double?,
+            search: String?,
+            onSuccess: (List<AdData>) -> Unit,
+            onFailure: (Exception) -> Unit) {
+            try {
+                val query = FirestoreService.filteredAdsFromDatabase(
+                    location,
+                    category,
+                    minPrice,
+                    maxPrice,
+                    search
+                )
+                val ads = query?.documents?.mapNotNull { document ->
+                    document.toObject(AdData::class.java)
+
+                }
+                if (ads != null) {
+                    onSuccess(ads)
+                }
+
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+
         }
 
     }

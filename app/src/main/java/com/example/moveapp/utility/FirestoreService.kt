@@ -11,6 +11,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -38,6 +39,21 @@ object FirestoreService {
     suspend fun <T> readDocument(collection: String, documentId: String, className: Class<T>): T? {
         val snapshot = db.collection(collection).document(documentId).get().await()
         return snapshot.toObject(className)
+    }
+
+    suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?): QuerySnapshot? {
+        var query: Query = db.collection("ads")
+        if (location!=null && location!="")
+            query = query.whereEqualTo("address", location)
+        if (category!=null && category!="")
+            query = query.whereEqualTo("adCategory", category)
+        if (minPrice!=null)
+            query = query.whereGreaterThan("adPrice", minPrice)
+        if (maxPrice!=null)
+            query = query.whereLessThan("adPrice", maxPrice)
+        if (search!=null && location!="")
+            query = query.orderBy("adTitle").startAt(search).endAt(search + "\uf8ff")
+        return query.get().await()
     }
 
     suspend fun <T : Any> updateDocument(collection: String, documentId: String, data: T) {

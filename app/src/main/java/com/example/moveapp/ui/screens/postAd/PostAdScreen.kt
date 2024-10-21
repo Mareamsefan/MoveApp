@@ -50,6 +50,7 @@ fun PostAdScreen(navController: NavController) {
     val title = remember { mutableStateOf("") }
     val price = remember { mutableStateOf("") }
     val description = remember { mutableStateOf("") }
+    val city = remember { mutableStateOf("") }
     val address = remember { mutableStateOf("") }
     val postalCode = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String>() }
@@ -143,6 +144,11 @@ fun PostAdScreen(navController: NavController) {
                 label = { Text(text = stringResource(R.string.address)) }
             )
             OutlinedTextField(
+                value = city.value,
+                onValueChange = { city.value = it },
+                label = { Text(text = stringResource(R.string.city)) }
+            )
+            OutlinedTextField(
                 value = postalCode.value,
                 onValueChange = { postalCode.value = it },
                 label = { Text(text = stringResource(R.string.postal_code)) }
@@ -189,6 +195,7 @@ fun PostAdScreen(navController: NavController) {
                                 adType.value,
                                 description.value,
                                 currentUser.uid,
+                                city.value,
                                 address.value,
                                 postalCode.value
                             )
