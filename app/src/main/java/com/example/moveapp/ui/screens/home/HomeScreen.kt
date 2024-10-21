@@ -44,14 +44,12 @@ import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun HomeScreen(navController: NavController, location: String?, category: String?, minPrice: Double?, maxPrice: Double?, searchQuery: String?) {
-    // Fetching ads
-    var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
+
+    var filteredAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     val user = FireAuthService.getCurrentUser() // Updated to correct method call
-    var lastVisibleAd by remember { mutableStateOf<DocumentSnapshot?>(null) }
-    var isLoadingMore by remember { mutableStateOf(false) }
     val userId = user?.uid
 
     Log.d("home", "location saved $location")
@@ -61,84 +59,36 @@ fun HomeScreen(navController: NavController, location: String?, category: String
     Log.d("home", "search saved $searchQuery")
 
     LaunchedEffect(location, category, minPrice, maxPrice) {
-        val filteredAds = AdRepo.filterAd(location, category, minPrice, maxPrice, searchQuery) ?: emptyList()
-        for (ad in filteredAds) {
-            Log.d("filtered ads", "filtered ${ad.adTitle}")
+        try {
+           AdRepo.filterAd(
+               location,
+               category,
+               minPrice,
+               maxPrice,
+               searchQuery,
+               onSuccess = { fetchedAds ->
+                   filteredAds = fetchedAds
+                   loading = false
+                   Log.d("HomeScreen", "Fetched ads: $fetchedAds")
+               },
+               onFailure = { exception ->
+                   errorMessage = exception.message ?: "Error fetching ads"
+                   loading = false
+                   Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
+               }
+
+           )
+        }catch (e: Exception){
+            Log.e("HomeScreen", "Exception while fetching ads", e)
+
         }
+
     }
-
-
-
-
 
     // asking for user location:
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation()
 
-
-
-    // Initial ads fetch using real-time listener
-    LaunchedEffect(userId) {
-        if (userId != null) {
-            try {
-                AdRepo.getAds(
-                    onSuccess = { fetchedAds ->
-                        ads = fetchedAds
-                        loading = false
-                        Log.d("HomeScreen", "Fetched ads: $fetchedAds") // Logg fetched ads
-                    },
-                    onFailure = { exception ->
-                        errorMessage = exception.message ?: "Error fetching ads"
-                        loading = false
-                        Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception) // Logg feil
-                    }
-                )
-            } catch (e: Exception) {
-                Log.e("HomeScreen", "Exception while fetching ads", e)
-            }
-        } else {
-            loading = false
-            errorMessage = "User not logged in"
-            Log.e("HomeScreen", "User is not logged in")
-        }
-    }
-
-
-    // Pagination logic
-    fun loadMoreAds() {
-        if (isLoadingMore || lastVisibleAd == null) return
-
-        isLoadingMore = true
-        coroutineScope.launch {
-            AdRepo.getPaginatedAds(
-                lastVisible = lastVisibleAd,
-                pageSize = 20,
-                onSuccess = { fetchedAds, lastSnapshot ->
-                    ads = ads + fetchedAds
-                    lastVisibleAd = lastSnapshot
-                    isLoadingMore = false
-                },
-                onFailure = { exception ->
-                    errorMessage = exception.message ?: "Error fetching more ads"
-                    isLoadingMore = false
-                }
-            )
-        }
-    }
-
-    // Scroll state for LazyVerticalGrid
-    val listState = rememberLazyGridState()
-
-    // Detect when scrolled to the bottom to load more ads
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-        }.collect { lastIndex ->
-            if (lastIndex == ads.size - 1 && !isLoadingMore && lastVisibleAd != null) {
-               // loadMoreAds()
-            }
-        }
-    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -157,44 +107,45 @@ fun HomeScreen(navController: NavController, location: String?, category: String
                         loading = true
                         errorMessage = ""
                         coroutineScope.launch {
-                            AdRepo.getAds(
-                                onSuccess = { fetchedAds ->
-                                    ads = fetchedAds
-                                    loading = false
-                                },
-                                onFailure = { exception ->
-                                    errorMessage = exception.message ?: "Error fetching ads"
-                                    loading = false
-                                }
-                            )
+                            try {
+                                AdRepo.filterAd(
+                                    location,
+                                    category,
+                                    minPrice,
+                                    maxPrice,
+                                    searchQuery,
+                                    onSuccess = { fetchedAds ->
+                                        filteredAds = fetchedAds
+                                        loading = false
+                                        Log.d("HomeScreen", "Fetched ads: $fetchedAds")
+                                    },
+                                    onFailure = { exception ->
+                                        errorMessage = exception.message ?: "Error fetching ads"
+                                        loading = false
+                                        Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
+                                    }
+
+                                )
+                            }catch (e: Exception){
+                                Log.e("HomeScreen", "Exception while fetching ads", e)
+
+                            }
+
                         }
                     }) {
                         Text(text = "Retry")
                     }
                 }
             }
-            ads.isNotEmpty() -> {
+            filteredAds.isNotEmpty() -> {
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(8.dp),
-                    state = listState
                 ) {
-                    items(ads) { ad ->
+                    items(filteredAds) { ad ->
                         AdItem(navController, ad = ad)
 
-                    }
-                    if (isLoadingMore) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = "Loading more ads...")
-                            }
-                        }
                     }
                 }
             }

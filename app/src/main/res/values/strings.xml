@@ -37,8 +37,9 @@
     <string name="city">City</string>
     <string name="postal_code">Postal code</string>
     <string name="Rent_vehicle">Rent vehicle</string>
-    <string name="Deliver_A_to_B">Deliver A to B</string>
+    <string name="Delivery_service">Delivery service</string>
     <string name="Select_an_ad_type">Select an ad type</string>
+    <string name="Select_a_category">Select a category</string>
     <string name="Options">Options</string>
     <string name="settings">Settings</string>
     <string name="send_password_reset_email">Send me a password reset email</string>

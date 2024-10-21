@@ -4,12 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -25,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import org.junit.experimental.categories.Categories
 
 
 @Composable
@@ -37,6 +42,10 @@ fun FilterBar(
     var tempCategory by remember { mutableStateOf<String?>(null) }
     var tempMinPrice by remember { mutableStateOf<Double?>(null) }
     var tempMaxPrice by remember { mutableStateOf<Double?>(null) }
+    var selectedCategory by remember { mutableStateOf(R.string.Select_a_category) }
+    var expanded by remember { mutableStateOf(false) }
+    val options = listOf(R.string.Rent_vehicle, R.string.Delivery_service, R.string.unwanted_items)
+
     if (isVisible) {
         Box(
             modifier = Modifier
@@ -67,12 +76,44 @@ fun FilterBar(
                 )
             }
 
-            OutlinedTextField(
-                value = tempCategory ?: "",
-                onValueChange = { tempCategory = it },
-                label = { Text(text = stringResource(R.string.category)) }
-            )
+            Box {
+                OutlinedTextField(
+                    value = stringResource(selectedCategory),
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.Options)) },
+                    trailingIcon = {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                    )
+                    {
+                        options.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(stringResource(category)) },
+                                onClick = {
+                                    selectedCategory = category
 
+                                    expanded = false
+                                }
+
+                            )
+                            tempCategory = stringResource(selectedCategory)
+                        }
+                    }
+            }
             OutlinedTextField(
                 value = tempMinPrice?.toString() ?: "",
                 onValueChange = { input ->
@@ -107,6 +148,7 @@ fun FilterBar(
                     tempCategory = null
                     tempMinPrice = null
                     tempMaxPrice = null
+                    selectedCategory = R.string.Select_a_category
                     onApplyFilter(null, null, null, null)
 
                 }
