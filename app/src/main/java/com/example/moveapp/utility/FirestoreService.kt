@@ -51,7 +51,7 @@ object FirestoreService {
             query = query.whereGreaterThan("adPrice", minPrice)
         if (maxPrice!=null)
             query = query.whereLessThan("adPrice", maxPrice)
-        if (search!=null && location!="")
+        if (search!=null && location!=" ")
             query = query.orderBy("adTitle").startAt(search).endAt(search + "\uf8ff")
         return query.get().await()
     }
