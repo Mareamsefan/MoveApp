@@ -38,6 +38,7 @@ fun AppNavigation () {
     val category = remember { mutableStateOf<String?>(null) }
     val minPrice = remember { mutableStateOf<Double?>(null) }
     val maxPrice = remember { mutableStateOf<Double?>(null) }
+    val searchQuery = remember { mutableStateOf<String?>(null) }
 
 
     val bottomNavScreens = listOf(
@@ -50,11 +51,12 @@ fun AppNavigation () {
     Scaffold(
         topBar = {
             if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
-                TopBar(navController = navController, onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
+                TopBar(navController = navController, onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice, newSearchQuery ->
                     location.value = newLocation
                     category.value = newCategory
                     minPrice.value = newMinPrice
                     maxPrice.value = newMaxPrice
+                    searchQuery.value = newSearchQuery
                 })
             }
         },
@@ -77,7 +79,7 @@ fun AppNavigation () {
             }
 
             composable(AppScreens.HOME.name) {
-                HomeScreen(navController, location.value, category.value, minPrice.value, maxPrice.value)
+                HomeScreen(navController, location.value, category.value, minPrice.value, maxPrice.value, searchQuery.value)
             }
 
             composable(AppScreens.REGISTER.name) {

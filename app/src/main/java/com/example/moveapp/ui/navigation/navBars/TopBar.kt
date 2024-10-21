@@ -1,7 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
 import android.util.Log
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -9,33 +8,24 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.MutableState
+import com.example.moveapp.ui.composables.SearchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (String?, String?, Double?, Double?) -> Unit){
+fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (String?, String?, Double?, Double?, String?) -> Unit){
     val currentScreen = getCurrentScreen(navController)
     val isMainScreen = shortcuts.any { it.route.name == currentScreen }
     val isFilterBarVisible = remember { mutableStateOf(false) }
@@ -43,7 +33,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (
     val category = remember { mutableStateOf<String?>(null) }
     val minPrice = remember { mutableStateOf<Double?>(null) }
     val maxPrice = remember { mutableStateOf<Double?>(null) }
-    val searchQuery = remember { mutableStateOf("") }
+    val searchQuery = remember { mutableStateOf<String?>(null) }
 
 
 
@@ -70,16 +60,11 @@ fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (
         },
 
         actions = {
-            if(currentScreen == AppScreens.HOME.name)
-                Box(modifier = Modifier.padding(top=2.dp, bottom = 15.dp)) {
-                    OutlinedTextField(
-                        modifier = Modifier.height(56.dp),
-                        value = searchQuery.value,
-                        onValueChange = { searchQuery.value = it },
-                        label = { Text(text = stringResource(R.string.search)) }
+            if(currentScreen == AppScreens.HOME.name){
+                SearchBar(onApplySearch = searchQuery, navController)
 
-                    )
-                }
+
+            }
             if(currentScreen == AppScreens.HOME.name)
                 IconButton( onClick = {
                     isFilterBarVisible.value = !isFilterBarVisible.value
@@ -141,13 +126,15 @@ fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (
     )
 
     if (!isFilterBarVisible.value){
-        onApplyFilter(location.value, category.value, minPrice.value, maxPrice.value)
+        onApplyFilter(location.value, category.value, minPrice.value, maxPrice.value, searchQuery.value)
     }
+
 
     Log.d("topbar", "location saved $location")
     Log.d("topbar", "category saved $category")
     Log.d("topbar", "minprice saved $minPrice")
     Log.d("topbar", "maxprice saved $maxPrice")
+    Log.d("topbar", "search saved $searchQuery")
 
 
 

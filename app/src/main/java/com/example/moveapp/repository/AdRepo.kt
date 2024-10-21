@@ -236,8 +236,8 @@ class AdRepo {
             }
         }
 
-        suspend fun filterAd(location: String?, category: String?, minPrice: Double?, maxPrice: Double?): List<AdData>? {
-            val query = FirestoreService.filteredAdsFromDatabase(location, category, minPrice, maxPrice)
+        suspend fun filterAd(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?): List<AdData>? {
+            val query = FirestoreService.filteredAdsFromDatabase(location, category, minPrice, maxPrice, search)
             return query?.documents?.mapNotNull { document ->
                 document.toObject(AdData::class.java)
             }

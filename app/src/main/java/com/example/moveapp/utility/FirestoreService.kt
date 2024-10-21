@@ -41,7 +41,7 @@ object FirestoreService {
         return snapshot.toObject(className)
     }
 
-    suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?): QuerySnapshot? {
+    suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?): QuerySnapshot? {
         var query: Query = db.collection("ads")
         if (location!=null && location!="")
             query = query.whereEqualTo("address", location)
@@ -51,6 +51,8 @@ object FirestoreService {
             query = query.whereGreaterThan("adPrice", minPrice)
         if (maxPrice!=null)
             query = query.whereLessThan("adPrice", maxPrice)
+        if (search!=null && location!="")
+            query = query.orderBy("adTitle").startAt(search).endAt(search + "\uf8ff")
         return query.get().await()
     }
 

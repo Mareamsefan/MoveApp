@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun HomeScreen(navController: NavController, location: String?, category: String?, minPrice: Double?, maxPrice: Double?) {
+fun HomeScreen(navController: NavController, location: String?, category: String?, minPrice: Double?, maxPrice: Double?, searchQuery: String?) {
     // Fetching ads
     var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -58,9 +58,10 @@ fun HomeScreen(navController: NavController, location: String?, category: String
     Log.d("home", "category saved $category")
     Log.d("home", "minprice saved $minPrice")
     Log.d("home", "maxprice saved $maxPrice")
+    Log.d("home", "search saved $searchQuery")
 
     LaunchedEffect(location, category, minPrice, maxPrice) {
-        val filteredAds = AdRepo.filterAd(location, category, minPrice, maxPrice) ?: emptyList()
+        val filteredAds = AdRepo.filterAd(location, category, minPrice, maxPrice, searchQuery) ?: emptyList()
         for (ad in filteredAds) {
             Log.d("filtered ads", "filtered ${ad.adTitle}")
         }
