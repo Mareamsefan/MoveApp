@@ -45,6 +45,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 Text(text = stringResource(R.string.category) + ": " + ad!!.adCategory)
                 Text(text = stringResource(R.string.price) + ": " + ad!!.adPrice.toString() + stringResource(R.string.kr))
                 Text(text = stringResource(R.string.address) + ": " + ad!!.address)
+                Text(text = stringResource(R.string.city) + ": " + ad!!.city)
                 Text(text = stringResource(R.string.postal_code) + ": "  + ad!!.postalCode)
             } else {
                 Text(text = "ad not found")
