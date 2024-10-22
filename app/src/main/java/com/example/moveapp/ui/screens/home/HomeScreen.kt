@@ -129,7 +129,7 @@ fun HomeScreen(
                         }
                     }
                 }) {
-                    Text("Hide bottom sheet")
+                    Text("Hide filter")
                 }
             }
         }
