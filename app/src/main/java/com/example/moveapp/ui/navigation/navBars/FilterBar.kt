@@ -20,7 +20,6 @@ import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
 fun FilterBar(
-    Filtred: (Boolean)-> Unit,
     navController: NavController,
     onApplyFilter: (String?, String?, Double?, Double?) -> Unit
 ) {
@@ -131,7 +130,6 @@ fun FilterBar(
                 tempMaxPrice = null
                 selectedCategory = R.string.Select_a_category
                 onApplyFilter(null, null, null, null)
-                Filtred(true)
 
             }
         ) {

@@ -58,11 +58,10 @@ fun HomeScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     // Filter variables
-    var location = remember { mutableStateOf<String?>(null) }
-    var category = remember { mutableStateOf<String?>(null) }
-    var minPrice = remember { mutableStateOf<Double?>(null) }
-    var maxPrice = remember { mutableStateOf<Double?>(null) }
-    var filtred by remember { mutableStateOf(true) }
+    val location = remember { mutableStateOf<String?>(null) }
+    val category = remember { mutableStateOf<String?>(null) }
+    val minPrice = remember { mutableStateOf<Double?>(null) }
+    val maxPrice = remember { mutableStateOf<Double?>(null) }
 
     // Fetch ads whenever the filters or search query change
     LaunchedEffect(location.value, category.value, minPrice.value, maxPrice.value, searchQuery) {
@@ -121,9 +120,6 @@ fun HomeScreen(
                         category.value = newCategory
                         minPrice.value = newMinPrice
                         maxPrice.value = newMaxPrice
-                    },
-                    Filtred = { newFiltred ->
-                        filtred = newFiltred
                     }
                 )
                 Button(onClick = {
