@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import android.icu.text.StringSearch
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -25,26 +26,16 @@ import com.example.moveapp.ui.composables.SearchBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (String?, String?, Double?, Double?, String?) -> Unit){
+fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit){
+
     val currentScreen = getCurrentScreen(navController)
-    val isMainScreen = shortcuts.any { it.route.name == currentScreen }
-    val isFilterBarVisible = remember { mutableStateOf(false) }
-    val location = remember { mutableStateOf<String?>(null) }
-    val category = remember { mutableStateOf<String?>(null) }
-    val minPrice = remember { mutableStateOf<Double?>(null) }
-    val maxPrice = remember { mutableStateOf<Double?>(null) }
     val searchQuery = remember { mutableStateOf<String?>(null) }
 
-
-
-
-    DisposableEffect(currentScreen) {
-        if (currentScreen != AppScreens.HOME.name) {
-            isFilterBarVisible.value = false
-        }
-        onDispose {}
-    }
     CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary
+            ),
         title = {
             Text(
                 text = when (currentScreen) {
@@ -62,20 +53,10 @@ fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (
         actions = {
             if(currentScreen == AppScreens.HOME.name){
                 SearchBar(onApplySearch = searchQuery, navController)
-
+                onApplySearch(searchQuery.value)
 
             }
-            if(currentScreen == AppScreens.HOME.name)
-                IconButton( onClick = {
-                    isFilterBarVisible.value = !isFilterBarVisible.value
-                } ) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = stringResource(R.string.filter),
-                    )
-                }
 
-        // Add gear icon for settings
             if (currentScreen == AppScreens.PROFILE.name) {
                 IconButton(onClick = {
                     navController.navigate(AppScreens.PROFILE_SETTINGS.name)
@@ -106,35 +87,11 @@ fun TopBar(navController: NavController, route: String? = null, onApplyFilter: (
             }
         },
 
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-        // TODO: Fix the color so it matches BottomNavBar
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
 
-        )
 
 
     )
-    FilterBar(
-        isVisible = isFilterBarVisible.value,
-        navController = navController,
-        onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
-            location.value = newLocation
-            category.value = newCategory
-            minPrice.value = newMinPrice
-            maxPrice.value = newMaxPrice
-        }
-    )
 
-    if (!isFilterBarVisible.value){
-        onApplyFilter(location.value, category.value, minPrice.value, maxPrice.value, searchQuery.value)
-    }
-
-
-    Log.d("topbar", "location saved $location")
-    Log.d("topbar", "category saved $category")
-    Log.d("topbar", "minprice saved $minPrice")
-    Log.d("topbar", "maxprice saved $maxPrice")
-    Log.d("topbar", "search saved $searchQuery")
 
 
 

@@ -14,8 +14,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -30,127 +38,186 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.AdItem
+import com.example.moveapp.ui.navigation.navBars.FilterBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.launch
-
+import androidx.compose.runtime.collectAsState
+import com.example.moveapp.ui.viewmodels.FilterViewModel
+import kotlinx.coroutines.flow.StateFlow
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun HomeScreen(navController: NavController, location: String?, category: String?, minPrice: Double?, maxPrice: Double?, searchQuery: String?) {
-
+fun HomeScreen(
+    navController: NavController,
+    searchQuery: String?,
+    filterViewModel: FilterViewModel = viewModel()
+) {
     var filteredAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
-    val user = FireAuthService.getCurrentUser() // Updated to correct method call
+    val user = FireAuthService.getCurrentUser()
     val userId = user?.uid
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
-    Log.d("home", "location saved $location")
-    Log.d("home", "category saved $category")
-    Log.d("home", "minprice saved $minPrice")
-    Log.d("home", "maxprice saved $maxPrice")
-    Log.d("home", "search saved $searchQuery")
+    // Collect state from FilterViewModel
+    val location = filterViewModel.location.collectAsState()
+    val category = filterViewModel.category.collectAsState()
+    val minPrice = filterViewModel.minPrice.collectAsState()
+    val maxPrice = filterViewModel.maxPrice.collectAsState()
 
-    LaunchedEffect(location, category, minPrice, maxPrice) {
+    // Debugging logs
+    Log.d("HomeScreen", "FilterViewModel values:")
+    Log.d("HomeScreen", "Location: ${location.value}")
+    Log.d("HomeScreen", "Category: ${category.value}")
+    Log.d("HomeScreen", "MinPrice: ${minPrice.value}")
+    Log.d("HomeScreen", "MaxPrice: ${maxPrice.value}")
+    Log.d("HomeScreen", "SearchQuery: $searchQuery")
+
+    LaunchedEffect(Unit) {
         try {
-           AdRepo.filterAd(
-               location,
-               category,
-               minPrice,
-               maxPrice,
-               searchQuery,
-               onSuccess = { fetchedAds ->
-                   filteredAds = fetchedAds
-                   loading = false
-                   Log.d("HomeScreen", "Fetched ads: $fetchedAds")
-               },
-               onFailure = { exception ->
-                   errorMessage = exception.message ?: "Error fetching ads"
-                   loading = false
-                   Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
-               }
+            Log.d("HomeScreen", "Calling AdRepo.filterAd() with parameters:")
+            Log.d("HomeScreen", "Location: ${location.value}")
+            Log.d("HomeScreen", "Category: ${category.value}")
+            Log.d("HomeScreen", "MinPrice: ${minPrice.value}")
+            Log.d("HomeScreen", "MaxPrice: ${maxPrice.value}")
+            Log.d("HomeScreen", "SearchQuery: $searchQuery")
 
-           )
-        }catch (e: Exception){
+            // Fetch filtered ads
+            AdRepo.filterAd(
+                location.value,
+                category.value,
+                minPrice.value,
+                maxPrice.value,
+                searchQuery,
+                onSuccess = { fetchedAds ->
+                    filteredAds = fetchedAds
+                    loading = false
+                    Log.d("HomeScreen", "Successfully fetched ads: $fetchedAds")
+                },
+                onFailure = { exception ->
+                    errorMessage = exception.message ?: "Error fetching ads"
+                    loading = false
+                    Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
+                }
+            )
+        } catch (e: Exception) {
             Log.e("HomeScreen", "Exception while fetching ads", e)
-
+            loading = false
         }
-
     }
 
-    // asking for user location:
-    val locationUtil = LocationUtil()
-    locationUtil.RequestUserLocation()
+    Scaffold(
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text("Show bottom sheet") },
+                icon = { Icon(Icons.Filled.Add, contentDescription = "") },
+                onClick = {
+                    showBottomSheet = true
+                }
+            )
+        }
+    ) { contentPadding ->
 
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when {
-            loading -> {
-                Text(text = "Loading...")
-            }
-            errorMessage.isNotEmpty() -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Error: $errorMessage", color = Color.Red)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        // Retry logic
-                        loading = true
-                        errorMessage = ""
-                        coroutineScope.launch {
-                            try {
-                                AdRepo.filterAd(
-                                    location,
-                                    category,
-                                    minPrice,
-                                    maxPrice,
-                                    searchQuery,
-                                    onSuccess = { fetchedAds ->
-                                        filteredAds = fetchedAds
-                                        loading = false
-                                        Log.d("HomeScreen", "Fetched ads: $fetchedAds")
-                                    },
-                                    onFailure = { exception ->
-                                        errorMessage = exception.message ?: "Error fetching ads"
-                                        loading = false
-                                        Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
-                                    }
-
-                                )
-                            }catch (e: Exception){
-                                Log.e("HomeScreen", "Exception while fetching ads", e)
-
-                            }
-
+        if (showBottomSheet) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+                FilterBar(
+                    navController = navController,
+                )
+                Button(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
                         }
-                    }) {
-                        Text(text = "Retry")
                     }
+                }) {
+                    Text("Hide bottom sheet")
                 }
             }
-            filteredAds.isNotEmpty() -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(8.dp),
-                ) {
-                    items(filteredAds) { ad ->
-                        AdItem(navController, ad = ad)
+        }
 
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            when {
+                loading -> {
+                    Text(text = "Loading...")
+                }
+                errorMessage.isNotEmpty() -> {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "Error: $errorMessage", color = Color.Red)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = {
+                            // Retry logic
+                            loading = true
+                            errorMessage = ""
+                            coroutineScope.launch {
+                                try {
+                                    Log.d("HomeScreen", "Retrying AdRepo.filterAd() with parameters:")
+                                    Log.d("HomeScreen", "Location: ${location.value}")
+                                    Log.d("HomeScreen", "Category: ${category.value}")
+                                    Log.d("HomeScreen", "MinPrice: ${minPrice.value}")
+                                    Log.d("HomeScreen", "MaxPrice: ${maxPrice.value}")
+                                    Log.d("HomeScreen", "SearchQuery: $searchQuery")
+
+                                    AdRepo.filterAd(
+                                        location.value,
+                                        category.value,
+                                        minPrice.value,
+                                        maxPrice.value,
+                                        searchQuery,
+                                        onSuccess = { fetchedAds ->
+                                            filteredAds = fetchedAds
+                                            loading = false
+                                            Log.d("HomeScreen", "Successfully fetched ads: $fetchedAds")
+                                        },
+                                        onFailure = { exception ->
+                                            errorMessage = exception.message ?: "Error fetching ads"
+                                            loading = false
+                                            Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
+                                        }
+                                    )
+                                } catch (e: Exception) {
+                                    Log.e("HomeScreen", "Exception while fetching ads", e)
+                                    loading = false
+                                }
+                            }
+                        }) {
+                            Text(text = "Retry")
+                        }
                     }
                 }
-            }
-            else -> {
-                Text(text = "No ads available.")
+                filteredAds.isNotEmpty() -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(8.dp),
+                    ) {
+                        items(filteredAds) { ad ->
+                            AdItem(navController, ad = ad)
+                        }
+                    }
+                }
+                else -> {
+                    Text(text = "No ads available.")
+                }
             }
         }
     }

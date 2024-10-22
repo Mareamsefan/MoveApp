@@ -51,11 +51,7 @@ fun AppNavigation () {
     Scaffold(
         topBar = {
             if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
-                TopBar(navController = navController, onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice, newSearchQuery ->
-                    location.value = newLocation
-                    category.value = newCategory
-                    minPrice.value = newMinPrice
-                    maxPrice.value = newMaxPrice
+                TopBar(navController = navController, onApplySearch = {newSearchQuery ->
                     searchQuery.value = newSearchQuery
                 })
             }
@@ -79,7 +75,7 @@ fun AppNavigation () {
             }
 
             composable(AppScreens.HOME.name) {
-                HomeScreen(navController, location.value, category.value, minPrice.value, maxPrice.value, searchQuery.value)
+                HomeScreen(navController, searchQuery.value)
             }
 
             composable(AppScreens.REGISTER.name) {
