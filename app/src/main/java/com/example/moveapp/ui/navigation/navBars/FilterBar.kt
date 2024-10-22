@@ -31,109 +31,113 @@ fun FilterBar(
     var expanded by remember { mutableStateOf(false) }
     val options = listOf(R.string.Rent_vehicle, R.string.Delivery_service, R.string.unwanted_items)
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        OutlinedTextField(
-            value = tempLocation ?: "",
-            onValueChange = { newValue ->
-                tempLocation = newValue
-            },
-            label = { Text(text = stringResource(R.string.location)) }
-        )
+    Box (
+        modifier = Modifier
+            .padding(20.dp)
+    ){
 
-        IconButton(onClick = {
-            navController.navigate(AppScreens.MAP.name)
-        }) {
-            Icon(
-                imageVector = Icons.Filled.Place,
-                contentDescription = stringResource(R.string.map)
-            )
-        }
-        // Category dropdown menu
-        Box {
-
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.Start,
+        ) {
             OutlinedTextField(
-                value = stringResource(selectedCategory),
-                onValueChange = {},
-                label = { Text(stringResource(R.string.Options)) },
-                trailingIcon = {
-                    IconButton(onClick = { expanded = !expanded }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = null
-                        )
-                    }
+                value = tempLocation ?: "",
+                onValueChange = { newValue ->
+                    tempLocation = newValue
                 },
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
+                label = { Text(text = stringResource(R.string.location)) }
             )
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-            )
-            {
-                options.forEach { category ->
-                    DropdownMenuItem(
-                        text = { Text(stringResource(category)) },
-                        onClick = {
-                            selectedCategory = category
+            IconButton(onClick = {
+                navController.navigate(AppScreens.MAP.name)
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Place,
+                    contentDescription = stringResource(R.string.map)
+                )
+            }
+            // Category dropdown menu
+            Box {
 
-                            expanded = false
+                OutlinedTextField(
+                    value = stringResource(selectedCategory),
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.Options)) },
+                    trailingIcon = {
+                        IconButton(onClick = { expanded = !expanded }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null
+                            )
                         }
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
 
-                    )
-                    tempCategory = stringResource(selectedCategory)
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                )
+                {
+                    options.forEach { category ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(category)) },
+                            onClick = {
+                                selectedCategory = category
+
+                                expanded = false
+                            }
+
+                        )
+                        tempCategory = stringResource(selectedCategory)
+                    }
                 }
             }
-        }
 
-        OutlinedTextField(
-            value = tempMinPrice?.toString() ?: "",
-            onValueChange = { input ->
-                tempMinPrice = input.toDoubleOrNull()
-            },
-            label = { Text(text = stringResource(R.string.min_price)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
+            OutlinedTextField(
+                value = tempMinPrice?.toString() ?: "",
+                onValueChange = { input ->
+                    tempMinPrice = input.toDoubleOrNull()
+                },
+                label = { Text(text = stringResource(R.string.min_price)) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
             )
-        )
-        OutlinedTextField(
-            value = tempMaxPrice?.toString() ?: "",
-            onValueChange = { input ->
-                tempMaxPrice = input.toDoubleOrNull()
-            },
-            label = { Text(text = stringResource(R.string.max_price)) },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
+            OutlinedTextField(
+                value = tempMaxPrice?.toString() ?: "",
+                onValueChange = { input ->
+                    tempMaxPrice = input.toDoubleOrNull()
+                },
+                label = { Text(text = stringResource(R.string.max_price)) },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number
+                )
             )
-        )
 
-        Button(
-            onClick = {
-                onApplyFilter(tempLocation, tempCategory, tempMinPrice, tempMaxPrice)
+            Button(
+                onClick = {
+                    onApplyFilter(tempLocation, tempCategory, tempMinPrice, tempMaxPrice)
 
+                }
+            ) {
+                Text(text = stringResource(R.string.filter))
             }
-        ) {
-            Text(text = stringResource(R.string.filter))
-        }
-        Button(
-            onClick = {
-                tempLocation = null
-                tempCategory = null
-                tempMinPrice = null
-                tempMaxPrice = null
-                selectedCategory = R.string.Select_a_category
-                onApplyFilter(null, null, null, null)
+            Button(
+                onClick = {
+                    tempLocation = null
+                    tempCategory = null
+                    tempMinPrice = null
+                    tempMaxPrice = null
+                    selectedCategory = R.string.Select_a_category
+                    onApplyFilter(null, null, null, null)
 
+                }
+            ) {
+                Text(text = stringResource(R.string.reset_filter))
             }
-        ) {
-            Text(text = stringResource(R.string.reset_filter))
         }
     }
 }

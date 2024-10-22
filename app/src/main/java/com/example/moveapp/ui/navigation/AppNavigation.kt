@@ -1,15 +1,20 @@
 package com.example.moveapp.ui.navigation
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -78,7 +83,7 @@ fun AppNavigation() {
         floatingActionButton = {
             if (currentScreen == AppScreens.HOME.name){
                 ExtendedFloatingActionButton(
-                    text = {         Text(stringResource(R.string.show_filter))},
+                    text = { Text(stringResource(R.string.show_filter))},
                     icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                     onClick = {
                         scope.launch {
@@ -110,15 +115,22 @@ fun AppNavigation() {
                             maxPrice.value = newMaxPrice
                         }
                     )
-                    Button(onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet = false
+                    ExtendedFloatingActionButton(
+                        text = { Text(stringResource(R.string.hide_filter))},
+                        icon = { Icon(Icons.Filled.Clear, contentDescription = null) },
+                        onClick = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    showBottomSheet = false
+                                }
                             }
-                        }
-                    }) {
-                        Text(stringResource(R.string.hide_filter))
-                    }
+                        },
+                        modifier = Modifier
+                            .padding(top = 5.dp)
+                            .padding(16.dp)
+                            .align(Alignment.CenterHorizontally), // Justerer plasseringen
+                    )
+
                 }
             }
             NavHost(
