@@ -17,17 +17,17 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import com.example.moveapp.ui.viewmodels.FilterViewModel
 
 @Composable
 fun FilterBar(
+    Filtred: (Boolean)-> Unit,
     navController: NavController,
-    filterViewModel: FilterViewModel = viewModel() // Use the shared ViewModel
+    onApplyFilter: (String?, String?, Double?, Double?) -> Unit
 ) {
-    var tempMaxPrice by remember { mutableStateOf<Double?>(null) }
+    var tempLocation by remember { mutableStateOf<String?>(null) }
+    var tempCategory by remember { mutableStateOf<String?>(null) }
     var tempMinPrice by remember { mutableStateOf<Double?>(null) }
-    var tempLocation by remember { mutableStateOf<String?>(null)}
-    var tempCategory by remember { mutableStateOf<String?>(null)}
+    var tempMaxPrice by remember { mutableStateOf<Double?>(null) }
     var selectedCategory by remember { mutableStateOf(R.string.Select_a_category) }
     var expanded by remember { mutableStateOf(false) }
     val options = listOf(R.string.Rent_vehicle, R.string.Delivery_service, R.string.unwanted_items)
@@ -36,15 +36,14 @@ fun FilterBar(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        // Location input field
         OutlinedTextField(
             value = tempLocation ?: "",
             onValueChange = { newValue ->
-                tempLocation = newValue  },
+                tempLocation = newValue
+            },
             label = { Text(text = stringResource(R.string.location)) }
         )
 
-        // Map icon button
         IconButton(onClick = {
             navController.navigate(AppScreens.MAP.name)
         }) {
@@ -53,9 +52,9 @@ fun FilterBar(
                 contentDescription = stringResource(R.string.map)
             )
         }
-
         // Category dropdown menu
         Box {
+
             OutlinedTextField(
                 value = stringResource(selectedCategory),
                 onValueChange = {},
@@ -69,67 +68,73 @@ fun FilterBar(
                     }
                 },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
             )
 
-            // Dropdown menu for category selection
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth(0.6f)
-            ) {
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+            )
+            {
                 options.forEach { category ->
                     DropdownMenuItem(
                         text = { Text(stringResource(category)) },
                         onClick = {
                             selectedCategory = category
-                            expanded = false
 
+                            expanded = false
                         }
+
                     )
+                    tempCategory = stringResource(selectedCategory)
                 }
             }
         }
 
-        // Minimum price input field
         OutlinedTextField(
-            value = filterViewModel.minPrice.collectAsState().value?.toString() ?: "",
-            onValueChange = { input -> tempMinPrice = input.toDoubleOrNull() },
+            value = tempMinPrice?.toString() ?: "",
+            onValueChange = { input ->
+                tempMinPrice = input.toDoubleOrNull()
+            },
             label = { Text(text = stringResource(R.string.min_price)) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             )
         )
-
-        // Maximum price input field
         OutlinedTextField(
-            value = filterViewModel.maxPrice.collectAsState().value?.toString() ?: "",
-            onValueChange = { input -> tempMaxPrice = input.toDoubleOrNull() },
+            value = tempMaxPrice?.toString() ?: "",
+            onValueChange = { input ->
+                tempMaxPrice = input.toDoubleOrNull()
+            },
             label = { Text(text = stringResource(R.string.max_price)) },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             )
         )
 
-        // Filter button
-        Button(onClick = {
-            filterViewModel.applyFilter(
-                tempLocation,
-                tempCategory,
-                tempMinPrice,
-                tempMaxPrice
-            )
+        Button(
+            onClick = {
+                onApplyFilter(tempLocation, tempCategory, tempMinPrice, tempMaxPrice)
 
-            Log.d("Filter applied", "Location: ${filterViewModel.location.value}, Category: ${filterViewModel.category.value}, MinPrice: ${filterViewModel.minPrice.value}, MaxPrice: ${filterViewModel.maxPrice.value}")
-            navController.navigate(AppScreens.HOME.name)
-        }) {
+            }
+        ) {
             Text(text = stringResource(R.string.filter))
         }
+        Button(
+            onClick = {
+                tempLocation = null
+                tempCategory = null
+                tempMinPrice = null
+                tempMaxPrice = null
+                selectedCategory = R.string.Select_a_category
+                onApplyFilter(null, null, null, null)
+                Filtred(true)
 
-        // Reset button
-        Button(onClick = {
-            filterViewModel.resetFilters() // Reset filters in ViewModel
-        }) {
+            }
+        ) {
             Text(text = stringResource(R.string.reset_filter))
         }
     }
