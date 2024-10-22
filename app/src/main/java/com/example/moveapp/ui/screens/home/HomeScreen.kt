@@ -46,34 +46,29 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController,
     searchQuery: String?,
+    location: String?,
+    category: String?,
+    minPrice: Double?,
+    maxPrice: Double?
+
+
 ) {
     // States to store filtered ads, loading status, and error messages
     var filteredAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
 
-    // BottomSheet and filter states
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-
-    // Filter variables
-    val location = remember { mutableStateOf<String?>(null) }
-    val category = remember { mutableStateOf<String?>(null) }
-    val minPrice = remember { mutableStateOf<Double?>(null) }
-    val maxPrice = remember { mutableStateOf<Double?>(null) }
-
     // Fetch ads whenever the filters or search query change
-    LaunchedEffect(location.value, category.value, minPrice.value, maxPrice.value, searchQuery) {
+    LaunchedEffect(location, category, minPrice, maxPrice, searchQuery) {
         try {
             Log.d("HomeScreen", "Fetching filtered ads with parameters:")
-            Log.d("HomeScreen", "Location: ${location.value}, Category: ${category.value}, MinPrice: ${minPrice.value}, MaxPrice: ${maxPrice.value}, SearchQuery: $searchQuery")
+            Log.d("HomeScreen", "Location: ${location}, Category: ${category}, MinPrice: ${minPrice}, MaxPrice: ${maxPrice}, SearchQuery: $searchQuery")
 
             AdRepo.filterAd(
-                location = location.value,
-                category = category.value,
-                minPrice = minPrice.value,
-                maxPrice = maxPrice.value,
+                location = location,
+                category = category,
+                minPrice = minPrice,
+                maxPrice = maxPrice,
                 search = searchQuery,
                 onSuccess = { fetchedAds ->
                     filteredAds = fetchedAds
@@ -93,83 +88,42 @@ fun HomeScreen(
         }
     }
 
-    Scaffold(
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text("Show filter") },
-                icon = { Icon(Icons.Filled.Add, contentDescription = "") },
-                onClick = {
-                    showBottomSheet = true
-                }
-            )
-        }
-    ) { contentPadding ->
-        if (showBottomSheet) {
-            // Modal BottomSheet for filter options
-            ModalBottomSheet(
-                onDismissRequest = {
-                    showBottomSheet = false
-                },
-                sheetState = sheetState
-            ) {
-                FilterBar(
-                    navController = navController,
-                    onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
-                        // Update filter states
-                        location.value = newLocation
-                        category.value = newCategory
-                        minPrice.value = newMinPrice
-                        maxPrice.value = newMaxPrice
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        when {
+            loading -> {
+                Text(text = "Loading...")
+            }
+            errorMessage.isNotEmpty() -> {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "Error: $errorMessage", color = Color.Red)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = {
+                        // Retry fetching ads
+                        loading = true
+                        errorMessage = ""
+                    }) {
+                        Text(text = "Retry")
                     }
-                )
-                Button(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                        }
-                    }
-                }) {
-                    Text("Hide filter")
                 }
             }
-        }
-        // Main content area
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            when {
-                loading -> {
-                    Text(text = "Loading...")
-                }
-                errorMessage.isNotEmpty() -> {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Error: $errorMessage", color = Color.Red)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = {
-                            // Retry fetching ads
-                            loading = true
-                            errorMessage = ""
-                        }) {
-                            Text(text = "Retry")
-                        }
+            filteredAds.isNotEmpty() -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                ) {
+                    items(filteredAds) { ad ->
+                        AdItem(navController, ad = ad)
                     }
                 }
-                filteredAds.isNotEmpty() -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(8.dp),
-                    ) {
-                        items(filteredAds) { ad ->
-                            AdItem(navController, ad = ad)
-                        }
-                    }
-                }
-                else -> {
-                    Text(text = "No ads available.")
-                }
+            }
+            else -> {
+                Text(text = "No ads available.")
             }
         }
     }
 }
+
