@@ -19,11 +19,13 @@ data class AdData(
     var country: String = "Norway",                             // Default country
     var address: String = "",                                   // Address where the ad is located
     var postalCode: String = "",
-    // TODO: add city column to the database
     var city: String = "",
     @ServerTimestamp
     var timestamp: Date? = null,                                // Timestamp for when the ad was posted
-    var adImages: List<String> = emptyList()                    // List of image URLs for the ad (if any)
+    var adImages: List<String> = emptyList(),                   // List of image URLs for the ad (if any)
+    // data for the ad coordinates
+    var latitude: Double? = null,
+    var longitude: Double? = null
 ) {
     // Default constructor required for Firestore
     constructor() : this(
@@ -39,7 +41,9 @@ data class AdData(
         address = "",
         postalCode = "",
         timestamp = null,
-        adImages = emptyList()
+        adImages = emptyList(),
+        latitude = null,
+        longitude = null
     )
 
     // Function to exclude any fields you don't want to send to Firebase
