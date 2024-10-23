@@ -33,6 +33,7 @@ import com.example.moveapp.ui.composables.CameraPermission
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireStorageService
+import com.example.moveapp.utility.LocationUtil
 import com.example.moveapp.viewModel.AdViewModel.Companion.createAd
 import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStorage
 import kotlinx.coroutines.MainScope
@@ -45,6 +46,7 @@ fun PostAdScreen(navController: NavController) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val currentUser = getCurrentUser()
+    val locationUtil = LocationUtil()
 
     // State for form fields
     val title = remember { mutableStateOf("") }
@@ -181,10 +183,17 @@ fun PostAdScreen(navController: NavController) {
             )
 
             Text(text = adType.value) // Display the selected ad type
+            val fullAddress = "${address}, ${postalCode}, ${city}"
+            val geoPoint = locationUtil.addressToGeopoint(context = context, addressString = fullAddress)
 
             // Button to submit the ad
             Button(
                 onClick = {
+                    if (geoPoint != null) {
+                        Log.d("SpecificAd", "Geopoint: Latitude = ${geoPoint.first}, Longitude = ${geoPoint.second}")
+                    } else {
+                        Log.d("SpecificAd", "Failed to get Geopoint for the address: ${fullAddress}") }
+
                     if (currentUser != null) {
                         coroutineScope.launch {
                             // Create an ad and retrieve the adId
