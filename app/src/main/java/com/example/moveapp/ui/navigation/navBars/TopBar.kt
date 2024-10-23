@@ -23,12 +23,14 @@ import com.example.moveapp.ui.navigation.AppScreens
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
 import com.example.moveapp.ui.composables.SearchBar
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit){
 
     val currentScreen = getCurrentScreen(navController)
+    val currentUser = getCurrentUser()
     val searchQuery = remember { mutableStateOf<String?>(null) }
 
     CenterAlignedTopAppBar(
@@ -39,7 +41,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
         title = {
             Text(
                 text = when (currentScreen) {
-                    AppScreens.PROFILE.name -> stringResource(R.string.my_profile)
+                    AppScreens.PROFILE.name && !currentUser.isAnonymous -> stringResource(R.string.my_profile)
                     AppScreens.ALL_MESSAGES.name -> stringResource(R.string.messages)
                     AppScreens.POST_AD.name -> stringResource(R.string.post_ad)
                     AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)

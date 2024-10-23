@@ -1,5 +1,7 @@
 package com.example.moveapp.utility
 
+import android.content.Context
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
@@ -30,6 +32,22 @@ object FireAuthService {
             e.printStackTrace()
             null
         }
+    }
+
+    // Funksjon for anonym pålogging retunerer true/false
+    suspend fun signInAnonymously(): Boolean {
+        return try {
+            // Prøv å logge inn anonymt
+            val authResult = auth.signInAnonymously().await()
+            authResult?.user != null
+        } catch (e: Exception) {
+            false
+        }
+    }
+    // Sjekk om bruker er logget inn
+    fun isUserLoggedIn(): Boolean {
+        val user = auth.currentUser
+        return user != null && !user.isAnonymous
     }
 
     // Function for registering new user
