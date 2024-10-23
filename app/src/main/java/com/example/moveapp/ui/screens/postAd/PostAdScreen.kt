@@ -196,7 +196,6 @@ fun PostAdScreen(navController: NavController) {
 
                     if (currentUser != null) {
                         coroutineScope.launch {
-                            // Create an ad and retrieve the adId
                             val ad = createAd(
                                 context,
                                 title.value,
@@ -206,7 +205,9 @@ fun PostAdScreen(navController: NavController) {
                                 currentUser.uid,
                                 city.value,
                                 address.value,
-                                postalCode.value
+                                postalCode.value,
+                                geoPoint?.first,
+                                geoPoint?.second
                             )
                             val adId = ad?.adId
                             if (adId != null) {
