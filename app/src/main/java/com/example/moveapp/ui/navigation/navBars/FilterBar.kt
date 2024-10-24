@@ -86,7 +86,6 @@ fun FilterBar(
                             text = { Text(stringResource(category)) },
                             onClick = {
                                 selectedCategory = category
-
                                 expanded = false
                             }
 

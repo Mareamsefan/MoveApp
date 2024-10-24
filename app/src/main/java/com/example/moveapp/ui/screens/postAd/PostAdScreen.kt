@@ -127,7 +127,8 @@ fun PostAdScreen(navController: NavController) {
                             }
 
                         )
-                        adType.value = stringResource(option)
+                        adType.value = stringResource(selectedOption)
+
                     }
                 }
             }
@@ -180,7 +181,6 @@ fun PostAdScreen(navController: NavController) {
                 label = { Text(text = stringResource(R.string.description)) }
             )
 
-            Text(text = adType.value) // Display the selected ad type
 
             // Button to submit the ad
             Button(
