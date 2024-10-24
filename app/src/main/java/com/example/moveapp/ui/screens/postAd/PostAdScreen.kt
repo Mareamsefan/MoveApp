@@ -184,17 +184,13 @@ fun PostAdScreen(navController: NavController) {
             )
 
             Text(text = adType.value) // Display the selected ad type
+
+            // turn the location information to a geopoint that gets saved in the database
             val fullAddress = "${address}, ${postalCode}, ${city}"
             val geoPoint = locationUtil.addressToGeopoint(context = context, addressString = fullAddress)
 
-            // Button to submit the ad
             Button(
                 onClick = {
-                    if (geoPoint != null) {
-                        Log.d("SpecificAd", "Geopoint: Latitude = ${geoPoint.first}, Longitude = ${geoPoint.second}")
-                    } else {
-                        Log.d("SpecificAd", "Failed to get Geopoint for the address: ${fullAddress}") }
-
                     if (currentUser != null) {
                         coroutineScope.launch {
                             // Create an ad and retrieve the adId
@@ -208,10 +204,10 @@ fun PostAdScreen(navController: NavController) {
                                 city.value,
                                 address.value,
                                 postalCode.value,
-                                geoPoint?.first,
-                                geoPoint?.second
+                                geoPoint
                             )
                             val adId = ad?.adId
+                            Log.d("PostADIMAGESlocal", "Ad iMAGES: $adImages")
                             if (adId != null) {
                                 val uriImagesList = adImages.map { it.toUri() }
                                 // Upload the images and get the URLs
@@ -220,7 +216,7 @@ fun PostAdScreen(navController: NavController) {
                                 // Ensure you only update with non-empty URLs
                                 if (uploadedImageUrls.isNotEmpty()) {
                                     // Deleting the localUris
-                                    adImages.map { FireStorageService.deleteFileFromStorage(it) }
+                                    //adImages.map { FireStorageService.deleteFileFromStorage(it) }
 
                                     // Update ad with the list of uploaded image URLs
                                     val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
