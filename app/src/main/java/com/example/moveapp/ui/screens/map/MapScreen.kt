@@ -47,7 +47,7 @@ fun MapScreen(navController: NavController) {
 
     locationUtil.getUserLocation(context) { location ->
         location?.let {
-            userLocation = it
+            userLocation = org.osmdroid.util.GeoPoint(it.latitude, it.longitude)
             hasLocationPermission = true
             Log.d("MapScreen", "User location retrieved: ${it.latitude}, ${it.longitude}")
         } ?: run {

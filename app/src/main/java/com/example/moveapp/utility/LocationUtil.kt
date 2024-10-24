@@ -14,20 +14,19 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import org.osmdroid.util.GeoPoint
+import com.google.firebase.firestore.GeoPoint
 import java.io.IOException
 
 class LocationUtil {
 
     @Composable
-    fun addressToGeopoint(context: Context, addressString: String): Pair<Double, Double>? {
+    fun addressToGeopoint(context: Context, addressString: String): GeoPoint? {
         val geocoder = Geocoder(context)
         return try {
-            val addresses = geocoder.getFromLocationName(addressString, 1)
+            val addresses: MutableList<Address>? = geocoder.getFromLocationName(addressString, 1)
             if (addresses?.isNotEmpty() == true) {
                 val address = addresses[0]
-                address?.let { Pair(it.latitude, address.longitude)
-                }
+                GeoPoint(address.latitude, address.longitude)
             } else {
                 null
             }
@@ -35,8 +34,6 @@ class LocationUtil {
             e.printStackTrace()
             null
         }
-
-
     }
 
     @OptIn(ExperimentalPermissionsApi::class)
@@ -96,3 +93,4 @@ class LocationUtil {
 }
 
 // https://medium.com/@munbonecci/how-to-get-your-location-in-jetpack-compose-f085031df4c1
+// https://developer.android.com/reference/android/location/Geocoder

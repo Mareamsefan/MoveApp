@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
+import com.google.firebase.firestore.GeoPoint
 import java.util.Date
 import java.util.UUID
 @Stable
@@ -24,8 +25,7 @@ data class AdData(
     var timestamp: Date? = null,                                // Timestamp for when the ad was posted
     var adImages: List<String> = emptyList(),                   // List of image URLs for the ad (if any)
     // data for the ad coordinates
-    var latitude: Double? = null,
-    var longitude: Double? = null
+    var position: GeoPoint? = null
 ) {
     // Default constructor required for Firestore
     constructor() : this(
@@ -42,8 +42,7 @@ data class AdData(
         postalCode = "",
         timestamp = null,
         adImages = emptyList(),
-        latitude = null,
-        longitude = null
+        position = null
     )
 
     // Function to exclude any fields you don't want to send to Firebase

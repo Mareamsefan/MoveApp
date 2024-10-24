@@ -38,6 +38,7 @@ import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.ui.navigation.navBars.FilterBar
 import com.example.moveapp.utility.FireAuthService
+import com.example.moveapp.utility.LocationUtil
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +58,10 @@ fun HomeScreen(
     var filteredAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
+
+    // request for user location
+    val locationUtil = LocationUtil()
+    locationUtil.RequestUserLocation()
 
     // Fetch ads whenever the filters or search query change
     LaunchedEffect(location, category, minPrice, maxPrice, searchQuery) {

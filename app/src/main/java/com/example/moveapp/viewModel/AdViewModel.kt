@@ -8,6 +8,7 @@ import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.FirestoreService
+import com.google.firebase.firestore.GeoPoint
 
 
 class AdViewModel {
@@ -25,8 +26,7 @@ class AdViewModel {
             city: String,
             address: String,
             postalCode: String,
-            latitude: Double?,
-            longitude: Double?
+            position: GeoPoint?
         ): AdData? {
             return try {
                 // Create the ad object
@@ -39,8 +39,7 @@ class AdViewModel {
                     city = city,
                     address = address,
                     postalCode = postalCode,
-                    latitude = latitude,
-                    longitude = longitude
+                    position = position
                 )
 
                 // Attempt to add the ad to the database
