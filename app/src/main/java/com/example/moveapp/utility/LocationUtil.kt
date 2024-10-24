@@ -2,6 +2,8 @@ package com.example.moveapp.utility
 
 import android.Manifest
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,8 +15,29 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import org.osmdroid.util.GeoPoint
+import java.io.IOException
 
 class LocationUtil {
+
+    @Composable
+    fun addressToGeopoint(context: Context, addressString: String): Pair<Double, Double>? {
+        val geocoder = Geocoder(context)
+        return try {
+            val addresses = geocoder.getFromLocationName(addressString, 1)
+            if (addresses?.isNotEmpty() == true) {
+                val address = addresses[0]
+                address?.let { Pair(it.latitude, address.longitude)
+                }
+            } else {
+                null
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+
+
+    }
 
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable

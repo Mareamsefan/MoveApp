@@ -24,7 +24,9 @@ class AdViewModel {
             userId: String,
             city: String,
             address: String,
-            postalCode: String
+            postalCode: String,
+            latitude: Double?,
+            longitude: Double?
         ): AdData? {
             return try {
                 // Create the ad object
@@ -37,6 +39,8 @@ class AdViewModel {
                     city = city,
                     address = address,
                     postalCode = postalCode,
+                    latitude = latitude,
+                    longitude = longitude
                 )
 
                 // Attempt to add the ad to the database
