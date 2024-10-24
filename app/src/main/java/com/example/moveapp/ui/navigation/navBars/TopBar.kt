@@ -23,12 +23,14 @@ import com.example.moveapp.ui.navigation.AppScreens
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
 import com.example.moveapp.ui.composables.SearchBar
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit){
 
     val currentScreen = getCurrentScreen(navController)
+    val currentUser = getCurrentUser()
     val searchQuery = remember { mutableStateOf<String?>(null) }
 
     CenterAlignedTopAppBar(
@@ -39,11 +41,31 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
         title = {
             Text(
                 text = when (currentScreen) {
-                    AppScreens.PROFILE.name -> stringResource(R.string.my_profile)
-                    AppScreens.ALL_MESSAGES.name -> stringResource(R.string.messages)
-                    AppScreens.POST_AD.name -> stringResource(R.string.post_ad)
+                    AppScreens.PROFILE.name-> {
+                        if(currentUser != null && !currentUser.isAnonymous){
+                            stringResource(R.string.my_profile)
+                        }
+                        else {
+                            stringResource(R.string.guest_denied)
+                        }
+                    }
+                    AppScreens.ALL_MESSAGES.name -> {
+                        if(currentUser != null && !currentUser.isAnonymous){
+                            stringResource(R.string.messages)
+                        }
+                        else {
+                            stringResource(R.string.guest_denied)
+                        }
+                    }
+                    AppScreens.POST_AD.name -> {
+                        if(currentUser != null && !currentUser.isAnonymous){
+                            stringResource(R.string.post_ad)
+                        }
+                        else {
+                            stringResource(R.string.guest_denied)
+                        }
+                    }
                     AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
-                    AppScreens.GUEST_DENIED.name -> stringResource(R.string.guest_denied)
                     else -> ""
                 },
                 textAlign = TextAlign.Center
@@ -57,7 +79,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
 
             }
 
-            if (currentScreen == AppScreens.PROFILE.name) {
+            if (currentScreen == AppScreens.PROFILE.name && currentUser!= null && !currentUser.isAnonymous) {
                 IconButton(onClick = {
                     navController.navigate(AppScreens.PROFILE_SETTINGS.name)
                 }) {
@@ -66,6 +88,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                         contentDescription = stringResource(R.string.settings)
                     )
                 }
+
             }
 
         },

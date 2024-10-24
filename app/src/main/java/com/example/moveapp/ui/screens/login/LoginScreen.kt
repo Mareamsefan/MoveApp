@@ -72,22 +72,7 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Text(text = stringResource(R.string.login))
             }
-            Button(
-                onClick = {
-                    coroutineScope.launch() {
-                         /* Dette er en bruker jeg laget som skal være guest bruker.
-                            Vurderinger:
-                            - Kanskje vurdere å putte passordet et annet sted. 08/10/2024
-                         */
-                        val user = loginUser(context, "guest@guest.com", "D%B{8oK\\pDOEgg+lwt'r\$|dxf@Rb")
-                        if (user != null) {
-                            navController.navigate(AppScreens.HOME.name)
-                        }
-                    }
-                }
-            ) {
-                Text(text = stringResource(R.string.login_as_guest))
-            }
+
             Button(
                 onClick = { navController.navigate(AppScreens.REGISTER.name) }
             ) {

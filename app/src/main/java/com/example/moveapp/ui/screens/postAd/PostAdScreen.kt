@@ -129,7 +129,8 @@ fun PostAdScreen(navController: NavController) {
                             }
 
                         )
-                        adType.value = stringResource(option)
+                        adType.value = stringResource(selectedOption)
+
                     }
                 }
             }
@@ -196,6 +197,7 @@ fun PostAdScreen(navController: NavController) {
 
                     if (currentUser != null) {
                         coroutineScope.launch {
+                            // Create an ad and retrieve the adId
                             val ad = createAd(
                                 context,
                                 title.value,
