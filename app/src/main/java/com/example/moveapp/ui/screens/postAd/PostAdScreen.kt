@@ -193,6 +193,7 @@ fun PostAdScreen(navController: NavController) {
                 onClick = {
                     if (currentUser != null) {
                         coroutineScope.launch {
+                            // Create an ad and retrieve the adId
                             val ad = createAd(
                                 context,
                                 title.value,
