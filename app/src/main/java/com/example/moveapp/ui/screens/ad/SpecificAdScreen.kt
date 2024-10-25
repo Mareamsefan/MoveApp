@@ -22,11 +22,17 @@ import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
+import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
+import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun SpecificAdScreen(navController: NavController, adId: String?) {
     var ad by remember { mutableStateOf<AdData?>(null) }
+    var showSuccessMessage by remember { mutableStateOf(false) }
     val currentUser = getCurrentUser()
     LaunchedEffect(Unit) {
          ad = getAd(adId)
@@ -68,6 +74,25 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     }
                 ) {
                     Text(text = stringResource(R.string.edit_ad))
+                }
+            } else if (isUserLoggedIn()){
+                Button(
+                    onClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            ad!!.adId?.let { addAdToFavorites(currentUser!!.uid, it) }
+                            showSuccessMessage = true
+                        }
+                    }
+                ) {
+                    Text(text = stringResource(R.string.add_to_favorites))
+                }
+
+                if (showSuccessMessage) {
+                    Text(
+                        text = stringResource(R.string.favorite_added),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         }

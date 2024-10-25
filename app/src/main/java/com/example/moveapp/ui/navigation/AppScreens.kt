@@ -12,5 +12,7 @@ enum class AppScreens {
     SPECIFIC_MESSAGE,
     START_NEW_CHAT,
     GUEST_DENIED,
+    MY_ADS,
+
 
 }
