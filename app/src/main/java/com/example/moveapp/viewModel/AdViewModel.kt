@@ -3,11 +3,8 @@ import com.example.moveapp.data.AdData
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.moveapp.repository.AdRepo
-import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.utility.FireStorageService
-import com.example.moveapp.utility.FirestoreService
 import com.google.firebase.firestore.GeoPoint
 
 
@@ -29,7 +26,6 @@ class AdViewModel {
             position: GeoPoint?
         ): AdData? {
             return try {
-                // Create the ad object
                 val ad = AdData(
                     adTitle = adTitle,
                     adPrice = adPrice,
@@ -41,7 +37,6 @@ class AdViewModel {
                     postalCode = postalCode,
                     position = position
                 )
-
                 // Attempt to add the ad to the database
                 val success = AdRepo.addAdToDatabase(ad)
 

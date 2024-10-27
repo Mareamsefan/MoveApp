@@ -103,6 +103,4 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
     implementation("com.google.accompanist:accompanist-permissions:0.31.0-alpha")
-
-
 }

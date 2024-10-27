@@ -6,6 +6,7 @@ import com.example.moveapp.utility.FirestoreService
 
 import com.example.moveapp.utility.FirestoreService.db
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -243,20 +244,18 @@ class AdRepo {
             minPrice: Double?,
             maxPrice: Double?,
             search: String?,
+            currentLocation: GeoPoint,
             onSuccess: (List<AdData>) -> Unit,
             onFailure: (Exception) -> Unit) {
             try {
-                val query = FirestoreService.filteredAdsFromDatabase(
+                val ads = FirestoreService.filteredAdsFromDatabase(
                     location,
                     category,
                     minPrice,
                     maxPrice,
-                    search
+                    search,
+                    currentLocation,
                 )
-                val ads = query?.documents?.mapNotNull { document ->
-                    document.toObject(AdData::class.java)
-
-                }
                 if (ads != null) {
                     onSuccess(ads)
                 }
