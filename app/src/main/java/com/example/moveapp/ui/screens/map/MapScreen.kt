@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.map
 
 import android.app.Activity
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAds
 import com.example.moveapp.utility.LocationUtil
@@ -43,7 +46,6 @@ fun MapScreen(navController: NavController) {
             }
         )
     }
-    // TODO: add the ads to the map
 
     locationUtil.getUserLocation(context) { location ->
         location?.let {
@@ -56,17 +58,17 @@ fun MapScreen(navController: NavController) {
     }
 
 
-    Log.d("MapScreen", "user location on map ${userLocation}")
+    Log.d("MapScreen", "user location on map $userLocation")
 
 
 
     if (hasLocationPermission){
-        Map(userLocation!!, hasLocationPermission)
+        Map(userLocation!!, hasLocationPermission, ads, navController)
     }
 }
 
 @Composable
-fun Map(geoPoint: GeoPoint, hasLocationPermission: Boolean, ) {
+fun Map(geoPoint: GeoPoint, hasLocationPermission: Boolean, ads: List<AdData>, navController: NavController) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -95,6 +97,28 @@ fun Map(geoPoint: GeoPoint, hasLocationPermission: Boolean, ) {
                     }
                     if (hasLocationPermission)
                         overlays.add(marker)
+                    val userMarker = Marker(this).apply {
+                        position = geoPoint
+                        Log.d("MapScreen", "User location on map: ${geoPoint}")
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = "My location"
+                    }
+                    overlays.add(userMarker)
+
+                    for (ad in ads) {
+                        ad.position?.let { geo ->
+                            val adMarker = Marker(this).apply {
+                                position = GeoPoint(geo.latitude, geo.longitude)
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                title = ad.adTitle
+                            }
+                            adMarker.setOnMarkerClickListener { _, _ ->
+                                navController.navigate("specific_ad/${ad.adId}")
+                                true
+                            }
+                            overlays.add(adMarker)
+                        }
+                    }
                 }
             },
             update = { mapView?.invalidate() }
