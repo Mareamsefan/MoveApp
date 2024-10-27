@@ -50,6 +50,10 @@ object FireAuthService {
         return user != null && !user.isAnonymous
     }
 
+    fun signOutUser(){
+        auth.signOut()
+    }
+
     // Function for registering new user
     suspend fun register(email: String, password: String, userName: String): FirebaseUser? {
         return try {

@@ -15,6 +15,7 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import com.google.firebase.firestore.SetOptions
 
 // Using object instead of class to ensure that there is only one instance
 // Because the app only need one instance of the connection to the database
@@ -57,7 +58,7 @@ object FirestoreService {
     }
 
     suspend fun <T : Any> updateDocument(collection: String, documentId: String, data: T) {
-        db.collection(collection).document(documentId).set(data).await()
+        db.collection(collection).document(documentId).set(data, SetOptions.merge()).await()
     }
 
     suspend fun deleteDocument(collection: String, documentId: String) {

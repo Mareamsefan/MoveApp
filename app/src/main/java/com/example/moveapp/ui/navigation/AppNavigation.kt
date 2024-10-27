@@ -39,6 +39,7 @@ import com.example.moveapp.ui.screens.messages.StartNewChatScreen
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
+import com.example.moveapp.ui.screens.profile.MyAdsScreen
 import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
@@ -246,6 +247,14 @@ fun AppNavigation() {
 
                     composable(AppScreens.START_NEW_CHAT.name) {
                         StartNewChatScreen(navController)
+                    }
+
+                    composable(AppScreens.MY_ADS.name) {
+                        if (currentUser != null && !currentUser.isAnonymous) {
+                            MyAdsScreen(navController)
+                        } else {
+                            GuestDenied(navController)
+                        }
                     }
                 }
             }

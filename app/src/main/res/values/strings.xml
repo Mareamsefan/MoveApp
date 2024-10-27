@@ -55,5 +55,7 @@
     <string name="show_filter">Show Filter</string>
     <string name="guest_text">You need to login to view this page.</string>
     <string name="access_denied">Access denied</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="favorite_added">The ad has been added to your favorites!</string>
 
 </resources>

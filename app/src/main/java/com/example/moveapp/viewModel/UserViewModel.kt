@@ -9,6 +9,9 @@ import com.example.moveapp.data.UserData
 import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.repository.UserRepo.Companion.addUserToDatabase
 import com.example.moveapp.utility.FireAuthService
+import com.example.moveapp.utility.FirestoreService.updateDocument
+import com.example.moveapp.utility.FirestoreService.readDocument
+import com.example.moveapp.utility.FirestoreService.getCollection
 import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.HelpFunctions.Companion.validatePassword
 import com.google.firebase.auth.FirebaseUser
@@ -93,6 +96,36 @@ class UserViewModel {
                 }
             } catch (e: Exception) {
                 false
+            }
+        }
+
+        suspend fun addAdToFavorites(userId: String, adId: String) {
+            try {
+                // Read the current user document using FirestoreService
+                val userDocument = readDocument("users", userId, UserData::class.java)
+
+                if (userDocument == null) {
+                    Log.e("AddToFavorites", "User document not found for user ID: $userId")
+                    return
+                }
+
+                // Retrieve the current favorites and check if ad ID is already in the list
+                val currentFavorites = userDocument.favorites.toMutableList()
+                if (currentFavorites.contains(adId)) {
+                    Log.i("AddToFavorites", "Ad ID $adId is already in favorites for user $userId")
+                    return
+                }
+
+                // Add the new ad ID to favorites
+                currentFavorites.add(adId)
+
+                // Update the document with the new favorites list
+                updateDocument("users", userId, mapOf("favorites" to currentFavorites))
+
+                Log.i("AddToFavorites", "Successfully added ad ID $adId to favorites for user $userId")
+
+            } catch (e: Exception) {
+                Log.e("AddToFavorites", "Error adding ad to favorites: ${e.message}", e)
             }
         }
 
