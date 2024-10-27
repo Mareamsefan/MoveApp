@@ -4,23 +4,26 @@ import android.net.Uri
 import android.util.Log
 import com.example.moveapp.data.AdData
 import com.example.moveapp.utility.FireStorageService.uploadFileToStorage
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import com.google.firebase.firestore.SetOptions
+import com.example.moveapp.utility.LocationUtil
+
 
 // Using object instead of class to ensure that there is only one instance
 // Because the app only need one instance of the connection to the database
 // this approach will ensure efficiency and reduce unnecessary objects
 object FirestoreService {
+    val locationUtil = LocationUtil()
 
     // Declares the db property with the keyword lazy
     // lazy ensures that the init of the property only happens once
@@ -41,8 +44,7 @@ object FirestoreService {
         val snapshot = db.collection(collection).document(documentId).get().await()
         return snapshot.toObject(className)
     }
-
-    suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?): QuerySnapshot? {
+    suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?, currentLocation: GeoPoint): List<AdData> {
         var query: Query = db.collection("ads")
         if (location!=null && location!="")
             query = query.whereEqualTo("city", location)
@@ -52,10 +54,23 @@ object FirestoreService {
             query = query.whereGreaterThan("adPrice", minPrice)
         if (maxPrice!=null)
             query = query.whereLessThan("adPrice", maxPrice)
-        if (search!=null && location!=" ")
+        if (search!=null && search!="")
             query = query.orderBy("adTitle").startAt(search).endAt(search + "\uf8ff")
-        return query.get().await()
+        val querySnapshot: QuerySnapshot = query.get().await()
+        val ads = querySnapshot.toObjects(AdData::class.java)
+
+        if (location.isNullOrEmpty()) {
+            val adsWithPosition = ads.filter { it.position != null }
+
+            val sortedAds = adsWithPosition.sortedBy { ad ->
+                locationUtil.calculateDistance(currentLocation, ad.position!!)
+            }
+
+            return sortedAds + ads.filter { it.position == null }
+        }
+        return ads
     }
+
 
     suspend fun <T : Any> updateDocument(collection: String, documentId: String, data: T) {
         db.collection(collection).document(documentId).set(data, SetOptions.merge()).await()
