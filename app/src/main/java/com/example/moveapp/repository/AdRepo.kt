@@ -197,7 +197,8 @@ class AdRepo {
                     adImages = it.adImages,
                     city = it.city,
                     address = it.address,
-                    postalCode = it.postalCode
+                    postalCode = it.postalCode,
+                    position = it.position
                 )
             }
         }

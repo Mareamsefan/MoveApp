@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
+import com.example.moveapp.ui.composables.AdMap
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
@@ -37,13 +40,20 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     LaunchedEffect(Unit) {
          ad = getAd(adId)
     }
+
     // Sjekker om annonsen tilhører den innloggede brukeren
     val isOwner = currentUser != null && ad?.userId == currentUser.uid
 
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ){
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
             if (ad != null) {
                 Text(text = ad!!.adTitle, style = MaterialTheme.typography.titleLarge)
                 Image_swipe(imageList = ad!!.adImages)
@@ -53,6 +63,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 Text(text = stringResource(R.string.address) + ": " + ad!!.address)
                 Text(text = stringResource(R.string.city) + ": " + ad!!.city)
                 Text(text = stringResource(R.string.postal_code) + ": "  + ad!!.postalCode)
+                AdMap(ad = ad!!)
             } else {
                 Text(text = "ad not found")
             }
