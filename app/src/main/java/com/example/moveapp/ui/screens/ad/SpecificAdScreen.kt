@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +23,7 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
+import com.example.moveapp.ui.composables.AdMap
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
@@ -31,69 +35,84 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SpecificAdScreen(navController: NavController, adId: String?) {
+    val scrollState = rememberScrollState()
     var ad by remember { mutableStateOf<AdData?>(null) }
     var showSuccessMessage by remember { mutableStateOf(false) }
     val currentUser = getCurrentUser()
     LaunchedEffect(Unit) {
          ad = getAd(adId)
     }
+
     // Sjekker om annonsen tilhører den innloggede brukeren
     val isOwner = currentUser != null && ad?.userId == currentUser.uid
 
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
-    ){
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
             if (ad != null) {
                 Text(text = ad!!.adTitle, style = MaterialTheme.typography.titleLarge)
                 Image_swipe(imageList = ad!!.adImages)
                 Text(text = ad!!.adDescription)
                 Text(text = stringResource(R.string.category) + ": " + ad!!.adCategory)
-                Text(text = stringResource(R.string.price) + ": " + ad!!.adPrice.toString() + stringResource(R.string.kr))
+                Text(
+                    text = stringResource(R.string.price) + ": " + ad!!.adPrice.toString() + stringResource(
+                        R.string.kr
+                    )
+                )
                 Text(text = stringResource(R.string.address) + ": " + ad!!.address)
                 Text(text = stringResource(R.string.city) + ": " + ad!!.city)
-                Text(text = stringResource(R.string.postal_code) + ": "  + ad!!.postalCode)
-            } else {
-                Text(text = "ad not found")
-            }
+                Text(text = stringResource(R.string.postal_code) + ": " + ad!!.postalCode)
 
-
-            Button(
-                onClick = {
-                    // TODO: open message with seller and current user
-                }
-            ) {
-                Text(text = stringResource(R.string.contact_seller))
-            }
-            // Vis "Rediger annonse"-knappen hvis brukeren er eieren
-            if (isOwner) {
                 Button(
                     onClick = {
-                        // Naviger til redigeringsskjerm med annonsens ID
-                        navController.navigate("editAd/${ad!!.adId}")
+                        // TODO: open message with seller and current user
                     }
                 ) {
-                    Text(text = stringResource(R.string.edit_ad))
+                    Text(text = stringResource(R.string.contact_seller))
                 }
-            } else if (isUserLoggedIn()){
-                Button(
-                    onClick = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            ad!!.adId?.let { addAdToFavorites(currentUser!!.uid, it) }
-                            showSuccessMessage = true
+                // Vis "Rediger annonse"-knappen hvis brukeren er eieren
+                if (isOwner) {
+                    Button(
+                        onClick = {
+                            // Naviger til redigeringsskjerm med annonsens ID
+                            navController.navigate("editAd/${ad!!.adId}")
                         }
+                    ) {
+                        Text(text = stringResource(R.string.edit_ad))
                     }
-                ) {
-                    Text(text = stringResource(R.string.add_to_favorites))
-                }
+                } else if (isUserLoggedIn()) {
+                    Button(
+                        onClick = {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                ad!!.adId?.let { addAdToFavorites(currentUser!!.uid, it) }
+                                showSuccessMessage = true
+                            }
+                        }
+                    ) {
+                        Text(text = stringResource(R.string.add_to_favorites))
+                    }
 
-                if (showSuccessMessage) {
-                    Text(
-                        text = stringResource(R.string.favorite_added),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    if (showSuccessMessage) {
+                        Text(
+                            text = stringResource(R.string.favorite_added),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
+                if(ad!!.position != null)
+                    AdMap(ad = ad!!)
+            }
+            else {
+                Text(text = "ad not found")
             }
         }
     }

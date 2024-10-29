@@ -54,7 +54,7 @@ fun HomeScreen(
 
     // request for user location
     val locationUtil = LocationUtil()
-    locationUtil.RequestUserLocation()
+    locationUtil.RequestUserLocation(navController)
 
     locationUtil.getUserLocation(context) { loca ->
         loca?.let {
