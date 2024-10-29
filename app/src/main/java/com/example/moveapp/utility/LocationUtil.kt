@@ -7,6 +7,10 @@ import android.location.Geocoder
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.navigation.NavController
+import com.example.moveapp.ui.navigation.AppScreens
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -22,7 +26,7 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 
-class LocationUtil {
+class LocationUtil() {
 
     @Composable
     fun addressToGeopoint(context: Context, addressString: String): GeoPoint? {
@@ -43,18 +47,22 @@ class LocationUtil {
 
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
-    fun RequestUserLocation() {
-
+    fun RequestUserLocation(navController: NavController) {
         val permissionState = rememberMultiplePermissionsState(
             listOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
         )
-
         LaunchedEffect(permissionState) {
             if (!permissionState.allPermissionsGranted) {
                 permissionState.launchMultiplePermissionRequest()
+                when {
+                    permissionState.allPermissionsGranted -> {
+                        navController.navigate(AppScreens.HOME.name)
+                    }
+                }
+
             }
         }
     }
