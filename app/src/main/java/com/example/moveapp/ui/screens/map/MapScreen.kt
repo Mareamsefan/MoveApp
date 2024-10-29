@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.map
 
 import android.app.Activity
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -86,19 +88,12 @@ fun Map(geoPoint: GeoPoint, hasLocationPermission: Boolean, ads: List<AdData>, n
                     controller.setCenter(geoPoint)
                     val marker = Marker(this).apply {
                         position = geoPoint
-                        Log.d("MapScreen", "user location on map ${geoPoint}")
+                        Log.d("MapScreen", "user location on map $geoPoint")
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "My location"
                     }
                     if (hasLocationPermission)
                         overlays.add(marker)
-                    val userMarker = Marker(this).apply {
-                        position = geoPoint
-                        Log.d("MapScreen", "User location on map: ${geoPoint}")
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "My location"
-                    }
-                    overlays.add(userMarker)
                     for (ad in ads) {
                         ad.position?.let { geo ->
                             val adMarker = Marker(this).apply {

@@ -1,10 +1,8 @@
 package com.example.moveapp.ui.navigation.navBars
 
-import android.icu.text.StringSearch
-import android.util.Log
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -12,7 +10,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
@@ -22,6 +19,9 @@ import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.example.moveapp.ui.composables.SearchBar
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
@@ -29,7 +29,7 @@ import com.example.moveapp.utility.FireAuthService.getCurrentUser
 @Composable
 fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit){
 
-    val currentScreen = getCurrentScreen(navController)
+    var currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
     val searchQuery = remember { mutableStateOf<String?>(null) }
 
@@ -72,6 +72,8 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
             )
         },
 
+
+
         actions = {
             if(currentScreen == AppScreens.HOME.name){
                 SearchBar(onApplySearch = searchQuery, navController)
@@ -105,6 +107,16 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            }
+            if (currentScreen == AppScreens.HOME.name) {
+                IconButton(onClick = {
+                    navController.navigate(AppScreens.MAP.name)
+                },  modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.map),
+                        contentDescription = stringResource(R.string.map)
                     )
                 }
             }

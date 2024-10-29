@@ -47,16 +47,6 @@ fun FilterBar(
                 },
                 label = { Text(text = stringResource(R.string.location)) }
             )
-
-            IconButton(onClick = {
-                navController.navigate(AppScreens.MAP.name)
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Place,
-                    contentDescription = stringResource(R.string.map)
-                )
-            }
-            // Category dropdown menu
             Box {
 
                 OutlinedTextField(
