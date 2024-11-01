@@ -7,8 +7,10 @@ import android.location.Geocoder
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.example.moveapp.ui.navigation.AppScreens
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -44,28 +46,31 @@ class LocationUtil() {
             null
         }
     }
-
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     fun RequestUserLocation(navController: NavController) {
+        var permissionPreviouslyDenied by remember { mutableStateOf(false) }
         val permissionState = rememberMultiplePermissionsState(
             listOf(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
         )
-        LaunchedEffect(permissionState) {
+        LaunchedEffect(Unit) {
             if (!permissionState.allPermissionsGranted) {
                 permissionState.launchMultiplePermissionRequest()
-                when {
-                    permissionState.allPermissionsGranted -> {
-                        navController.navigate(AppScreens.HOME.name)
-                    }
-                }
-
+            }
+        }
+        LaunchedEffect(permissionState.allPermissionsGranted) {
+            if (permissionPreviouslyDenied && permissionState.allPermissionsGranted) {
+                navController.navigate(AppScreens.HOME.name)
+            }
+            if (!permissionState.allPermissionsGranted) {
+                permissionPreviouslyDenied = true
             }
         }
     }
+
 
     @OptIn(ExperimentalPermissionsApi::class)
     @Composable
@@ -91,7 +96,7 @@ class LocationUtil() {
                     val geoPoint = GeoPoint(location.latitude, location.longitude)
                     onLocationResult(geoPoint)
                 }
-            }.addOnFailureListener { exception ->
+            }.addOnFailureListener {
                 Log.d("LocationUtil", "Last known location is null")
                 onLocationResult(null)
             }
@@ -103,6 +108,8 @@ class LocationUtil() {
             onLocationResult(GeoPoint(59.9139, 10.7522))
         }
     }
+
+
     fun calculateDistance(currentLocation: GeoPoint, adLocation: GeoPoint): Double {
         val earthRadius = 6371e3
 
