@@ -10,9 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.ui.navigation.AppScreens
 
@@ -45,6 +47,15 @@ fun AdItem(navcontroller: NavController, ad: AdData) {
                         .height(150.dp) // Set a fixed height for the image
                         .fillMaxWidth(), // Image takes up the full width of the card
                     contentScale = ContentScale.Crop // Crop the image to fill the area without distortion
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.placeholder_img_foreground),
+                    contentDescription = ad.adTitle,
+                    modifier = Modifier
+                        .height(150.dp)
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.Crop
                 )
             }
 

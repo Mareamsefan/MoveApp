@@ -122,7 +122,7 @@ fun AppNavigation() {
                             }
                         }
                     )
-            }
+                }
             }
         ) { innerPadding ->
 
