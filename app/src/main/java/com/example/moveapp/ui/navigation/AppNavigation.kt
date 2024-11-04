@@ -23,6 +23,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.moveapp.R
+import com.example.moveapp.ui.composables.SplitFloatingActionButton
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.FilterBar
 import com.example.moveapp.ui.navigation.navBars.TopBar
@@ -68,6 +69,9 @@ fun AppNavigation() {
     var showBottomSheet by remember { mutableStateOf(false) }
     val coroutineScope = MainScope()
 
+    // State variable for Grid <-> List view
+    var isListView by remember { mutableStateOf(true) }
+
     // Screens to show bottom navigation bar
     val bottomNavScreens = listOf(
         AppScreens.HOME.name,
@@ -111,12 +115,16 @@ fun AppNavigation() {
                     BottomNavBar(navController)
                 }
             },
+
             floatingActionButton = {
-                if (currentScreen == AppScreens.HOME.name){
-                    ExtendedFloatingActionButton(
-                        text = { Text(stringResource(R.string.show_filter))},
-                        icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                        onClick = {
+                if (currentScreen == AppScreens.HOME.name) {
+                    SplitFloatingActionButton (
+                        isListView = isListView,
+                        onViewToggle = { newIsListView ->
+                            isListView = newIsListView
+                            // Here you can also trigger any layout changes in your screen
+                        },
+                        onRightClick = {
                             scope.launch {
                                 showBottomSheet = true
                             }
@@ -124,6 +132,10 @@ fun AppNavigation() {
                     )
                 }
             }
+
+
+
+
         ) { innerPadding ->
 
 
@@ -180,7 +192,8 @@ fun AppNavigation() {
                             location = location.value,
                             category = category.value,
                             minPrice = minPrice.value,
-                            maxPrice = maxPrice.value
+                            maxPrice = maxPrice.value,
+                            isListView = isListView
 
                         )
                     }
