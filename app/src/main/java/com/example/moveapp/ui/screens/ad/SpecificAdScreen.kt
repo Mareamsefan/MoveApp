@@ -108,8 +108,8 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                         )
                     }
                 }
-                if(ad!!.position != null)
-                    AdMap(ad = ad!!)
+                //if(ad!!.position != null)
+                    //AdMap(ad = ad!!)
             }
             else {
                 Text(text = "ad not found")
