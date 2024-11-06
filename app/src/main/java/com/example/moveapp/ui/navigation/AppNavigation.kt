@@ -72,14 +72,6 @@ fun AppNavigation() {
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
 
-    // Screens to show bottom navigation bar
-    val bottomNavScreens = listOf(
-        AppScreens.HOME.name,
-        AppScreens.ALL_MESSAGES.name,
-        AppScreens.POST_AD.name,
-        AppScreens.PROFILE.name,
-        AppScreens.GUEST_DENIED.name
-    )
 
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
@@ -111,9 +103,7 @@ fun AppNavigation() {
                 }
             },
             bottomBar = {
-                if (currentScreen in bottomNavScreens) {
-                    BottomNavBar(navController)
-                }
+                BottomNavBar(navController)
             },
 
             floatingActionButton = {
