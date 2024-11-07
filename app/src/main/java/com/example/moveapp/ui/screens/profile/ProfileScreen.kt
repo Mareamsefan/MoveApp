@@ -48,6 +48,7 @@ import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.repository.UserRepo
 import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.ui.composables.Image_swipe
+import com.example.moveapp.ui.composables.ProfilePicture
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.utility.FirestoreService.readDocument
@@ -142,7 +143,8 @@ fun Profile(navController: NavController) {
             )
 
             // Profile image
-            Image_swipe(imageList = listOf(profileImageUrl.value))
+            ProfilePicture(image = profileImageUrl.value)
+            //Image_swipe(imageList = listOf(profileImageUrl.value))
 
             // Upload or update image button
             Button(
