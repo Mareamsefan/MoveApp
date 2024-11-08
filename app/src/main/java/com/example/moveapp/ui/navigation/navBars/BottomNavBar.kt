@@ -1,17 +1,26 @@
 package com.example.moveapp.ui.navigation.navBars
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,19 +29,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.getValue
 import com.example.moveapp.utility.FireAuthService.fetchUserEmail
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
 import com.example.moveapp.utility.FireAuthService.signOutUser
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import com.example.moveapp.utility.FireAuthService
 
 
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
@@ -50,6 +49,7 @@ val shortcuts = listOf(
 @Composable
 fun BottomNavBar(navController: NavController) {
     var isProfileMenuExpanded by remember { mutableStateOf(false) }
+    var showLogoutConfirmation by remember { mutableStateOf(false) }
 
     NavigationBar (
 
@@ -108,12 +108,39 @@ fun BottomNavBar(navController: NavController) {
                             )
 
                             DropdownMenuItem(
-                                text = { Text("Logout")},
+                                text = { Text("Logout") },
                                 onClick = {
-                                    signOutUser()
+                                    showLogoutConfirmation = true
                                     isProfileMenuExpanded = false
-                                          },
+                                }
                             )
+
+                            if (showLogoutConfirmation) {
+                                AlertDialog(
+                                    onDismissRequest = { showLogoutConfirmation = false },
+                                    title = { Text("Confirm Logout") },
+                                    text = { Text("Are you sure you want to log out?") },
+                                    confirmButton = {
+                                        Button(
+                                            onClick = {
+                                                signOutUser()
+                                                showLogoutConfirmation = false
+                                            }
+                                        ) {
+                                            Text("Yes")
+                                        }
+                                    },
+                                    dismissButton = {
+                                        Button(
+                                            onClick = {
+                                                showLogoutConfirmation = false
+                                            }
+                                        ) {
+                                            Text("No")
+                                        }
+                                    }
+                                )
+                            }
                         }
                         }
                     }
