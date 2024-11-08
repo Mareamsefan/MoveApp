@@ -13,6 +13,7 @@ enum class AppScreens {
     START_NEW_CHAT,
     GUEST_DENIED,
     MY_ADS,
+    WELCOME_SCREEN
 
 
 }

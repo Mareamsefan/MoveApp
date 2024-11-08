@@ -1,15 +1,9 @@
 package com.example.moveapp.ui.navigation
 
-import android.content.Context
-import android.util.Log
-import androidx.annotation.StringRes
-import androidx.compose.foundation.gestures.snapping.SnapPosition
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -42,6 +36,7 @@ import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 import com.example.moveapp.ui.screens.profile.MyAdsScreen
 import com.example.moveapp.ui.screens.register.Register
+import com.example.moveapp.ui.screens.welcome.WelcomeScreen
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import kotlinx.coroutines.MainScope
@@ -168,8 +163,12 @@ fun AppNavigation() {
                 }
                 NavHost(
                     navController = navController,
-                    startDestination = AppScreens.HOME.name
+                    startDestination = AppScreens.WELCOME_SCREEN.name
                 ) {
+
+                    composable(AppScreens.WELCOME_SCREEN.name) {
+                        WelcomeScreen(navController)
+                    }
 
                     composable(AppScreens.LOGIN.name) {
                         LoginScreen(navController)
