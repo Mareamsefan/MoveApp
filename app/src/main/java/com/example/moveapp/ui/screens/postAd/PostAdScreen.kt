@@ -57,6 +57,9 @@ fun PostAdScreen(navController: NavController) {
     val postalCode = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String>() }
 
+    // State for sending request to database
+    var isPosting by remember { mutableStateOf(false) }
+
     // Dropdown state for ad type
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(R.string.Select_an_ad_type) }
@@ -191,50 +194,53 @@ fun PostAdScreen(navController: NavController) {
 
             Button(
                 onClick = {
-                    if (currentUser != null) {
+                    if (!isPosting && currentUser != null) {
+                        isPosting = true
                         coroutineScope.launch {
-                            // Create an ad and retrieve the adId
-                            val ad = createAd(
-                                context,
-                                title.value,
-                                price.value.toDouble(),
-                                adType.value,
-                                description.value,
-                                currentUser.uid,
-                                city.value,
-                                address.value,
-                                postalCode.value,
-                                geoPoint
-                            )
-                            val adId = ad?.adId
-                            Log.d("PostADIMAGESlocal", "Ad iMAGES: $adImages")
-                            if (adId != null) {
-                                val uriImagesList = adImages.map { it.toUri() }
-                                // Upload the images and get the URLs
-                                val uploadedImageUrls = uploadAdImagesToStorage(adId, uriImagesList)
+                            try {
+                                // Create an ad and retrieve the adId
+                                val ad = createAd(
+                                    context,
+                                    title.value,
+                                    price.value.toDouble(),
+                                    adType.value,
+                                    description.value,
+                                    currentUser.uid,
+                                    city.value,
+                                    address.value,
+                                    postalCode.value,
+                                    geoPoint
+                                )
+                                val adId = ad?.adId
+                                Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
 
-                                // Ensure you only update with non-empty URLs
-                                if (uploadedImageUrls.isNotEmpty()) {
-                                    // Deleting the localUris
-                                    //adImages.map { FireStorageService.deleteFileFromStorage(it) }
+                                if (adId != null) {
+                                    val uriImagesList = adImages.map { it.toUri() }
 
-                                    // Update ad with the list of uploaded image URLs
-                                    val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
-                                    if (updateSuccess) {
-                                        Log.d("PostAdScreen", "Ad images updated successfully.")
+                                    val uploadedImageUrls = uploadAdImagesToStorage(adId, uriImagesList)
+
+                                    if (uploadedImageUrls.isNotEmpty()) {
+                                        
+                                        val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
+                                        if (updateSuccess) {
+                                            Log.d("PostAdScreen", "Ad images updated successfully.")
+                                        } else {
+                                            Log.e("PostAdScreen", "Failed to update ad images.")
+                                        }
                                     } else {
-                                        Log.e("PostAdScreen", "Failed to update ad images.")
+                                        Log.e("PostAdScreen", "No URLs returned from upload.")
                                     }
-                                } else {
-                                    Log.e("PostAdScreen", "No URLs returned from upload.")
-                                }
 
-                                // Navigate after everything is completed
-                                navController.navigate(AppScreens.HOME.name)
+                                    // Navigate after everything is completed
+                                    navController.navigate(AppScreens.HOME.name)
+                                }
+                            } finally {
+                                isPosting = false
                             }
                         }
                     }
-                }
+                },
+                enabled = !isPosting
             ) {
                 Text(text = stringResource(R.string.post_ad))
             }
