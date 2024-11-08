@@ -6,7 +6,7 @@
     <string name="back_button">Back button</string>
     <string name="dropdown_menu_button">Dropdown menu button</string>
     <string name="post_ad">Post ad</string>
-    <string name="my_profile">My profile</string>
+    <string name="my_profile">Profile</string>
     <string name="messages">Messages</string>
     <string name="filter">Filter</string>
     <string name="email">Email</string>
@@ -19,8 +19,8 @@
     <string name="registration_failed">Registration failed…</string>
     <string name="location">Location</string>
     <string name="category">Category</string>
-    <string name="min_price">min price</string>
-    <string name="max_price">max price</string>
+    <string name="min_price">Min price</string>
+    <string name="max_price">Max price</string>
     <string name="market_near_you">The market near you</string>
     <string name="search">Search</string>
     <string name="unwanted_items">Unwanted items</string>
@@ -57,5 +57,6 @@
     <string name="access_denied">Access denied</string>
     <string name="add_to_favorites">Add to Favorites</string>
     <string name="favorite_added">The ad has been added to your favorites!</string>
+    <string name="browse">Just browse</string>
 
 </resources>

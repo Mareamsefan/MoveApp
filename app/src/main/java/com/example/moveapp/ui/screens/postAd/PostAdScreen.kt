@@ -32,11 +32,9 @@ import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.CameraPermission
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
-import com.example.moveapp.utility.FireStorageService
 import com.example.moveapp.utility.LocationUtil
 import com.example.moveapp.viewModel.AdViewModel.Companion.createAd
 import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStorage
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.io.File
 
