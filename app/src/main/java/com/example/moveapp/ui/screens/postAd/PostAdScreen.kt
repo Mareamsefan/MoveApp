@@ -220,7 +220,7 @@ fun PostAdScreen(navController: NavController) {
                                     val uploadedImageUrls = uploadAdImagesToStorage(adId, uriImagesList)
 
                                     if (uploadedImageUrls.isNotEmpty()) {
-                                        
+
                                         val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
                                         if (updateSuccess) {
                                             Log.d("PostAdScreen", "Ad images updated successfully.")
