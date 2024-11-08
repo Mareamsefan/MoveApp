@@ -26,7 +26,7 @@ fun WelcomeScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "What are you looking for today?")
+            Text(text = stringResource(id = R.string.what_looking_for))
 
             Button(
                 onClick = {

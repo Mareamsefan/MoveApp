@@ -58,5 +58,6 @@
     <string name="add_to_favorites">Add to Favorites</string>
     <string name="favorite_added">The ad has been added to your favorites!</string>
     <string name="browse">Just browse</string>
+    <string name="what_looking_for">What are you looking for?</string>
 
 </resources>
