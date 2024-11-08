@@ -24,6 +24,10 @@ import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.ui.composables.AdItemList
 import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.GeoPoint
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import kotlinx.coroutines.launch
+import androidx.compose.material3.CircularProgressIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -44,6 +48,11 @@ fun HomeScreen(
     var userLocation by remember { mutableStateOf<GeoPoint?>(null) }
     val context = LocalContext.current
 
+
+    var isRefreshing by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
     // request for user location
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation(navController)
@@ -57,36 +66,45 @@ fun HomeScreen(
         }
     }
 
+    fun fetchAds() {
+        coroutineScope.launch {
+            isRefreshing = true
+            try {
+                userLocation?.let {
+                    AdRepo.filterAd(
+                        location = location,
+                        category = category,
+                        minPrice = minPrice,
+                        maxPrice = maxPrice,
+                        search = searchQuery,
+                        currentLocation = it,
+                        onSuccess = { fetchedAds ->
+                            filteredAds = fetchedAds
+                            loading = false
+                        },
+                        onFailure = { exception ->
+                            errorMessage = exception.message ?: "Error fetching ads"
+                            loading = false
+                        }
+                    )
+                }
+            } catch (e: Exception) {
+                errorMessage = e.message ?: "Exception fetching ads"
+                loading = false
+            } finally {
+                isRefreshing = false  // Hide refreshing indicator
+            }
+        }
+    }
+
     // Fetch ads whenever the filters or search query change
     LaunchedEffect(location, category, minPrice, maxPrice, searchQuery, userLocation) {
-        try {
-            Log.d("HomeScreen", "Fetching filtered ads with parameters:")
-            Log.d("HomeScreen", "Location: ${location}, Category: ${category}, MinPrice: ${minPrice}, MaxPrice: ${maxPrice}, SearchQuery: $searchQuery")
+        fetchAds()
+    }
 
-            userLocation?.let {
-                AdRepo.filterAd(
-                    location = location,
-                    category = category,
-                    minPrice = minPrice,
-                    maxPrice = maxPrice,
-                    search = searchQuery,
-                    currentLocation = it,
-                    onSuccess = { fetchedAds ->
-                        filteredAds = fetchedAds
-                        loading = false
-                        Log.d("HomeScreen", "Successfully fetched ads: $fetchedAds")
-                    },
-                    onFailure = { exception ->
-                        errorMessage = exception.message ?: "Error fetching ads"
-                        loading = false
-                        Log.e("HomeScreen", "Error fetching ads: ${exception.message}", exception)
-                    }
-                )
-            }
-        } catch (e: Exception) {
-            errorMessage = e.message ?: "Exception fetching ads"
-            loading = false
-            Log.e("HomeScreen", "Exception while fetching ads", e)
+    LaunchedEffect(remember { derivedStateOf { listState.firstVisibleItemIndex } }, remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }) {
+        if (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0) {
+            fetchAds()
         }
     }
 
@@ -106,6 +124,7 @@ fun HomeScreen(
                         // Retry fetching ads
                         loading = true
                         errorMessage = ""
+                        fetchAds()
                     }) {
                         Text(text = "Retry")
                     }
@@ -118,6 +137,19 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
+                        if (isRefreshing) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+
                         items(filteredAds) { ad ->
                             AdItemList(navController, ad = ad)
                         }
@@ -129,6 +161,19 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(8.dp),
                     ) {
+                        if (isRefreshing) {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                        }
+
                         items(filteredAds) { ad ->
                             AdItem(navController, ad = ad)
                         }
