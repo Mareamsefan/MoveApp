@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -10,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -22,6 +24,9 @@ fun AdItemList(navcontroller: NavController, ad: AdData) {
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
+            .clickable {
+                navcontroller.navigate("specific_ad/${ad.adId}")
+            }
     ) {
         Row(
             modifier = Modifier
@@ -50,7 +55,6 @@ fun AdItemList(navcontroller: NavController, ad: AdData) {
                 )
             }
 
-            // Content on the right
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -60,9 +64,16 @@ fun AdItemList(navcontroller: NavController, ad: AdData) {
                     text = ad.adTitle,
                     maxLines = 1
                 )
+                Text(
+                    text = ad.city,
+                    maxLines = 1
+                )
 
                 Spacer(modifier = Modifier.height(4.dp))
-
+                Text(
+                    text = ad.adPrice.toInt().toString() + stringResource(R.string.kr),
+                    maxLines = 1
+                )
                 Button(
                     onClick = {
                         navcontroller.navigate("specific_ad/${ad.adId}")

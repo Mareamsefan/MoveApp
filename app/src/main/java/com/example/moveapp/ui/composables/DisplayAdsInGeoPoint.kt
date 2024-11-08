@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,7 +42,9 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController) {
             val ad = ads[page]
             val painter = rememberAsyncImagePainter(model = ad.adImages.firstOrNull())
 
-            Card(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+            Card(modifier = Modifier.fillMaxSize().padding(8.dp).clickable {
+                navController.navigate("specific_ad/${ad.adId}")
+            }) {
                 Column {
                     Row(
                         modifier = Modifier
