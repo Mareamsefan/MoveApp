@@ -71,7 +71,7 @@ fun AdItemList(navcontroller: NavController, ad: AdData) {
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = ad.adPrice.toInt().toString() + stringResource(R.string.kr),
+                    text = ad.adPrice.toInt().toString() +" "+ stringResource(R.string.kr),
                     maxLines = 1
                 )
                 Button(

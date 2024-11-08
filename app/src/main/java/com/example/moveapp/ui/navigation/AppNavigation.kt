@@ -135,7 +135,6 @@ fun AppNavigation() {
                         sheetState = sheetState
                     ) {
                         FilterBar(
-                            navController = navController,
                             onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
                                 location.value = newLocation
                                 category.value = newCategory

@@ -20,7 +20,6 @@ import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
 fun FilterBar(
-    navController: NavController,
     onApplyFilter: (String?, String?, Double?, Double?) -> Unit
 ) {
     var tempLocation by remember { mutableStateOf<String?>(null) }

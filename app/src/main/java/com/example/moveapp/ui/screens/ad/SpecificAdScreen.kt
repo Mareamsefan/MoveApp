@@ -120,7 +120,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 Text(text = ad!!.adTitle,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
                 Text(text = stringResource(R.string.for_sale))
-                Text(text = ad!!.adPrice.toInt().toString() + stringResource(R.string.kr),
+                Text(text = ad!!.adPrice.toInt().toString() +" "+ stringResource(R.string.kr),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
                 Button(
                     onClick = {
