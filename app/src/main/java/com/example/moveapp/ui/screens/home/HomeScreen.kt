@@ -2,6 +2,7 @@ package com.example.moveapp.ui.screens.home
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -75,7 +76,6 @@ fun HomeScreen(
     fun fetchAds() {
         coroutineScope.launch {
             isRefreshing = true
-            delay(2.seconds)
             try {
                 userLocation?.let {
                     AdRepo.filterAd(
@@ -104,11 +104,15 @@ fun HomeScreen(
         }
     }
 
-
     // Fetch ads whenever the filters or search query change
     LaunchedEffect(location, category, minPrice, maxPrice, searchQuery, userLocation) {
         fetchAds()
     }
+
+    //https://developer.android.com/reference/kotlin/androidx/compose/material3/pulltorefresh/package-summary
+    //https://medium.com/@domen.lanisnik/pull-to-refresh-with-compose-material-3-26b37dbea966
+    //https://proandroiddev.com/material3-pulltorefresh-for-jetpack-compose-ebce277b9bca
+    //https://developer.android.com/jetpack/androidx/releases/compose-material3
 
     PullToRefreshBox(
         modifier = Modifier
@@ -145,9 +149,17 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-
                         items(filteredAds) { ad ->
-                            AdItemList(navController, ad = ad)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        navController.navigate("specific_ad/${ad.adId}")
+                                    }
+                                    .padding(8.dp) // Optional padding around the card
+                            ) {
+                                AdItemList(navController, ad = ad)
+                            }
                         }
                     }
                 } else {
@@ -157,9 +169,17 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(8.dp),
                     ) {
-
                         items(filteredAds) { ad ->
-                            AdItem(navController, ad = ad)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        navController.navigate("specific_ad/${ad.adId}")
+                                    }
+                                    .padding(8.dp)
+                            ) {
+                                AdItem(navController, ad = ad)
+                            }
                         }
                     }
                 }

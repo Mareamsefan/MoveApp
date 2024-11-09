@@ -76,6 +76,9 @@ dependencies {
     implementation(libs.firebase.database.ktx)
     implementation(libs.play.services.cast.framework)
     implementation(libs.androidx.ui.text.google.fonts)
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("androidx.credentials:credentials:1.5.0-beta01")
+    implementation("androidx.credentials:credentials-play-services-auth:1.5.0-beta01")
 
 
     testImplementation(libs.junit)
