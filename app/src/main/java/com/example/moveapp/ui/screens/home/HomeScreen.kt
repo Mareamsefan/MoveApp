@@ -24,10 +24,15 @@ import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.ui.composables.AdItemList
 import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.GeoPoint
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import kotlinx.coroutines.launch
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -48,10 +53,11 @@ fun HomeScreen(
     var userLocation by remember { mutableStateOf<GeoPoint?>(null) }
     val context = LocalContext.current
 
-
+    val refreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
 
     // request for user location
     val locationUtil = LocationUtil()
@@ -69,6 +75,7 @@ fun HomeScreen(
     fun fetchAds() {
         coroutineScope.launch {
             isRefreshing = true
+            delay(2.seconds)
             try {
                 userLocation?.let {
                     AdRepo.filterAd(
@@ -97,24 +104,25 @@ fun HomeScreen(
         }
     }
 
+
     // Fetch ads whenever the filters or search query change
     LaunchedEffect(location, category, minPrice, maxPrice, searchQuery, userLocation) {
         fetchAds()
     }
 
-    LaunchedEffect(remember { derivedStateOf { listState.firstVisibleItemIndex } }, remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }) {
-        if (listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0) {
+    PullToRefreshBox(
+        modifier = Modifier
+            .fillMaxSize(),
+        contentAlignment = Alignment.Center,
+        state = refreshState,
+        isRefreshing = isRefreshing,
+        onRefresh = {
             fetchAds()
         }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
     ) {
         when {
             loading -> {
-                Text(text = "Loading...")
+                Text(text = "Loading")
             }
             errorMessage.isNotEmpty() -> {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -137,18 +145,6 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        if (isRefreshing) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
-                        }
 
                         items(filteredAds) { ad ->
                             AdItemList(navController, ad = ad)
@@ -161,18 +157,6 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(8.dp),
                     ) {
-                        if (isRefreshing) {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    CircularProgressIndicator()
-                                }
-                            }
-                        }
 
                         items(filteredAds) { ad ->
                             AdItem(navController, ad = ad)
