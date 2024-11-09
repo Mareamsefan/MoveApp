@@ -28,9 +28,12 @@ import androidx.credentials.GetCredentialResponse
 import androidx.credentials.PublicKeyCredential
 import androidx.credentials.GetPublicKeyCredentialOption
 import com.example.moveapp.utility.FirestoreService
+import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.example.moveapp.utility.HelpFunctions.Companion.validatePassword
+import com.example.moveapp.utility.InvalidPasswordException
+import com.example.moveapp.utility.ProhibitedContentException
 
 @Composable
 fun Register(navController: NavController) {
@@ -129,11 +132,13 @@ fun Register(navController: NavController) {
             } else {
                 Button(
                     onClick = {
-                        if (!validatePassword(context, password.value)) {
-                            errorMessage = "Invalid password. Must contain a capital letter, number, and special character."
-                        } else {
+                        try {
+                            censorshipValidator(username.value)
+                            validatePassword(context, password.value)
+
                             isLoading = true
                             errorMessage = null
+
                             coroutineScope.launch {
                                 val user = registeringUser(context, username.value, email.value, password.value)
                                 isLoading = false
@@ -143,7 +148,17 @@ fun Register(navController: NavController) {
                                     errorMessage = "Registration failed. Please try again."
                                 }
                             }
+                        } catch (e: InvalidPasswordException) {
+                            errorMessage = e.message
+                            isLoading = false
+                        } catch (e: ProhibitedContentException) {
+                            errorMessage = e.message
+                            isLoading = false
+                        } catch (e: Exception) {
+                            errorMessage = "An unexpected error occurred."
+                            isLoading = false
                         }
+
                     }
                 ) {
                     Text(text = stringResource(R.string.register))

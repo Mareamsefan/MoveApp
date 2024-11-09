@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
@@ -28,6 +29,7 @@ import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun ProfileSettingsScreen(navController: NavController) {
@@ -43,6 +45,7 @@ fun ProfileSettingsScreen(navController: NavController) {
     val userEmail = remember { mutableStateOf<String?>(null) }
     val updatedEmail = remember { mutableStateOf("") }
     val guestEmail = "guest@guest.com" // do not change from guest@guest.com
+
 
     // Henter location
     LaunchedEffect(Unit) {
@@ -86,6 +89,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                 onClick = {
                     coroutineScope.launch {
                         if (updatedUsername.value.isNotEmpty()) {
+
                             val updateSuccess = updateUsername(updatedUsername.value)
                             errorMessage.value =
                                 if (updateSuccess) {
@@ -156,7 +160,6 @@ fun ProfileSettingsScreen(navController: NavController) {
                 coroutineScope.launch {
                     val emailRegex = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
                     val newEmail = updatedEmail.value
-
                     /* TODO:
                         Problem:
                             Her vises Current Email som hentes fra tabellen i Firestore Database
