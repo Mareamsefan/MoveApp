@@ -46,8 +46,6 @@ object FirestoreService {
     }
     suspend fun filteredAdsFromDatabase(location: String?, category: String?, minPrice: Double?, maxPrice: Double?, search: String?, currentLocation: GeoPoint): List<AdData> {
         var query: Query = db.collection("ads")
-        if (location!=null && location!="")
-            query = query.whereEqualTo("city", location, )
         if (category!=null && category!="")
             query = query.whereEqualTo("adCategory", category)
         if (minPrice!=null)
@@ -57,8 +55,12 @@ object FirestoreService {
         val querySnapshot: QuerySnapshot = query.get().await()
         var ads = querySnapshot.toObjects(AdData::class.java)
 
-        if (search!=null && search!="") {
+        if (search!=null && search!=" ") {
             ads = ads.filter { it.adTitle.contains(search, ignoreCase = true) }
+        }
+
+        if (location!=null && location!="") {
+            ads = ads.filter { it.city.contains(location, ignoreCase = true) }
         }
 
         if (location.isNullOrEmpty()) {
