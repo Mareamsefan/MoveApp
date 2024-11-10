@@ -185,22 +185,21 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp) // Adds spacing between image and text
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         owner?.profilePictureUrl?.let { url ->
                             Image(
                                 painter = rememberImagePainter(url),
                                 contentDescription = null,
                                 modifier = Modifier
-                                    .size(50.dp)
-                                    .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                                    .size(70.dp)
                             )
-                        }
-                        Column() {
+                    }
+                        Column {
                             owner?.let {
                                 Text(text = it.username, fontWeight = FontWeight.Bold)
-                                Text(text = it.email, color = Color.Gray)
                             }
+                            Text(text = stringResource(R.string.contact_seller_above), color = Color.Gray)
                         }
                     }
                 }
@@ -214,9 +213,9 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
 
-                if (ad!!.position != null) {
-                    AdMap(ad = ad!!)
-                }
+                //if (ad!!.position != null)
+                  //  AdMap(ad = ad!!)
+
             }
             else {
                 Text(text = "ad not found")
