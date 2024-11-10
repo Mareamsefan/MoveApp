@@ -13,7 +13,6 @@ import com.example.moveapp.utility.FirestoreService.updateDocument
 import com.example.moveapp.utility.FirestoreService.readDocument
 import com.example.moveapp.utility.FirestoreService.getCollection
 import com.example.moveapp.utility.FireStorageService
-import com.example.moveapp.utility.HelpFunctions.Companion.validatePassword
 import com.google.firebase.auth.FirebaseUser
 
 class UserViewModel {
@@ -22,39 +21,34 @@ class UserViewModel {
             context: Context,
             username: String,
             email: String,
-            password: String
+            password: String? = null
         ): FirebaseUser? {
-            if (!validatePassword(context, password)) {
-                return null
+            var user: FirebaseUser? = null
+
+            if (password != null) {
+                // Register with email and password
+                user = FireAuthService.register(email, password, username)
+                if (user == null) {
+                    Toast.makeText(context, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show()
+                    return null
+                }
+            } else {
+                // No password means Google sign-in, get the current user from FirebaseAuth
+                user = FireAuthService.getCurrentUser()
             }
 
-            var user = FireAuthService.register(email, password, username)
+            // Proceed if user is successfully authenticated
+            user?.let {
+                val userId = it.uid
+                val databaseUser = UserData(userId = userId, email = email, username = username)
 
-            if (user == null) {
-                Toast.makeText(
-                    context,
-                    "Registration failed. Please try again.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return null
-            }
-            val userId = user.uid
-            val databaseUser = UserData(userId = userId, username = username, email = email)
-            addUserToDatabase(databaseUser)
-
-            user = FireAuthService.signInUser(email, password)
-
-            if (user == null) {
-                Toast.makeText(
-                    context,
-                    "Sign-in failed. Please check your credentials.",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return null
+                // Save user to Firestore
+                addUserToDatabase(databaseUser)
             }
 
             return user
         }
+
 
 
         suspend fun loginUser(context: Context, email: String, password: String): FirebaseUser? {
