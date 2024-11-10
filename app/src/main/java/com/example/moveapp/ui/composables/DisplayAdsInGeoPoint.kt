@@ -65,7 +65,7 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController) {
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(text = ad.adCategory)
-                            Text(text = ad.adPrice.toString() + stringResource(R.string.kr))
+                            Text(text = ad.adPrice.toInt().toString() + stringResource(R.string.kr))
                             Button(
                                 onClick = {
                                     navController.navigate("specific_ad/${ad.adId}")

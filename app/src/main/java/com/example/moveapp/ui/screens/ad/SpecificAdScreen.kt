@@ -86,8 +86,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
             modifier = Modifier
                 .verticalScroll(scrollState)
                 .wrapContentHeight()
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .fillMaxSize()
         ) {
             if (ad != null) {
                 Image_swipe(imageList = ad!!.adImages)
@@ -185,7 +184,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         owner?.profilePictureUrl?.let { url ->
                             Image(
@@ -203,6 +202,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                         }
                     }
                 }
+                Spacer(modifier = Modifier.padding(top = 10.dp))
                 Text(
                     text = stringResource(R.string.address),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
