@@ -35,7 +35,7 @@ fun Image_swipe(imageList: List<String?>){
                     painter = painter,
                     contentDescription = null,
                     modifier = Modifier.fillMaxWidth()
-                        .height(230.dp)
+                        .height(250.dp)
                         .padding(8.dp)
                         .padding(top=8.dp)
                 )

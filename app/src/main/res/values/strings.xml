@@ -46,9 +46,10 @@
     <string name="get_my_location">Get my location</string>
     <string name="contact_seller">Contact seller</string>
     <string name="guest_denied">Please login to view</string>
-    <string name="kr">Kr</string>
-    <string name="for_sale">For sale</string>
-
+    <string name="kr"> kr</string>
+    <string name="Price">Price</string>
+    <string name="Seller">Seller</string>
+    <string name="contact_seller_above">Contact seller above</string>
     <string name="my_ads">My posted ads</string>
     <string name="no_ads">You have no ads posted at this moment</string>
     <string name="take_photo">Take a photo</string>

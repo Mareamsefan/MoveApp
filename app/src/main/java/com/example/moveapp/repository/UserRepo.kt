@@ -196,5 +196,9 @@ class UserRepo {
             val user: UserData? = readDocument("users", userId, UserData::class.java)
             return user?.username
         }
+
+        suspend fun getUser(userId: String): UserData? {
+            return readDocument("users", userId, UserData::class.java)
+        }
     }
 }

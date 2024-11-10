@@ -1,14 +1,21 @@
 package com.example.moveapp.ui.screens.ad
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -26,14 +33,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
+import com.example.compose.outlineDark
 import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
+import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.UserRepo.Companion.getUser
+import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.AdMap
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
@@ -57,6 +70,12 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
 
     // Sjekker om annonsen tilhører den innloggede brukeren
     val isOwner = currentUser != null && ad?.userId == currentUser.uid
+    var owner by remember { mutableStateOf<UserData?>(null) }
+    LaunchedEffect(ad) {
+        ad?.let {
+            owner = getUser(it.userId)
+        }
+    }
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -65,16 +84,18 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .verticalScroll(scrollState)
-                .wrapContentHeight(),
-            verticalArrangement = Arrangement.Top
+                .wrapContentHeight()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             if (ad != null) {
                 Image_swipe(imageList = ad!!.adImages)
                 if (isOwner) {
-                    Row(verticalAlignment = Alignment.CenterVertically, // Ensures alignment of IconButton and Text
-                        horizontalArrangement = Arrangement.Start) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, // Ensures alignment of IconButton and Text
+                        horizontalArrangement = Arrangement.Start
+                    ) {
                         IconButton(
                             onClick = {
                                 navController.navigate("editAd/${ad!!.adId}")
@@ -85,12 +106,18 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                                 contentDescription = stringResource(R.string.edit_ad)
                             )
                         }
-                        Text(text = stringResource(R.string.edit_ad), style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Bold))
+                        Text(
+                            text = stringResource(R.string.edit_ad),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
                     }
                 } else if (isUserLoggedIn()) {
-                    Row(verticalAlignment = Alignment.CenterVertically, // Ensures alignment of IconButton and Text
-                        horizontalArrangement = Arrangement.Start) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
                         IconButton(
                             onClick = {
                                 CoroutineScope(Dispatchers.IO).launch {
@@ -104,8 +131,12 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                                 contentDescription = stringResource(R.string.edit_ad)
                             )
                         }
-                        Text(text = stringResource(R.string.add_to_favorites), style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Bold))
+                        Text(
+                            text = stringResource(R.string.add_to_favorites),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
                     }
                     if (showSuccessMessage) {
                         Text(
@@ -115,13 +146,15 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                         )
                     }
                 }
-                //if(ad!!.position != null)
-                //AdMap(ad = ad!!)
-                Text(text = ad!!.adTitle,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                Text(text = stringResource(R.string.for_sale))
-                Text(text = ad!!.adPrice.toInt().toString() + stringResource(R.string.kr),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+                Text(
+                    text = ad!!.adTitle,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(text = stringResource(R.string.Price))
+                Text(
+                    text = ad!!.adPrice.toInt().toString() + " " + stringResource(R.string.kr),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
                 Button(
                     onClick = {
                         // TODO: open message with seller and current user
@@ -131,13 +164,57 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     Text(text = stringResource(R.string.contact_seller))
                 }
                 Text(text = ad!!.adDescription, Modifier.padding(bottom = 10.dp))
-                Text(text =stringResource(R.string.category) ,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+                Text(
+                    text = stringResource(R.string.category),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
                 Text(text = ad!!.adCategory, Modifier.padding(bottom = 10.dp))
-                Text(text =stringResource(R.string.address) ,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-                Text(text = (ad!!.address) + ", "+ ad!!.postalCode +", "+ ad!!.city)
-                // Vis "Rediger annonse"-knappen hvis brukeren er eieren
+                Text(
+                    text = stringResource(R.string.Seller),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Box(
+                    modifier = Modifier
+                        .border(
+                            width = 2.dp,
+                            color = Color.Gray,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(16.dp) // Adds padding inside the box
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        owner?.profilePictureUrl?.let { url ->
+                            Image(
+                                painter = rememberImagePainter(url),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(70.dp)
+                            )
+                    }
+                        Column {
+                            owner?.let {
+                                Text(text = it.username, fontWeight = FontWeight.Bold)
+                            }
+                            Text(text = stringResource(R.string.contact_seller_above), color = Color.Gray)
+                        }
+                    }
+                }
+                Text(
+                    text = stringResource(R.string.address),
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                )
+                Text(
+                    text = (ad!!.address) + ", " + ad!!.postalCode + ", " + ad!!.city,
+                    Modifier.padding(bottom = 10.dp)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+
+                //if (ad!!.position != null)
+                  //  AdMap(ad = ad!!)
 
             }
             else {
