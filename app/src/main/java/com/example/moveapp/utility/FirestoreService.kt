@@ -59,7 +59,7 @@ object FirestoreService {
             ads = ads.filter { it.adTitle.contains(search, ignoreCase = true) }
         }
 
-        if (location!=null && location!="") {
+        if (location!=null && location!=" ") {
             ads = ads.filter { it.city.contains(location, ignoreCase = true) }
         }
 
