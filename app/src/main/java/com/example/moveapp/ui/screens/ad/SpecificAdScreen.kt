@@ -239,6 +239,8 @@ fun startOrOpenChat(navController: NavController, sellerId: String, currentUserI
 
                 val chatId = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
 
+                Log.d("ChatDebug", "Attempting to to fin chat:::::: $chatId")
+
                 if (chatId == null) {
                     Log.d("ChatDebug", "No existing chat found. Creating a new chat.")
 
