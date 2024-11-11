@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -63,6 +64,43 @@ fun PostAdScreen(navController: NavController) {
     var selectedOption by remember { mutableStateOf(R.string.Select_an_ad_type) }
     val adType = remember { mutableStateOf("") }
     val options = listOf(R.string.Rent_vehicle, R.string.Delivery_service, R.string.unwanted_items)
+
+    // Dropdown for under category
+    var underCategoryExpanded by remember { mutableStateOf(false) }
+    var selectedUnderCategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
+    val underCategory = remember { mutableStateOf("") }
+
+
+    val unwantedItemsOptions = listOf(
+        R.string.Furniture,
+        R.string.Electronics,
+        R.string.Home_Decor,
+        R.string.Outdoor_and_Garden,
+        R.string.Clothing_and_Accessories,
+        R.string.Toys_and_Hobbies,
+        R.string.Miscellaneous
+    )
+
+    val rentVehicleOptions = listOf(
+        R.string.Personal_Vehicles,
+        R.string.Moving_Trucks,
+        R.string.Specialty_Vehicles,
+        R.string.Other
+    )
+    val deliveryServiceOption = listOf(
+        R.string.Small_Parcel_Delivery,
+        R.string.Furniture_and_Large_Item_Moving,
+        R.string.Long_Distance_Moves,
+        R.string.Special_Handling_Services,
+        R.string.Other
+    )
+
+    val currentSubcategoryOptions = when (selectedOption) {
+        R.string.unwanted_items -> unwantedItemsOptions
+        R.string.Rent_vehicle -> rentVehicleOptions
+        R.string.Delivery_service -> deliveryServiceOption
+        else -> emptyList()
+    }
 
     // Coroutine scope
     val coroutineScope = rememberCoroutineScope()
@@ -136,6 +174,47 @@ fun PostAdScreen(navController: NavController) {
                 }
             }
 
+            // underCategory
+            ExposedDropdownMenuBox(
+                expanded = underCategoryExpanded,
+                onExpandedChange = { underCategoryExpanded = !underCategoryExpanded }
+            ) {
+                TextField(
+                    value = stringResource(selectedUnderCategory),
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.Options)) },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null
+                        )
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = underCategoryExpanded,
+                    onDismissRequest = { underCategoryExpanded = false }
+                ) {
+                    currentSubcategoryOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(stringResource(option)) },
+                            onClick = {
+                                selectedUnderCategory = option
+                                underCategoryExpanded = false
+                            }
+                        )
+                        underCategory.value = stringResource(selectedUnderCategory)
+
+                    }
+                }
+            }
+
+
+
             // Title, address, postal code fields
             OutlinedTextField(
                 value = title.value,
@@ -185,6 +264,7 @@ fun PostAdScreen(navController: NavController) {
             )
 
             Text(text = adType.value) // Display the selected ad type
+            Text(text = underCategory.value)
 
             // turn the location information to a geopoint that gets saved in the database
             val fullAddress = "${address}, ${postalCode}, ${city}"
@@ -202,6 +282,7 @@ fun PostAdScreen(navController: NavController) {
                                     title.value,
                                     price.value.toDouble(),
                                     adType.value,
+                                    underCategory.value,
                                     description.value,
                                     currentUser.uid,
                                     city.value,
