@@ -45,6 +45,7 @@ import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
 import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.repository.UserRepo.Companion.getUser
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.AdMap
@@ -156,6 +157,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 )
                 Button(
                     onClick = {
+                        startOrOpenChat(navController, ad!!.userId, currentUser?.uid)
                         // TODO: open message with seller and current user
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -220,6 +222,15 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
             else {
                 Text(text = "ad not found")
             }
+        }
+    }
+}
+
+fun startOrOpenChat(navController: NavController, sellerId: String, currentUserId: String?) {
+    if (currentUserId != null && sellerId != currentUserId) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val chatId = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
+            navController.navigate("specificMessageScreen/$chatId")
         }
     }
 }
