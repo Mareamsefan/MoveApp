@@ -25,6 +25,8 @@ object FirebaseRealtimeService {
             null
         }
     }
+
+    /*
     fun getChatsFlow(): Flow<List<ChatData>> = callbackFlow {
         val chatsRef = FirebaseRealtimeService.db.child("chats")
 
@@ -88,7 +90,7 @@ object FirebaseRealtimeService {
 
         // Ensure the listener is removed when the flow is closed
         awaitClose { chatsRef.removeEventListener(valueEventListener) }
-    }
+    }*/
 
 
     suspend fun <T: Any> createData(path: String, data: T) {

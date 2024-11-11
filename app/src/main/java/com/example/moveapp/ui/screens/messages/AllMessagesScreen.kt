@@ -18,7 +18,7 @@ import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.ui.composables.ChatItem
 import com.example.moveapp.ui.navigation.AppScreens
-@Composable
+/*@Composable
 fun AllMessagesScreen(navController: NavController) {
     val userId = FireAuthService.getUserId()
     val scope = rememberCoroutineScope()
@@ -33,7 +33,7 @@ fun AllMessagesScreen(navController: NavController) {
         if (userId != null) {
             try {
                 // Fetch chats asynchronously
-                ChatRepo.getUserChatsFlow(userId).collect { fetchedChats ->
+                ChatRepogetUserChatsFlow(userId).collect { fetchedChats ->
                     chats = fetchedChats
                     loading = false
                     Log.d("AllMessagesScreen", "Fetched chats: $fetchedChats")
@@ -99,3 +99,4 @@ fun AllMessagesScreen(navController: NavController) {
 }
 
 
+*/

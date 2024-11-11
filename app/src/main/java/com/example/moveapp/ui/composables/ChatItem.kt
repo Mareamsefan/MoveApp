@@ -66,10 +66,11 @@ fun ChatItem(chat: ChatData, navController: NavController) {
             Spacer(modifier = Modifier.height(4.dp))
 
             // Last message preview
+            /*
             Text(
                 text = "Last message: ${chat.messages.lastOrNull()?.messageText ?: "No messages"}",
-                style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
-            )
+               // style = MaterialTheme.typography.bodyMedium.copy(color = Color.Gray)
+            )*/
 
             Spacer(modifier = Modifier.height(8.dp))
 

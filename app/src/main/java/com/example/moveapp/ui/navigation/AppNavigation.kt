@@ -28,9 +28,7 @@ import com.example.moveapp.ui.screens.guest.GuestDenied
 import com.example.moveapp.ui.screens.home.HomeScreen
 import com.example.moveapp.ui.screens.login.LoginScreen
 import com.example.moveapp.ui.screens.map.MapScreen
-import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
-import com.example.moveapp.ui.screens.messages.StartNewChatScreen
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
@@ -204,13 +202,15 @@ fun AppNavigation() {
                         ProfileSettingsScreen(navController)
                     }
 
+                    /*
+
                     composable(AppScreens.ALL_MESSAGES.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
                             AllMessagesScreen(navController)
                         } else {
                             GuestDenied(navController)
                         }
-                    }
+                    }*/
 
                     composable(AppScreens.POST_AD.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
@@ -239,16 +239,16 @@ fun AppNavigation() {
                     }
 
                     composable(
-                        route = "${AppScreens.SPECIFIC_MESSAGE.name}/{chatId}",
+                        route = "specificMessageScreen/{chatId}",
                         arguments = listOf(navArgument("chatId") { type = NavType.StringType })
                     ) { backStackEntry ->
                         val chatId = backStackEntry.arguments?.getString("chatId") ?: ""
                         SpecificMessageScreen(navController, chatId)
                     }
 
-                    composable(AppScreens.START_NEW_CHAT.name) {
+                    /*composable(AppScreens.START_NEW_CHAT.name) {
                         StartNewChatScreen(navController)
-                    }
+                    }*/
 
                     composable(AppScreens.MY_ADS.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {

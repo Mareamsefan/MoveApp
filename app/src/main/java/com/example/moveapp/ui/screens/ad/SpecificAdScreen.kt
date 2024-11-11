@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.ad
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +45,7 @@ import com.example.compose.outlineDark
 import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
+import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.UserData
 import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.repository.UserRepo.Companion.getUser
@@ -53,10 +55,13 @@ import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
+import com.example.moveapp.utility.FirebaseRealtimeService
 import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.UUID
+import kotlin.random.Random
 
 
 @Composable
@@ -229,9 +234,47 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
 fun startOrOpenChat(navController: NavController, sellerId: String, currentUserId: String?) {
     if (currentUserId != null && sellerId != currentUserId) {
         CoroutineScope(Dispatchers.IO).launch {
-            val chatId = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
-            navController.navigate("specificMessageScreen/$chatId")
+            try {
+                Log.d("ChatDebug", "Attempting to find or create a chat between $currentUserId and $sellerId")
+
+                val chatId = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
+
+                if (chatId == null) {
+                    Log.d("ChatDebug", "No existing chat found. Creating a new chat.")
+
+                    val chatData = ChatData(
+                        chatId = FirebaseRealtimeService.db.child("chats").push().key ?: return@launch,
+                        users = listOf(currentUserId, sellerId),
+                        messages = mapOf(),
+                        lastMessageTimestamp = System.currentTimeMillis()
+                    )
+
+                    Log.d("ChatDebug", "Adding new chat to database with chatId: ${chatData.chatId}")
+                    val chatAdded = ChatRepo.addChatToDatabase(chatData)
+
+                    if (chatAdded) {
+                        Log.d("ChatDebug", "Chat successfully added to the database")
+                    } else {
+                        Log.e("ChatError", "Failed to add chat to the database")
+                    }
+
+                    // Find the chat again after adding it
+                    val newChat = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
+                    if (newChat != null) {
+                        Log.d("ChatDebug", "Successfully found chat with chatId: $newChat")
+                        navController.navigate("specificMessageScreen/${newChat.chatId}")
+                    } else {
+                        Log.e("ChatError", "Failed to find the newly created chat")
+                    }
+                } else {
+                    Log.d("ChatDebug", "Chat already exists with chatId: $chatId")
+                    navController.navigate("specificMessageScreen/$chatId")
+                }
+            } catch (e: Exception) {
+                Log.e("ChatError", "Error occurred while trying to start or open chat: ${e.message}", e)
+            }
         }
+    } else {
+        Log.e("ChatError", "Invalid user IDs: currentUserId: $currentUserId, sellerId: $sellerId")
     }
 }
-

@@ -40,7 +40,7 @@ class ChatRepo {
                 false
             }
         }
-
+        /*
         fun getUserChatsFlow(userId: String): Flow<List<ChatData>> = FirebaseRealtimeService.getChatsFlow().map { chats ->
             // Filter chats to only include those where the userId is present in the users list
             val userChats = chats.filter { chat ->
@@ -48,7 +48,7 @@ class ChatRepo {
             }
             Log.d("getUserChatsFlow", "Number of chats for userId $userId: ${userChats.size}")
             userChats
-        }
+        }*/
 
 
 

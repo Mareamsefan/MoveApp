@@ -22,6 +22,7 @@ import com.example.moveapp.utility.FirebaseRealtimeService
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
+/*
 @Composable
 fun StartNewChatScreen(navController: NavController) {
     val userInput = remember { mutableStateOf("") }
@@ -105,4 +106,4 @@ fun StartNewChatScreen(navController: NavController) {
             Text(text = "Send Message")
         }
     }
-}
+}*/
