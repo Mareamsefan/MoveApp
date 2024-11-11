@@ -14,6 +14,7 @@ data class AdData(
     var adTitle: String = "",                                   // Title or description of the ad
     var adPrice: Double = 0.0,                                  // Price for the item or service
     var adCategory: String = "",                                // Category (e.g., 'Truck Rental', 'Item Sale', 'Moving Service')
+    var adUnderCategory: String = "",
     var adDescription: String = "",                             // Detailed description of the ad
     var userId: String = "",                                    // ID of the user who posted the ad
     var isActive: Boolean = true,                               // The ad is only shown in the app if it is active.
@@ -33,6 +34,7 @@ data class AdData(
         adTitle = "",
         adPrice = 0.0,
         adCategory = "",
+        adUnderCategory = "",
         adDescription = "",
         userId = "",
         isActive = true,
