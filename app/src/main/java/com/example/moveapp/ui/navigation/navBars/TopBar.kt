@@ -1,8 +1,12 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.moveapp.ui.composables.SearchBar
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +37,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
     val searchQuery = remember { mutableStateOf<String?>(null) }
 
     CenterAlignedTopAppBar(
+        modifier = Modifier.height(125.dp),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary
@@ -72,13 +76,29 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
             )
         },
 
-
-
         actions = {
             if(currentScreen == AppScreens.HOME.name){
-                SearchBar(onApplySearch = searchQuery, navController)
-                onApplySearch(searchQuery.value)
-
+                androidx.compose.material3.SearchBar(
+                    query = searchQuery.value ?: "",
+                    onQueryChange = { query ->
+                        searchQuery.value = query
+                    },
+                    onSearch = { query ->
+                        onApplySearch(query)
+                    },
+                    active = false,
+                    onActiveChange = {  },
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp).wrapContentWidth().widthIn(max = 350.dp),
+                    leadingIcon = {
+                        IconButton(onClick = { onApplySearch(searchQuery.value) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = stringResource(R.string.search)
+                            )
+                        }
+                    }
+                ) {}
             }
 
             if (currentScreen == AppScreens.PROFILE.name && currentUser!= null && !currentUser.isAnonymous) {
@@ -113,21 +133,13 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
             if (currentScreen == AppScreens.HOME.name) {
                 IconButton(onClick = {
                     navController.navigate(AppScreens.MAP.name)
-                },  modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)) {
+                },  modifier = Modifier.padding(bottom = 3.dp, start = 8.dp)) {
                     Icon(
                         painter = painterResource(id = R.drawable.map),
                         contentDescription = stringResource(R.string.map)
                     )
                 }
             }
-        },
-
-
-
-
+        }
     )
-
-
-
-
 }
