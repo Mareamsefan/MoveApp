@@ -38,8 +38,6 @@ import com.example.moveapp.ui.screens.welcome.WelcomeScreen
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -164,7 +162,9 @@ fun AppNavigation() {
                 ) {
 
                     composable(AppScreens.WELCOME_SCREEN.name) {
-                        WelcomeScreen(navController)
+                        WelcomeScreen(navController, onApplyCategory = { selectedCategory ->
+                            category.value = selectedCategory
+                        })
                     }
 
                     composable(AppScreens.LOGIN.name) {
