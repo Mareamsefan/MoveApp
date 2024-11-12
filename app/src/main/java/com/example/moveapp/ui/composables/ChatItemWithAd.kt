@@ -24,22 +24,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
+import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun ChatItemWithAd(chat: ChatData, ad: AdData?, onClick: () -> Unit) {
+fun ChatItemWithAd(navcontroller: NavController, chat: ChatData, ad: AdData?, onClick: () -> Unit) {
     val adImageUrl = ad?.adImages?.firstOrNull()
     var username by remember { mutableStateOf<String?>(null) }
     val currentUser = getCurrentUser()
     val userNames = remember { mutableStateOf<List<String>>(emptyList()) }
-
+    val adId = ad?.adId
     LaunchedEffect(chat.users) {
         val names = chat.users.mapNotNull { userId ->
             getUserNameById(userId)?.replaceFirstChar{
@@ -70,11 +72,15 @@ fun ChatItemWithAd(chat: ChatData, ad: AdData?, onClick: () -> Unit) {
 
         adImageUrl?.let {
             Image(
+
                 painter = rememberAsyncImagePainter(it),
                 contentDescription = null,
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(5.dp)),
+                    .clip(RoundedCornerShape(5.dp))
+                    .clickable {
+                        navcontroller.navigate("specific_ad/${adId}")
+                    },
                 contentScale = ContentScale.Crop
             )
         }
