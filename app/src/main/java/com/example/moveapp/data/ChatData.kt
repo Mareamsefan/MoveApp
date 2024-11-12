@@ -10,10 +10,11 @@ import com.google.firebase.firestore.IgnoreExtraProperties
 @IgnoreExtraProperties
 data class ChatData (
     var chatId: String,
-    // List containing the userId of the users in the chat
-    var users: List<String> = emptyList(),
-    // Timestamp of the last message sent between the two users
+    var users: List<String>,
+    val adId: String,
     var lastMessageTimestamp: Long,
-    // List containing alle the MessageObjects sent between the two users
-    var messages: List<MessageData> = emptyList()
-){}
+    var messages: Map<String, MessageData>
+) {
+    // No-argument constructor with default values
+    constructor() : this("", emptyList(), "", 0L, emptyMap())
+}
