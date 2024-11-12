@@ -53,7 +53,6 @@ fun HomeScreen(
 
     val refreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
 

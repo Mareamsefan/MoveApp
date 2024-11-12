@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -38,6 +39,11 @@ import com.example.moveapp.viewModel.AdViewModel.Companion.createAd
 import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStorage
 import kotlinx.coroutines.launch
 import java.io.File
+import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
+import com.example.moveapp.utility.HelpFunctions.Companion.isNumericFinal
+import com.example.moveapp.utility.HelpFunctions.Companion.isNumericInput
+import com.example.moveapp.utility.ProhibitedContentException
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +61,7 @@ fun PostAdScreen(navController: NavController) {
     val address = remember { mutableStateOf("") }
     val postalCode = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String>() }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // State for sending request to database
     var isPosting by remember { mutableStateOf(false) }
@@ -213,14 +220,13 @@ fun PostAdScreen(navController: NavController) {
                 }
             }
 
-
-
             // Title, address, postal code fields
             OutlinedTextField(
                 value = title.value,
                 onValueChange = { title.value = it },
-                label = { Text(text = stringResource(R.string.title)) }
+                label = { Text(text = stringResource(R.string.title)) },
             )
+
             OutlinedTextField(
                 value = address.value,
                 onValueChange = { address.value = it },
@@ -254,8 +260,16 @@ fun PostAdScreen(navController: NavController) {
             // Price and description fields
             OutlinedTextField(
                 value = price.value,
-                onValueChange = { price.value = it },
+                onValueChange = { newValue ->
+                    if (isNumericInput(newValue) || newValue.isEmpty()) {
+                        price.value = newValue
+                        errorMessage = null
+                    } else {
+                        errorMessage = "Please enter a valid number for price"
+                    }
+                },
                 label = { Text(text = stringResource(R.string.price)) }
+
             )
             OutlinedTextField(
                 value = description.value,
@@ -273,56 +287,79 @@ fun PostAdScreen(navController: NavController) {
             Button(
                 onClick = {
                     if (!isPosting && currentUser != null) {
+                        try {
+                            censorshipValidator(title.value)
+                            censorshipValidator(description.value)
+
                         isPosting = true
                         coroutineScope.launch {
                             try {
-                                // Create an ad and retrieve the adId
-                                val ad = createAd(
-                                    context,
-                                    title.value,
-                                    price.value.toDouble(),
-                                    adType.value,
-                                    underCategory.value,
-                                    description.value,
-                                    currentUser.uid,
-                                    city.value,
-                                    address.value,
-                                    postalCode.value,
-                                    geoPoint
-                                )
-                                val adId = ad?.adId
-                                Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
 
-                                if (adId != null) {
-                                    val uriImagesList = adImages.map { it.toUri() }
+                                if (!price.value.isEmpty() && isNumericFinal(price.value)) {
 
-                                    val uploadedImageUrls = uploadAdImagesToStorage(adId, uriImagesList)
+                                    // Create an ad and retrieve the adId
+                                    val ad = createAd(
+                                        context,
+                                        title.value,
+                                        price.value.toDouble(),
+                                        adType.value,
+                                        underCategory.value,
+                                        description.value,
+                                        currentUser.uid,
+                                        city.value,
+                                        address.value,
+                                        postalCode.value,
+                                        geoPoint
+                                    )
+                                    val adId = ad?.adId
+                                    Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
 
-                                    if (uploadedImageUrls.isNotEmpty()) {
+                                    if (adId != null) {
+                                        val uriImagesList = adImages.map { it.toUri() }
 
-                                        val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
-                                        if (updateSuccess) {
-                                            Log.d("PostAdScreen", "Ad images updated successfully.")
+                                        val uploadedImageUrls =
+                                            uploadAdImagesToStorage(adId, uriImagesList)
+
+                                        if (uploadedImageUrls.isNotEmpty()) {
+
+                                            val updateSuccess = AdRepo.updateAdImagesInDatabase(
+                                                adId,
+                                                uploadedImageUrls
+                                            )
+                                            if (updateSuccess) {
+                                                Log.d(
+                                                    "PostAdScreen",
+                                                    "Ad images updated successfully."
+                                                )
+                                            } else {
+                                                Log.e("PostAdScreen", "Failed to update ad images.")
+                                            }
                                         } else {
-                                            Log.e("PostAdScreen", "Failed to update ad images.")
+                                            Log.e("PostAdScreen", "No URLs returned from upload.")
                                         }
-                                    } else {
-                                        Log.e("PostAdScreen", "No URLs returned from upload.")
-                                    }
 
-                                    // Navigate after everything is completed
-                                    navController.navigate(AppScreens.HOME.name)
+                                        // Navigate after everything is completed
+                                        navController.navigate(AppScreens.HOME.name)
+                                    }
+                                    else {
+                                        errorMessage = "Please enter a valid number for price"
+                                    }
                                 }
                             } finally {
                                 isPosting = false
                             }
                         }
+                        } catch (e: ProhibitedContentException){
+                            errorMessage = e.message
+                        }
                     }
                 },
                 enabled = !isPosting
+
             ) {
                 Text(text = stringResource(R.string.post_ad))
             }
+            errorMessage?.let { Text(text = it, color = Color.Red) }
         }
     }
 }

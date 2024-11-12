@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.ad
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -39,12 +40,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.compose.outlineDark
 import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
+import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.ChatRepo
+import com.example.moveapp.repository.ChatRepo.Companion.startOrOpenChat
 import com.example.moveapp.repository.UserRepo.Companion.getUser
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.AdMap
@@ -52,10 +57,14 @@ import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
+import com.example.moveapp.utility.FirebaseRealtimeService
 import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
+import kotlin.random.Random
 
 
 @Composable
@@ -68,7 +77,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
          ad = getAd(adId)
     }
 
-    // Sjekker om annonsen tilhører den innloggede brukeren
+
     val isOwner = currentUser != null && ad?.userId == currentUser.uid
     var owner by remember { mutableStateOf<UserData?>(null) }
     LaunchedEffect(ad) {
@@ -92,7 +101,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 Image_swipe(imageList = ad!!.adImages)
                 if (isOwner) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically, // Ensures alignment of IconButton and Text
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
                         IconButton(
@@ -156,7 +165,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 )
                 Button(
                     onClick = {
-                        // TODO: open message with seller and current user
+                        startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -179,7 +188,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                             color = Color.Gray,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .padding(16.dp) // Adds padding inside the box
+                        .padding(16.dp)
                         .fillMaxWidth()
                 ) {
                     Row(
@@ -188,7 +197,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     ) {
                         owner?.profilePictureUrl?.let { url ->
                             Image(
-                                painter = rememberImagePainter(url),
+                                painter = rememberAsyncImagePainter(url),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(70.dp)
@@ -212,10 +221,6 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     Modifier.padding(bottom = 10.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-
-                //if (ad!!.position != null)
-                  //  AdMap(ad = ad!!)
-
             }
             else {
                 Text(text = "ad not found")
@@ -223,4 +228,3 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
         }
     }
 }
-

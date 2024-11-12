@@ -23,7 +23,8 @@ data class AdData(
     var postalCode: String = "",
     var city: String = "",
     @ServerTimestamp
-    var timestamp: Date? = null,                                // Timestamp for when the ad was posted
+    var createdAt: Date? = null,                                // Timestamp for when the ad was posted
+    var extendedTo: Date? = null,
     var adImages: List<String> = emptyList(),                   // List of image URLs for the ad (if any)
     // data for the ad coordinates
     var position: GeoPoint? = null
@@ -42,7 +43,8 @@ data class AdData(
         city = "",
         address = "",
         postalCode = "",
-        timestamp = null,
+        createdAt = null,
+        extendedTo = null,
         adImages = emptyList(),
         position = null
     )
@@ -57,7 +59,7 @@ data class AdData(
             "adCategory" to adCategory,
             "adDescription" to adDescription,
             "userId" to userId,
-            "timestamp" to timestamp,
+            "createdAt" to createdAt,
             "adImages" to adImages
         )
     }

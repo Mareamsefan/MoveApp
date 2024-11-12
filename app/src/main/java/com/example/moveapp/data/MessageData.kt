@@ -11,4 +11,7 @@ data class MessageData (
     var messageTimestamp: Long,
     var messageImageUrl: String?,  // ? -> you likely will not need an img for every message.
 )
-{}
+{
+    constructor() : this("", "", "", "", 0L, null)
+
+}
