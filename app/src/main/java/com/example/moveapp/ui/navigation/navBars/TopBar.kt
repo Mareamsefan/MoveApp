@@ -100,19 +100,6 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                     }
                 ) {}
             }
-
-            if (currentScreen == AppScreens.PROFILE.name && currentUser!= null && !currentUser.isAnonymous) {
-                IconButton(onClick = {
-                    navController.navigate(AppScreens.PROFILE_SETTINGS.name)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Settings,
-                        contentDescription = stringResource(R.string.settings)
-                    )
-                }
-
-            }
-
         },
 
         navigationIcon = {
