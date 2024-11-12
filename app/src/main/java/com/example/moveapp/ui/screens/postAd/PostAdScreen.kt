@@ -330,9 +330,11 @@ fun PostAdScreen(navController: NavController) {
                     }
                 },
                 enabled = !isPosting
+
             ) {
                 Text(text = stringResource(R.string.post_ad))
             }
+            errorMessage?.let { Text(text = it, color = Color.Red) }
         }
     }
 }
