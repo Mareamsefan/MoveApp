@@ -36,25 +36,16 @@ import com.example.moveapp.utility.FireAuthService.signOutUser
 
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
 
-
-val shortcuts = listOf(
-    BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
-    BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
-    BottomNavItems(AppScreens.POST_AD, Icons.Default.AddCircle, R.string.post_ad),
-    BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile),
-
-
-)
-
 @Composable
 fun BottomNavBar(navController: NavController) {
     var isProfileMenuExpanded by remember { mutableStateOf(false) }
     var showLogoutConfirmation by remember { mutableStateOf(false) }
+    var currentShortcuts = remember(isUserLoggedIn()) { getBottomNavShortcuts() }
 
     NavigationBar (
 
     ) {
-        shortcuts.forEach { shortcut ->
+        currentShortcuts.forEach { shortcut ->
             if (shortcut.route != AppScreens.PROFILE) {
                 NavigationBarItem(
                     icon = { Icon(shortcut.icon, contentDescription = stringResource(shortcut.label)) },
@@ -133,6 +124,9 @@ fun BottomNavBar(navController: NavController) {
                     onClick = {
                         signOutUser()
                         showLogoutConfirmation = false
+                        navController.navigate(AppScreens.HOME.name) {
+                            popUpTo(AppScreens.HOME.name) { inclusive = true }
+                        }
                     }
                 ) {
                     Text("Yes")
@@ -160,4 +154,20 @@ fun getCurrentScreen(navController: NavController): String {
 @Composable
 fun BottomNavBarPreview() {
     BottomNavBar(rememberNavController())
+}
+
+fun getBottomNavShortcuts(): List<BottomNavItems> {
+    if (!isUserLoggedIn()){
+        return listOf(
+            BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
+            BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile),
+        )
+    } else {
+        return listOf(
+            BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
+            BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
+            BottomNavItems(AppScreens.POST_AD, Icons.Default.AddCircle, R.string.post_ad),
+            BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile),
+        )
+    }
 }
