@@ -217,19 +217,6 @@ fun ProfileSettingsScreen(navController: NavController) {
                 ) {
                 Text(text = stringResource(R.string.send_password_reset_email))
             }
-
-
-            // Logout Button
-            Button(onClick = {
-                coroutineScope.launch {
-                    val user = logoutUser(context)
-                    if (user != null) {
-                        navController.navigate(AppScreens.LOGIN.name)
-                    }
-                }
-            }) {
-                Text(text = stringResource(R.string.logout))
-            }
         }
     }
 }
