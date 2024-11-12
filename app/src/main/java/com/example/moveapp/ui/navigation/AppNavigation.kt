@@ -28,6 +28,7 @@ import com.example.moveapp.ui.screens.guest.GuestDenied
 import com.example.moveapp.ui.screens.home.HomeScreen
 import com.example.moveapp.ui.screens.login.LoginScreen
 import com.example.moveapp.ui.screens.map.MapScreen
+import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
@@ -202,7 +203,6 @@ fun AppNavigation() {
                         ProfileSettingsScreen(navController)
                     }
 
-                    /*
 
                     composable(AppScreens.ALL_MESSAGES.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
@@ -210,7 +210,7 @@ fun AppNavigation() {
                         } else {
                             GuestDenied(navController)
                         }
-                    }*/
+                    }
 
                     composable(AppScreens.POST_AD.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
@@ -246,9 +246,6 @@ fun AppNavigation() {
                         SpecificMessageScreen(navController, chatId)
                     }
 
-                    /*composable(AppScreens.START_NEW_CHAT.name) {
-                        StartNewChatScreen(navController)
-                    }*/
 
                     composable(AppScreens.MY_ADS.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {

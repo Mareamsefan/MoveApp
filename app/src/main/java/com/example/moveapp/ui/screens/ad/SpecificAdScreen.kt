@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.compose.outlineDark
 import com.example.moveapp.R
@@ -48,6 +49,7 @@ import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.UserData
 import com.example.moveapp.repository.ChatRepo
+import com.example.moveapp.repository.ChatRepo.Companion.startOrOpenChat
 import com.example.moveapp.repository.UserRepo.Companion.getUser
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.AdMap
@@ -60,6 +62,7 @@ import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import kotlin.random.Random
 
@@ -74,7 +77,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
          ad = getAd(adId)
     }
 
-    // Sjekker om annonsen tilhører den innloggede brukeren
+
     val isOwner = currentUser != null && ad?.userId == currentUser.uid
     var owner by remember { mutableStateOf<UserData?>(null) }
     LaunchedEffect(ad) {
@@ -98,7 +101,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 Image_swipe(imageList = ad!!.adImages)
                 if (isOwner) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically, // Ensures alignment of IconButton and Text
+                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
                         IconButton(
@@ -162,8 +165,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 )
                 Button(
                     onClick = {
-                        startOrOpenChat(navController, ad!!.userId, currentUser?.uid)
-                        // TODO: open message with seller and current user
+                        startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -186,7 +188,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                             color = Color.Gray,
                             shape = RoundedCornerShape(8.dp)
                         )
-                        .padding(16.dp) // Adds padding inside the box
+                        .padding(16.dp)
                         .fillMaxWidth()
                 ) {
                     Row(
@@ -195,7 +197,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     ) {
                         owner?.profilePictureUrl?.let { url ->
                             Image(
-                                painter = rememberImagePainter(url),
+                                painter = rememberAsyncImagePainter(url),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(70.dp)
@@ -219,64 +221,10 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     Modifier.padding(bottom = 10.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-
-                //if (ad!!.position != null)
-                  //  AdMap(ad = ad!!)
-
             }
             else {
                 Text(text = "ad not found")
             }
         }
-    }
-}
-
-fun startOrOpenChat(navController: NavController, sellerId: String, currentUserId: String?) {
-    if (currentUserId != null && sellerId != currentUserId) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                Log.d("ChatDebug", "Attempting to find or create a chat between $currentUserId and $sellerId")
-
-                val chatId = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
-
-                Log.d("ChatDebug", "Attempting to to fin chat:::::: $chatId")
-
-                if (chatId == null) {
-                    Log.d("ChatDebug", "No existing chat found. Creating a new chat.")
-
-                    val chatData = ChatData(
-                        chatId = FirebaseRealtimeService.db.child("chats").push().key ?: return@launch,
-                        users = listOf(currentUserId, sellerId),
-                        messages = mapOf(),
-                        lastMessageTimestamp = System.currentTimeMillis()
-                    )
-
-                    Log.d("ChatDebug", "Adding new chat to database with chatId: ${chatData.chatId}")
-                    val chatAdded = ChatRepo.addChatToDatabase(chatData)
-
-                    if (chatAdded) {
-                        Log.d("ChatDebug", "Chat successfully added to the database")
-                    } else {
-                        Log.e("ChatError", "Failed to add chat to the database")
-                    }
-
-                    // Find the chat again after adding it
-                    val newChat = ChatRepo.findChatBetweenUsers(currentUserId, sellerId)
-                    if (newChat != null) {
-                        Log.d("ChatDebug", "Successfully found chat with chatId: $newChat")
-                        navController.navigate("specificMessageScreen/${newChat.chatId}")
-                    } else {
-                        Log.e("ChatError", "Failed to find the newly created chat")
-                    }
-                } else {
-                    Log.d("ChatDebug", "Chat already exists with chatId: $chatId")
-                    navController.navigate("specificMessageScreen/$chatId")
-                }
-            } catch (e: Exception) {
-                Log.e("ChatError", "Error occurred while trying to start or open chat: ${e.message}", e)
-            }
-        }
-    } else {
-        Log.e("ChatError", "Invalid user IDs: currentUserId: $currentUserId, sellerId: $sellerId")
     }
 }
