@@ -27,13 +27,9 @@ import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.GeoPoint
 import androidx.compose.foundation.lazy.rememberLazyListState
 import kotlinx.coroutines.launch
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.pullToRefresh
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import kotlinx.coroutines.delay
-import kotlin.time.Duration.Companion.seconds
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -43,6 +39,7 @@ fun HomeScreen(
     searchQuery: String?,
     location: String?,
     category: String?,
+    underCategory: String?,
     minPrice: Double?,
     maxPrice: Double?,
     isListView: Boolean
@@ -81,6 +78,7 @@ fun HomeScreen(
                     AdRepo.filterAd(
                         location = location,
                         category = category,
+                        underCategory = underCategory,
                         minPrice = minPrice,
                         maxPrice = maxPrice,
                         search = searchQuery,
@@ -105,7 +103,7 @@ fun HomeScreen(
     }
 
     // Fetch ads whenever the filters or search query change
-    LaunchedEffect(location, category, minPrice, maxPrice, searchQuery, userLocation) {
+    LaunchedEffect(location, category, underCategory, minPrice, maxPrice, searchQuery, userLocation) {
         fetchAds()
     }
 

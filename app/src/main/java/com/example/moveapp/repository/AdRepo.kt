@@ -242,6 +242,7 @@ class AdRepo {
         suspend fun filterAd(
             location: String?,
             category: String?,
+            underCategory: String?,
             minPrice: Double?,
             maxPrice: Double?,
             search: String?,
@@ -252,6 +253,7 @@ class AdRepo {
                 val ads = FirestoreService.filteredAdsFromDatabase(
                     location,
                     category,
+                    underCategory,
                     minPrice,
                     maxPrice,
                     search,
