@@ -16,28 +16,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.example.moveapp.R
 import java.io.File
 
-// Constants for permission request
 private const val REQUEST_CAMERA_PERMISSION = 100
 @Composable
 fun CameraPermission(onImageCaptured: (Uri) -> Unit) {
     val context = LocalContext.current
 
-    // Lagre tillatelsesstatus
+
     var cameraPermissionGranted by remember { mutableStateOf(false) }
 
-    // Sjekk om kamera-tillatelse er gitt
     cameraPermissionGranted = ContextCompat.checkSelfPermission(
         context,
         Manifest.permission.CAMERA
     ) == PackageManager.PERMISSION_GRANTED
 
-    // Funksjon for å be om kamera-tillatelse
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -45,7 +44,7 @@ fun CameraPermission(onImageCaptured: (Uri) -> Unit) {
         }
     )
 
-    // Fil og URI der bildet skal lagres
+
     val photoUri = remember { mutableStateOf<Uri?>(null) }
     val photoFile = File(context.cacheDir, "photo_${System.currentTimeMillis()}.jpg")
     val contentUri: Uri = FileProvider.getUriForFile(
@@ -54,7 +53,7 @@ fun CameraPermission(onImageCaptured: (Uri) -> Unit) {
         photoFile
     )
 
-    // Kamera-launcher
+
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
@@ -67,19 +66,19 @@ fun CameraPermission(onImageCaptured: (Uri) -> Unit) {
         }
     )
 
-    // UI for kamera-knappen
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier
+            .fillMaxWidth()
     ) {
         Button(
+            modifier = Modifier
+            .padding(5.dp),
+
             onClick = {
                 if (cameraPermissionGranted) {
-                    // Start kameraet hvis tillatelsen er gitt
-                    photoUri.value = contentUri // Sett URI før du starter kameraet
+                    photoUri.value = contentUri
                     cameraLauncher.launch(contentUri)
                 } else {
-                    // Be om tillatelse
                     permissionLauncher.launch(Manifest.permission.CAMERA)
                 }
             }
