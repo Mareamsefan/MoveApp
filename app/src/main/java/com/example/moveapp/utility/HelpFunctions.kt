@@ -56,6 +56,10 @@ class HelpFunctions {
             }
         }
 
+        fun isNumeric(input: String): Boolean {
+            return input.toDoubleOrNull() != null
+        }
+
 
 
     }

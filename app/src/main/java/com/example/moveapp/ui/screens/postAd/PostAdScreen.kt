@@ -40,7 +40,9 @@ import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStora
 import kotlinx.coroutines.launch
 import java.io.File
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
+import com.example.moveapp.utility.HelpFunctions.Companion.isNumeric
 import com.example.moveapp.utility.ProhibitedContentException
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -257,7 +259,14 @@ fun PostAdScreen(navController: NavController) {
             // Price and description fields
             OutlinedTextField(
                 value = price.value,
-                onValueChange = { price.value = it },
+                onValueChange = { newValue ->
+                    if (isNumeric(newValue) || newValue.isEmpty()) {
+                        price.value = newValue
+                        errorMessage = null
+                    } else {
+                        errorMessage = "Please enter a valid number for price"
+                    }
+                },
                 label = { Text(text = stringResource(R.string.price)) }
             )
             OutlinedTextField(
