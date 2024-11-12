@@ -115,32 +115,7 @@ fun BottomNavBar(navController: NavController) {
                                 }
                             )
 
-                            if (showLogoutConfirmation) {
-                                AlertDialog(
-                                    onDismissRequest = { showLogoutConfirmation = false },
-                                    title = { Text("Confirm Logout") },
-                                    text = { Text("Are you sure you want to log out?") },
-                                    confirmButton = {
-                                        Button(
-                                            onClick = {
-                                                signOutUser()
-                                                showLogoutConfirmation = false
-                                            }
-                                        ) {
-                                            Text("Yes")
-                                        }
-                                    },
-                                    dismissButton = {
-                                        Button(
-                                            onClick = {
-                                                showLogoutConfirmation = false
-                                            }
-                                        ) {
-                                            Text("No")
-                                        }
-                                    }
-                                )
-                            }
+
                         }
                         }
                     }
@@ -148,6 +123,32 @@ fun BottomNavBar(navController: NavController) {
             }
 
         }
+    if (showLogoutConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showLogoutConfirmation = false },
+            title = { Text("Confirm Logout") },
+            text = { Text("Are you sure you want to log out?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        signOutUser()
+                        showLogoutConfirmation = false
+                    }
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        showLogoutConfirmation = false
+                    }
+                ) {
+                    Text("No")
+                }
+            }
+        )
+    }
     }
 
 @Composable

@@ -14,6 +14,7 @@ data class AdData(
     var adTitle: String = "",                                   // Title or description of the ad
     var adPrice: Double = 0.0,                                  // Price for the item or service
     var adCategory: String = "",                                // Category (e.g., 'Truck Rental', 'Item Sale', 'Moving Service')
+    var adUnderCategory: String = "",
     var adDescription: String = "",                             // Detailed description of the ad
     var userId: String = "",                                    // ID of the user who posted the ad
     var isActive: Boolean = true,                               // The ad is only shown in the app if it is active.
@@ -22,7 +23,8 @@ data class AdData(
     var postalCode: String = "",
     var city: String = "",
     @ServerTimestamp
-    var timestamp: Date? = null,                                // Timestamp for when the ad was posted
+    var createdAt: Date? = null,                                // Timestamp for when the ad was posted
+    var extendedTo: Date? = null,
     var adImages: List<String> = emptyList(),                   // List of image URLs for the ad (if any)
     // data for the ad coordinates
     var position: GeoPoint? = null
@@ -33,6 +35,7 @@ data class AdData(
         adTitle = "",
         adPrice = 0.0,
         adCategory = "",
+        adUnderCategory = "",
         adDescription = "",
         userId = "",
         isActive = true,
@@ -40,7 +43,8 @@ data class AdData(
         city = "",
         address = "",
         postalCode = "",
-        timestamp = null,
+        createdAt = null,
+        extendedTo = null,
         adImages = emptyList(),
         position = null
     )
@@ -55,7 +59,7 @@ data class AdData(
             "adCategory" to adCategory,
             "adDescription" to adDescription,
             "userId" to userId,
-            "timestamp" to timestamp,
+            "createdAt" to createdAt,
             "adImages" to adImages
         )
     }

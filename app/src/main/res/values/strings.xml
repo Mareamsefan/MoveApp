@@ -63,5 +63,27 @@
     <string name="browse">Just browse</string>
     <string name="what_looking_for">What are you looking for?</string>
 
+    <string name="Furniture">Furniture</string>
+    <string name="Electronics">Electronics</string>
+    <string name="Home_Decor">Home Decor</string>
+    <string name="Outdoor_and_Garden">Outdoor and Garden</string>
+    <string name="Clothing_and_Accessories">Clothing and Accessories</string>
+    <string name="Toys_and_Hobbies">Toys and Hobbies</string>
+    <string name="Miscellaneous">Miscellaneous</string>
+
+    <string name="Personal_Vehicles">Personal Vehicles</string>
+    <string name="Moving_Trucks">Moving Trucks</string>
+    <string name="Specialty_Vehicles">Specialty Vehicles</string>
+    <string name="Other">other</string>
+
+    <string name="Small_Parcel_Delivery">Small Parcel Delivery</string>
+    <string name="Furniture_and_Large_Item_Moving">Furniture and Large Item Moving</string>
+    <string name="Long_Distance_Moves">Long-Distance Moves</string>
+    <string name="Special_Handling_Services">Special Handling Services</string>
+
+    <string name="Select_a_subcategory">Select a subcategory</string>
+
+
+
 
 </resources>

@@ -66,7 +66,7 @@ fun Register(navController: NavController) {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             // User signed in successfully
-                            navController.navigate(AppScreens.HOME.name)
+                            navController.navigate(AppScreens.WELCOME_SCREEN.name)
 
                             // Register the user in Firestore with basic details
                             val user = FirebaseAuth.getInstance().currentUser
@@ -143,7 +143,7 @@ fun Register(navController: NavController) {
                                 val user = registeringUser(context, username.value, email.value, password.value)
                                 isLoading = false
                                 if (user != null) {
-                                    navController.navigate(AppScreens.HOME.name)
+                                    navController.navigate(AppScreens.WELCOME_SCREEN.name)
                                 } else {
                                     errorMessage = "Registration failed. Please try again."
                                 }
