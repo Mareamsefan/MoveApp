@@ -91,7 +91,7 @@ fun ChatItemWithAd(chat: ChatData, ad: AdData?, onClick: () -> Unit) {
                 color = Color.Gray
             )
             Text(
-                text = "Last message at: $formattedTimestamp",
+                text = formattedTimestamp,
                 style = MaterialTheme.typography.labelMedium.copy(color = Color.Gray)
             )
         }
