@@ -56,7 +56,13 @@ class HelpFunctions {
             }
         }
 
-        fun isNumeric(input: String): Boolean {
+        // Helper function to validate progressive numeric input
+        fun isNumericInput(input: String): Boolean {
+            return input.matches(Regex("^-?\\d*(\\.\\d*)?$")) // Allows digits, optional decimal, optional leading minus
+        }
+
+        // Final validation to check if input is a valid number
+        fun isNumericFinal(input: String): Boolean {
             return input.toDoubleOrNull() != null
         }
 

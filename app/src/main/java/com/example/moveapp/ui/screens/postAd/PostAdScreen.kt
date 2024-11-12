@@ -40,7 +40,8 @@ import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStora
 import kotlinx.coroutines.launch
 import java.io.File
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
-import com.example.moveapp.utility.HelpFunctions.Companion.isNumeric
+import com.example.moveapp.utility.HelpFunctions.Companion.isNumericFinal
+import com.example.moveapp.utility.HelpFunctions.Companion.isNumericInput
 import com.example.moveapp.utility.ProhibitedContentException
 
 
@@ -260,7 +261,7 @@ fun PostAdScreen(navController: NavController) {
             OutlinedTextField(
                 value = price.value,
                 onValueChange = { newValue ->
-                    if (isNumeric(newValue) || newValue.isEmpty()) {
+                    if (isNumericInput(newValue) || newValue.isEmpty()) {
                         price.value = newValue
                         errorMessage = null
                     } else {
@@ -268,6 +269,7 @@ fun PostAdScreen(navController: NavController) {
                     }
                 },
                 label = { Text(text = stringResource(R.string.price)) }
+
             )
             OutlinedTextField(
                 value = description.value,
@@ -292,42 +294,56 @@ fun PostAdScreen(navController: NavController) {
                         isPosting = true
                         coroutineScope.launch {
                             try {
-                                // Create an ad and retrieve the adId
-                                val ad = createAd(
-                                    context,
-                                    title.value,
-                                    price.value.toDouble(),
-                                    adType.value,
-                                    underCategory.value,
-                                    description.value,
-                                    currentUser.uid,
-                                    city.value,
-                                    address.value,
-                                    postalCode.value,
-                                    geoPoint
-                                )
-                                val adId = ad?.adId
-                                Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
 
-                                if (adId != null) {
-                                    val uriImagesList = adImages.map { it.toUri() }
+                                if (!price.value.isEmpty() && isNumericFinal(price.value)) {
 
-                                    val uploadedImageUrls = uploadAdImagesToStorage(adId, uriImagesList)
+                                    // Create an ad and retrieve the adId
+                                    val ad = createAd(
+                                        context,
+                                        title.value,
+                                        price.value.toDouble(),
+                                        adType.value,
+                                        underCategory.value,
+                                        description.value,
+                                        currentUser.uid,
+                                        city.value,
+                                        address.value,
+                                        postalCode.value,
+                                        geoPoint
+                                    )
+                                    val adId = ad?.adId
+                                    Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
 
-                                    if (uploadedImageUrls.isNotEmpty()) {
+                                    if (adId != null) {
+                                        val uriImagesList = adImages.map { it.toUri() }
 
-                                        val updateSuccess = AdRepo.updateAdImagesInDatabase(adId, uploadedImageUrls)
-                                        if (updateSuccess) {
-                                            Log.d("PostAdScreen", "Ad images updated successfully.")
+                                        val uploadedImageUrls =
+                                            uploadAdImagesToStorage(adId, uriImagesList)
+
+                                        if (uploadedImageUrls.isNotEmpty()) {
+
+                                            val updateSuccess = AdRepo.updateAdImagesInDatabase(
+                                                adId,
+                                                uploadedImageUrls
+                                            )
+                                            if (updateSuccess) {
+                                                Log.d(
+                                                    "PostAdScreen",
+                                                    "Ad images updated successfully."
+                                                )
+                                            } else {
+                                                Log.e("PostAdScreen", "Failed to update ad images.")
+                                            }
                                         } else {
-                                            Log.e("PostAdScreen", "Failed to update ad images.")
+                                            Log.e("PostAdScreen", "No URLs returned from upload.")
                                         }
-                                    } else {
-                                        Log.e("PostAdScreen", "No URLs returned from upload.")
-                                    }
 
-                                    // Navigate after everything is completed
-                                    navController.navigate(AppScreens.HOME.name)
+                                        // Navigate after everything is completed
+                                        navController.navigate(AppScreens.HOME.name)
+                                    }
+                                    else {
+                                        errorMessage = "Please enter a valid number for price"
+                                    }
                                 }
                             } finally {
                                 isPosting = false
