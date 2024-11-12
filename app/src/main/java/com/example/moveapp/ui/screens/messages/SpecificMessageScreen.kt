@@ -60,7 +60,6 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                     MessageItem(message, currentUserId == message.senderId)
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

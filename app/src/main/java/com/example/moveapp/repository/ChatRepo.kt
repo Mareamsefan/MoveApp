@@ -30,13 +30,10 @@ class ChatRepo {
 
         suspend fun addMessageToChat(chatId: String, message: MessageData): Boolean {
             return try {
-                // Create a unique message ID
                 val messageId = FirebaseRealtimeService.db.child("chats/$chatId/messages").push().key ?: return false
 
-                // Add the new message under the "messages" node in the specified chat
                 FirebaseRealtimeService.db.child("chats/$chatId/messages/$messageId").setValue(message).await()
 
-                // Update the lastMessageTimestamp for the chat
                 FirebaseRealtimeService.db.child("chats/$chatId/lastMessageTimestamp").setValue(message.messageTimestamp).await()
 
                 true
@@ -46,7 +43,6 @@ class ChatRepo {
             }
         }
 
-        // Opprett en chat med adId (hvis relevant)
         suspend fun createChatWithAdId(userIds: List<String>, adId: String): String {
             val chatId = FirebaseRealtimeService.db.child("chats").push().key ?: return ""
 
@@ -58,7 +54,6 @@ class ChatRepo {
                 adId = adId // Legg til adId her
             )
 
-            // Lagre chatten i Firebase
             addChatToDatabase(chat)
 
             return chatId
@@ -74,14 +69,11 @@ class ChatRepo {
                 val chat = chatSnapshot.getValue(ChatData::class.java)
                 if (chat != null && chat.users.contains(userId)) {
                     chats.add(chat)
-                    Log.d("CHAT FETCHED:", "${chat}")
                 }
             }
-            Log.d("CHATS FETCHED:", "$chats")
             return chats
         }
 
-        // Hent chatter relatert til en spesifikk adId (hvis du trenger det)
         suspend fun getChatsByAdId(adId: String): List<ChatData> {
             return try {
                 val chatsRef = FirebaseRealtimeService.db.child("chats")
@@ -96,70 +88,68 @@ class ChatRepo {
                 }
                 chats
             } catch (e: Exception) {
-                Log.e("ChatRepo", "Feil under henting av chatter for adId $adId: ${e.message}")
-                emptyList() // Returner tom liste ved feil
+                Log.e("ChatRepo", "Error while fetching chats for adId $adId: ${e.message}")
+                emptyList()
             }
         }
 
         suspend fun getChatById(chatId: String): ChatData? {
             return try {
                 val chatRef = FirebaseRealtimeService.db.child("chats").child(chatId)
-                Log.d("ChatRepo", "Henter chat fra Firebase: $chatRef")
                 val snapshot = chatRef.get().await()
                 if (snapshot.exists()) {
                     snapshot.getValue(ChatData::class.java)
                 } else {
-                    Log.d("ChatRepo", "Chat ikke funnet for chatId: $chatId")
+                    Log.d("ChatRepo", "Chat not found for chatId: $chatId")
                     null
                 }
             } catch (e: Exception) {
-                Log.e("ChatRepo", "Feil under henting av chat: ${e.message}")
+                Log.e("ChatRepo", ",Error while fetching chat: ${e.message}")
                 null
             }
         }
 
-        suspend fun findChatBetweenUsers(currentUserId: String, receiverUserId: String): ChatData? {
+        suspend fun findChatBetweenUsers(currentUserId: String, receiverUserId: String, adId: String): ChatData? {
             val chatsSnapshot = FirebaseRealtimeService.getData("chats")?.children
             chatsSnapshot?.forEach { chatSnapshot ->
                 val chat = chatSnapshot.getValue(ChatData::class.java)
-                if (chat != null && chat.users.containsAll(listOf(currentUserId, receiverUserId))) {
+                if (chat != null && chat.users.containsAll(listOf(currentUserId, receiverUserId)) && chat.adId == adId) {
                     return chat
                 }
             }
             return null
         }
 
+
         fun startOrOpenChat(navController: NavController, sellerId: String, currentUserId: String?, adId: String?) {
             if (currentUserId != null && sellerId != currentUserId && adId != null) {
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        // Finn eksisterende chat mellom brukerne
-                        val chat = findChatBetweenUsers(currentUserId, sellerId)
+                        val chat = findChatBetweenUsers(currentUserId, sellerId, adId)
                         val chatId = chat?.chatId
+                        val chatAdId = chat?.adId
 
-                        // Hvis chat ikke finnes, opprett en ny chat
-                        if (chatId == null) {
-                            createChatWithAdId(listOf(currentUserId,sellerId), adId)
+                        if (chatId == null || chatAdId != adId) {
+                            createChatWithAdId(listOf(currentUserId, sellerId), adId)
 
-                            // Finn chatten igjen etter at den er lagt til
-                            val newChat = findChatBetweenUsers(currentUserId, sellerId)
+                            val newChat = findChatBetweenUsers(currentUserId, sellerId, adId)
                             if (newChat != null) {
-                                withContext(Dispatchers.Main) {  // Bytt til hovedtråden for navigering
+                                withContext(Dispatchers.Main) {
                                     navController.navigate("specificMessageScreen/${newChat.chatId}")
                                 }
                             }
                         } else {
-                            // Chatten finnes allerede
-                            withContext(Dispatchers.Main) {  // Bytt til hovedtråden for navigering
+                            withContext(Dispatchers.Main) {
                                 navController.navigate("specificMessageScreen/$chatId")
                             }
                         }
                     } catch (e: Exception) {
-                        // Håndter feil her uten logging
+                        Log.e("ChatRepo", ",Error while fetching or creating chat: ${e.message}")
                     }
                 }
             }
         }
+
 
 
     }
