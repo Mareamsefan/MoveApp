@@ -1,6 +1,10 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -35,98 +39,101 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
     var currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
     val searchQuery = remember { mutableStateOf<String?>(null) }
-
-    CenterAlignedTopAppBar(
-        modifier = Modifier.height(125.dp),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary
+    Column() {
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.primary
             ),
-        title = {
-            Text(
-                text = when (currentScreen) {
-                    AppScreens.PROFILE.name-> {
-                        if(currentUser != null && !currentUser.isAnonymous){
-                            stringResource(R.string.my_profile)
+            title = {
+                Text(
+                    text = when (currentScreen) {
+                        AppScreens.PROFILE.name -> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.my_profile)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
                         }
-                        else {
-                            stringResource(R.string.guest_denied)
+
+                        AppScreens.ALL_MESSAGES.name -> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.messages)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
                         }
+
+                        AppScreens.POST_AD.name -> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.post_ad)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+
+                        AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
+                        else -> ""
+                    },
+                    textAlign = TextAlign.Center
+                )
+            },
+
+            actions = {
+
+            },
+
+            navigationIcon = {
+                if (currentScreen != AppScreens.HOME.name) {
+                    IconButton(onClick = {
+                        if (route != null) {
+                            navController.navigate(route)
+                        } else {
+                            navController.popBackStack()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button)
+                        )
                     }
-                    AppScreens.ALL_MESSAGES.name -> {
-                        if(currentUser != null && !currentUser.isAnonymous){
-                            stringResource(R.string.messages)
-                        }
-                        else {
-                            stringResource(R.string.guest_denied)
-                        }
+                }
+                if (currentScreen == AppScreens.HOME.name) {
+                    IconButton(onClick = {
+                        navController.navigate(AppScreens.MAP.name)
+                    }, modifier = Modifier.padding(bottom = 3.dp, start = 8.dp)) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.map),
+                            contentDescription = stringResource(R.string.map)
+                        )
                     }
-                    AppScreens.POST_AD.name -> {
-                        if(currentUser != null && !currentUser.isAnonymous){
-                            stringResource(R.string.post_ad)
-                        }
-                        else {
-                            stringResource(R.string.guest_denied)
-                        }
-                    }
-                    AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
-                    else -> ""
+                }
+            }
+        )
+
+        if (currentScreen == AppScreens.HOME.name) {
+            androidx.compose.material3.SearchBar(
+                query = searchQuery.value ?: "",
+                onQueryChange = { query ->
+                    searchQuery.value = query
                 },
-                textAlign = TextAlign.Center
-            )
-        },
-
-        actions = {
-            if(currentScreen == AppScreens.HOME.name){
-                androidx.compose.material3.SearchBar(
-                    query = searchQuery.value ?: "",
-                    onQueryChange = { query ->
-                        searchQuery.value = query
-                    },
-                    onSearch = { query ->
-                        onApplySearch(query)
-                    },
-                    active = false,
-                    onActiveChange = {  },
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp).wrapContentWidth().widthIn(max = 350.dp),
-                    leadingIcon = {
-                        IconButton(onClick = { onApplySearch(searchQuery.value) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = stringResource(R.string.search)
-                            )
-                        }
+                onSearch = { query ->
+                    onApplySearch(query)
+                },
+                active = false,
+                onActiveChange = { },
+                modifier = Modifier.height(60.dp).offset(y = (-22).dp).padding(5.dp),
+                leadingIcon = {
+                    IconButton(onClick = { onApplySearch(searchQuery.value) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(R.string.search)
+                        )
                     }
-                ) {}
-            }
-        },
-
-        navigationIcon = {
-            if (currentScreen != AppScreens.HOME.name) {
-                IconButton(onClick = {
-                    if (route != null) {
-                        navController.navigate(route)
-                    } else {
-                        navController.popBackStack()
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back_button)
-                    )
                 }
-            }
-            if (currentScreen == AppScreens.HOME.name) {
-                IconButton(onClick = {
-                    navController.navigate(AppScreens.MAP.name)
-                },  modifier = Modifier.padding(bottom = 3.dp, start = 8.dp)) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.map),
-                        contentDescription = stringResource(R.string.map)
-                    )
-                }
-            }
+            ) {}
+            Spacer(modifier = Modifier.height(12.dp))
         }
-    )
+
+    }
 }
