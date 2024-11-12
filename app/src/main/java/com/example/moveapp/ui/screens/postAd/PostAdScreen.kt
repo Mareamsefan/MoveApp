@@ -161,6 +161,7 @@ fun PostAdScreen(navController: NavController) {
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .menuAnchor()
                 )
 
                 ExposedDropdownMenu(
@@ -186,7 +187,6 @@ fun PostAdScreen(navController: NavController) {
             ExposedDropdownMenuBox(
                 expanded = underCategoryExpanded,
                 onExpandedChange = { underCategoryExpanded = !underCategoryExpanded }
-
             ) {
                 TextField(
                     value = stringResource(selectedUnderCategory),
@@ -201,6 +201,7 @@ fun PostAdScreen(navController: NavController) {
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .menuAnchor()
                 )
 
                 ExposedDropdownMenu(
