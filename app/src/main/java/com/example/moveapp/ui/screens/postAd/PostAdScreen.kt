@@ -220,26 +220,9 @@ fun PostAdScreen(navController: NavController) {
             // Title, address, postal code fields
             OutlinedTextField(
                 value = title.value,
-                onValueChange = { newValue ->
-                    try {
-                        censorshipValidator(newValue)
-                        title.value = newValue
-                        errorMessage = null
-                    } catch (e: ProhibitedContentException) {
-                        errorMessage = e.message
-                    }
-                },
+                onValueChange = { title.value = it },
                 label = { Text(text = stringResource(R.string.title)) },
-                isError = errorMessage != null,
             )
-
-            if (errorMessage != null) {
-                Text(
-                    text = errorMessage ?: "Inappropriate content detected",
-                    color = Color.Red,
-                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                )
-            }
 
             OutlinedTextField(
                 value = address.value,
@@ -293,6 +276,10 @@ fun PostAdScreen(navController: NavController) {
             Button(
                 onClick = {
                     if (!isPosting && currentUser != null) {
+                        try {
+                            censorshipValidator(title.value)
+                            censorshipValidator(description.value)
+
                         isPosting = true
                         coroutineScope.launch {
                             try {
@@ -336,6 +323,9 @@ fun PostAdScreen(navController: NavController) {
                             } finally {
                                 isPosting = false
                             }
+                        }
+                        } catch (e: ProhibitedContentException){
+                            errorMessage = e.message
                         }
                     }
                 },
