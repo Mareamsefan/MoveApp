@@ -51,6 +51,7 @@ fun AppNavigation() {
   // State variables for filters
     val location = remember { mutableStateOf<String?>(null) }
     val category = remember { mutableStateOf<String?>(null) }
+    val underCategory = remember { mutableStateOf<String?>(null) }
     val minPrice = remember { mutableStateOf<Double?>(null) }
     val maxPrice = remember { mutableStateOf<Double?>(null) }
     val searchQuery = remember { mutableStateOf<String?>(null) }
@@ -131,10 +132,10 @@ fun AppNavigation() {
                         },
                         sheetState = sheetState
                     ) {
-                        FilterBar(
-                            onApplyFilter = { newLocation, newCategory, newMinPrice, newMaxPrice ->
+                        FilterBar(category.value,
+                            onApplyFilter = {newLocation, newUnderCategory, newMinPrice, newMaxPrice ->
                                 location.value = newLocation
-                                category.value = newCategory
+                                underCategory.value = newUnderCategory
                                 minPrice.value = newMinPrice
                                 maxPrice.value = newMaxPrice
                             }
@@ -178,6 +179,7 @@ fun AppNavigation() {
                             searchQuery = searchQuery.value,
                             location = location.value,
                             category = category.value,
+                            underCategory = underCategory.value,
                             minPrice = minPrice.value,
                             maxPrice = maxPrice.value,
                             isListView = isListView
