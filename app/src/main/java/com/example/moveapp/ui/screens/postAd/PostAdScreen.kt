@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
@@ -38,6 +39,8 @@ import com.example.moveapp.viewModel.AdViewModel.Companion.createAd
 import com.example.moveapp.viewModel.AdViewModel.Companion.uploadAdImagesToStorage
 import kotlinx.coroutines.launch
 import java.io.File
+import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
+import com.example.moveapp.utility.ProhibitedContentException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +58,7 @@ fun PostAdScreen(navController: NavController) {
     val address = remember { mutableStateOf("") }
     val postalCode = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String>() }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // State for sending request to database
     var isPosting by remember { mutableStateOf(false) }
@@ -213,14 +217,30 @@ fun PostAdScreen(navController: NavController) {
                 }
             }
 
-
-
             // Title, address, postal code fields
             OutlinedTextField(
                 value = title.value,
-                onValueChange = { title.value = it },
-                label = { Text(text = stringResource(R.string.title)) }
+                onValueChange = { newValue ->
+                    try {
+                        censorshipValidator(newValue)
+                        title.value = newValue
+                        errorMessage = null
+                    } catch (e: ProhibitedContentException) {
+                        errorMessage = e.message
+                    }
+                },
+                label = { Text(text = stringResource(R.string.title)) },
+                isError = errorMessage != null,
             )
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage ?: "Inappropriate content detected",
+                    color = Color.Red,
+                    modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                )
+            }
+
             OutlinedTextField(
                 value = address.value,
                 onValueChange = { address.value = it },
