@@ -110,7 +110,7 @@ fun AllMessagesScreen(navController: NavController) {
                         val chatMessages = chat.messages
 
                         if(chatMessages.isNotEmpty()){
-                            ChatItemWithAd(chat = chat, ad = ad, onClick = {
+                            ChatItemWithAd(navController, chat = chat, ad = ad, onClick = {
                                 navController.navigate("specificMessageScreen/$chatId")
                             })
                         }

@@ -2,6 +2,7 @@ package com.example.moveapp.repository
 
 import android.util.Log
 import androidx.navigation.NavController
+import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.MessageData
 import com.example.moveapp.utility.FirebaseRealtimeService
@@ -106,6 +107,17 @@ class ChatRepo {
             } catch (e: Exception) {
                 Log.e("ChatRepo", ",Error while fetching chat: ${e.message}")
                 null
+            }
+        }
+
+        suspend fun fetchChatsWithAds(userId: String): Pair<List<ChatData>, Map<String, AdData?>> {
+            return try {
+                val chats = ChatRepo.getUserChats(userId)
+                val adIds = chats.map { it.adId }
+                val adsMap = adIds.associateWith { adId -> AdRepo.getAd(adId) }
+                Pair(chats, adsMap)
+            } catch (e: Exception) {
+                Pair(emptyList(), emptyMap()) // Returner tomme verdier ved feil
             }
         }
 
