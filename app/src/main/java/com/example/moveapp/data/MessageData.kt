@@ -14,4 +14,7 @@ data class MessageData (
 {
     constructor() : this("", "", "", "", 0L, null)
 
+    fun compareTo(other: MessageData): Int {
+        return other.messageTimestamp.compareTo(this.messageTimestamp) // Nyeste først
+    }
 }

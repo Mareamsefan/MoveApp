@@ -38,7 +38,11 @@ fun AllMessagesScreen(navController: NavController) {
             if (userId != null) {
                 try {
                     val fetchedChats = ChatRepo.getUserChats(userId)
-                    chats = fetchedChats
+
+                    chats = fetchedChats.sortedByDescending { chat ->
+                        chat.messages.values.maxOfOrNull { it.messageTimestamp } ?: 0L
+                    }
+
                     loading = false
                     errorMessage = null
 
