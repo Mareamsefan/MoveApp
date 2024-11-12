@@ -43,6 +43,7 @@ import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
 import com.example.moveapp.utility.HelpFunctions.Companion.isNumericFinal
 import com.example.moveapp.utility.HelpFunctions.Companion.isNumericInput
 import com.example.moveapp.utility.ProhibitedContentException
+import org.osmdroid.util.GeoPoint
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +54,7 @@ fun PostAdScreen(navController: NavController) {
     val currentUser = getCurrentUser()
     val locationUtil = LocationUtil()
 
+    var geoPoint by remember { mutableStateOf<com.google.firebase.firestore.GeoPoint?>(null) }
     // State for form fields
     val title = remember { mutableStateOf("") }
     val price = remember { mutableStateOf("") }
@@ -138,8 +140,8 @@ fun PostAdScreen(navController: NavController) {
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp)
                 .verticalScroll(scrollState)
+                .padding(20.dp)
         ) {
             // Dropdown for ad type
             ExposedDropdownMenuBox(
@@ -159,7 +161,6 @@ fun PostAdScreen(navController: NavController) {
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor()
                 )
 
                 ExposedDropdownMenu(
@@ -185,6 +186,7 @@ fun PostAdScreen(navController: NavController) {
             ExposedDropdownMenuBox(
                 expanded = underCategoryExpanded,
                 onExpandedChange = { underCategoryExpanded = !underCategoryExpanded }
+
             ) {
                 TextField(
                     value = stringResource(selectedUnderCategory),
@@ -199,7 +201,6 @@ fun PostAdScreen(navController: NavController) {
                     readOnly = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor()
                 )
 
                 ExposedDropdownMenu(
@@ -244,15 +245,22 @@ fun PostAdScreen(navController: NavController) {
             )
 
             // Button to launch the gallery image picker
-            Button(
-                onClick = { galleryLauncher.launch("image/*") },
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                Text(text = stringResource(R.string.upload_image))
-            }
 
-            // Reusable Camera permission and capture composable
-            CameraPermission(onImageCaptured = onImageCaptured)
+            Row(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .offset(x = (-10).dp)
+            ){
+                Button(
+                    modifier = Modifier
+                        .padding(5.dp),
+                    onClick = { galleryLauncher.launch("image/*") },
+                ) {
+                    Text(text = stringResource(R.string.upload_image))
+                }
+                // Reusable Camera permission and capture composable
+                CameraPermission(onImageCaptured = onImageCaptured)
+            }
 
             // Display images in the ad
             Image_swipe(imageList = adImages.map { it.toString() })
@@ -282,73 +290,75 @@ fun PostAdScreen(navController: NavController) {
 
             // turn the location information to a geopoint that gets saved in the database
             val fullAddress = "${address}, ${postalCode}, ${city}"
-            val geoPoint = locationUtil.addressToGeopoint(context = context, addressString = fullAddress)
+            geoPoint = locationUtil.addressToGeopoint(context = context, addressString = fullAddress)
+
 
             Button(
+                modifier = Modifier.offset(y = (-35).dp),
                 onClick = {
                     if (!isPosting && currentUser != null) {
                         try {
                             censorshipValidator(title.value)
                             censorshipValidator(description.value)
 
-                        isPosting = true
-                        coroutineScope.launch {
-                            try {
+                            isPosting = true
+                            coroutineScope.launch {
+                                try {
 
-                                if (!price.value.isEmpty() && isNumericFinal(price.value)) {
+                                    if (!price.value.isEmpty() && isNumericFinal(price.value)) {
 
-                                    // Create an ad and retrieve the adId
-                                    val ad = createAd(
-                                        context,
-                                        title.value,
-                                        price.value.toDouble(),
-                                        adType.value,
-                                        underCategory.value,
-                                        description.value,
-                                        currentUser.uid,
-                                        city.value,
-                                        address.value,
-                                        postalCode.value,
-                                        geoPoint
-                                    )
-                                    val adId = ad?.adId
-                                    Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
+                                        // Create an ad and retrieve the adId
+                                        val ad = createAd(
+                                            context,
+                                            title.value,
+                                            price.value.toDouble(),
+                                            adType.value,
+                                            underCategory.value,
+                                            description.value,
+                                            currentUser.uid,
+                                            city.value,
+                                            address.value,
+                                            postalCode.value,
+                                            geoPoint
+                                        )
+                                        val adId = ad?.adId
+                                        Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
 
-                                    if (adId != null) {
-                                        val uriImagesList = adImages.map { it.toUri() }
+                                        if (adId != null) {
+                                            val uriImagesList = adImages.map { it.toUri() }
 
-                                        val uploadedImageUrls =
-                                            uploadAdImagesToStorage(adId, uriImagesList)
+                                            val uploadedImageUrls =
+                                                uploadAdImagesToStorage(adId, uriImagesList)
 
-                                        if (uploadedImageUrls.isNotEmpty()) {
+                                            if (uploadedImageUrls.isNotEmpty()) {
 
-                                            val updateSuccess = AdRepo.updateAdImagesInDatabase(
-                                                adId,
-                                                uploadedImageUrls
-                                            )
-                                            if (updateSuccess) {
-                                                Log.d(
-                                                    "PostAdScreen",
-                                                    "Ad images updated successfully."
+                                                val updateSuccess = AdRepo.updateAdImagesInDatabase(
+                                                    adId,
+                                                    uploadedImageUrls
                                                 )
+                                                if (updateSuccess) {
+                                                    Log.d(
+                                                        "PostAdScreen",
+                                                        "Ad images updated successfully."
+                                                    )
+                                                } else {
+                                                    Log.e("PostAdScreen", "Failed to update ad images.")
+                                                }
                                             } else {
-                                                Log.e("PostAdScreen", "Failed to update ad images.")
+                                                Log.e("PostAdScreen", "No URLs returned from upload.")
                                             }
-                                        } else {
-                                            Log.e("PostAdScreen", "No URLs returned from upload.")
-                                        }
 
-                                        // Navigate after everything is completed
-                                        navController.navigate(AppScreens.HOME.name)
+                                            // Navigate after everything is completed
+                                            navController.navigate(AppScreens.HOME.name)
+                                        }
+                                        else {
+                                            errorMessage = "Please enter a valid number for price"
+                                        }
                                     }
-                                    else {
-                                        errorMessage = "Please enter a valid number for price"
-                                    }
+                                } finally {
+                                    isPosting = false
                                 }
-                            } finally {
-                                isPosting = false
                             }
-                        }
                         } catch (e: ProhibitedContentException){
                             errorMessage = e.message
                         }
@@ -361,5 +371,9 @@ fun PostAdScreen(navController: NavController) {
             }
             errorMessage?.let { Text(text = it, color = Color.Red) }
         }
+
+
     }
+
+
 }
