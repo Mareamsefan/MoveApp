@@ -82,8 +82,9 @@
     <string name="Special_Handling_Services">Special Handling Services</string>
 
     <string name="Select_a_subcategory">Select a subcategory</string>
-
-
+    <string name="save_changes">Save changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="subcategory">Subcategory</string>
 
 
 </resources>
