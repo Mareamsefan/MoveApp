@@ -1,8 +1,10 @@
 package com.example.moveapp.ui.navigation.navBars
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -37,7 +39,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
     var currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
     val searchQuery = remember { mutableStateOf<String?>(null) }
-    Column(modifier = Modifier.padding(0.dp)) {
+    Column() {
         CenterAlignedTopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -109,28 +111,29 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
             }
         )
 
-        if (currentScreen == AppScreens.HOME.name)
-        androidx.compose.material3.SearchBar(
-            query = searchQuery.value ?: "",
-            onQueryChange = { query ->
-                searchQuery.value = query
-            },
-            onSearch = { query ->
-                onApplySearch(query)
-            },
-            active = false,
-            onActiveChange = { },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            leadingIcon = {
-                IconButton(onClick = { onApplySearch(searchQuery.value) }) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = stringResource(R.string.search)
-                    )
+        if (currentScreen == AppScreens.HOME.name) {
+            androidx.compose.material3.SearchBar(
+                query = searchQuery.value ?: "",
+                onQueryChange = { query ->
+                    searchQuery.value = query
+                },
+                onSearch = { query ->
+                    onApplySearch(query)
+                },
+                active = false,
+                onActiveChange = { },
+                modifier = Modifier.height(60.dp).offset(y = (-22).dp).padding(5.dp),
+                leadingIcon = {
+                    IconButton(onClick = { onApplySearch(searchQuery.value) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = stringResource(R.string.search)
+                        )
+                    }
                 }
-            }
-        ) {}
+            ) {}
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
     }
 }
