@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.ad
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
@@ -27,50 +28,35 @@ import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import java.util.UUID
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditAdScreen(navController: NavController, adId: String?) {
 
+    // Initialiser ad data hvis adId finnes
     var ad by remember { mutableStateOf<AdData?>(null) }
-    var adData by remember { mutableStateOf<AdData?>(null) }
-
-    if(adId != null){
+    if (adId != null) {
         LaunchedEffect(Unit) {
-             ad = getAd(adId)
-        }
-    }
-
-    if (ad != null){
-        var adData = ad?.let {
-            AdData(
-            adTitle = it.adTitle,
-            adPrice = it.adPrice,
-            adCategory = it.adCategory,
-            adUnderCategory = it.adUnderCategory,
-            adDescription = it.adDescription,
-            address = it.address,
-            postalCode = it.postalCode,
-            city = it.city
-        )
+            ad = getAd(adId)
+            Log.d("AD FETCHED:", "$ad")
         }
     }
 
     // State for form fields
-    var title by remember { mutableStateOf(adData?.adTitle ?: "") }
-    var price by remember { mutableStateOf(adData?.adPrice?.toString() ?: "") }
-    var description by remember { mutableStateOf(adData?.adDescription ?: "") }
-    var address by remember { mutableStateOf(adData?.address ?: "") }
-    var postalCode by remember { mutableStateOf(adData?.postalCode ?: "") }
-    var city by remember { mutableStateOf(adData?.city ?: "") }
+    var title by remember { mutableStateOf(ad?.adTitle) }
+    var price by remember { mutableStateOf(ad?.adPrice.toString()) }
+    var description by remember { mutableStateOf(ad?.adDescription ?: "") }
+    var address by remember { mutableStateOf(ad?.address ?: "") }
+    var postalCode by remember { mutableStateOf(ad?.postalCode ?: "") }
+    var city by remember { mutableStateOf(ad?.city ?: "") }
 
     // Dropdown state for categories
     var expanded by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf<Int>(0) }
+    var selectedCategory by remember { mutableStateOf(R.string.Select_an_ad_type) }
     val categoryOptions = listOf(R.string.Rent_vehicle, R.string.Delivery_service, R.string.unwanted_items)
 
     // Dropdown state for subcategories
     var subcategoryExpanded by remember { mutableStateOf(false) }
-    var selectedSubcategory by remember { mutableStateOf<Int>(0) }
+    var selectedSubcategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
 
     // Options for each category
     val unwantedItemsOptions = listOf(
@@ -126,10 +112,11 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         OutlinedTextField(
             value = price,
             onValueChange = { price = it },
-            label = { Text(stringResource(R.string.price)) },
+            label = { Text(price) },
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
+        Log.d("AD FETCHED p:", "$price")
 
         // Category dropdown
         ExposedDropdownMenuBox(
@@ -137,7 +124,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
             onExpandedChange = { expanded = !expanded }
         ) {
             TextField(
-                value = stringResource(selectedCategory),
+                value = stringResource(id = selectedCategory),
                 onValueChange = {},
                 label = { Text(stringResource(R.string.category)) },
                 trailingIcon = {
@@ -147,7 +134,10 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                     )
                 },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
+
             )
 
             ExposedDropdownMenu(
@@ -160,7 +150,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                         onClick = {
                             selectedCategory = category
                             expanded = false
-                            selectedSubcategory = (currentSubcategoryOptions.firstOrNull() ?: 0)
+                            selectedSubcategory = currentSubcategoryOptions.firstOrNull() ?: R.string.Select_a_subcategory
                         }
                     )
                 }
@@ -173,7 +163,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
             onExpandedChange = { subcategoryExpanded = !subcategoryExpanded }
         ) {
             TextField(
-                value = stringResource(selectedSubcategory),
+                value = stringResource(id = selectedSubcategory),
                 onValueChange = {},
                 label = { Text(stringResource(R.string.subcategory)) },
                 trailingIcon = {
@@ -183,7 +173,9 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                     )
                 },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor()
             )
 
             ExposedDropdownMenu(

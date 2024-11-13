@@ -286,8 +286,6 @@ fun PostAdScreen(navController: NavController) {
                 label = { Text(text = stringResource(R.string.description)) }
             )
 
-            Text(text = adType.value) // Display the selected ad type
-            Text(text = underCategory.value)
 
             // turn the location information to a geopoint that gets saved in the database
             val fullAddress = "${address}, ${postalCode}, ${city}"
@@ -295,7 +293,6 @@ fun PostAdScreen(navController: NavController) {
 
 
             Button(
-                modifier = Modifier.offset(y = (-35).dp),
                 onClick = {
                     if (!isPosting && currentUser != null) {
                         try {
