@@ -9,19 +9,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,21 +28,30 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.R
 import com.example.moveapp.data.AdData
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+
 
 @Composable
-fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController) {
+fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController, onClose: () -> Unit) {
     if (ads.isNullOrEmpty()) return
 
     val pageState = rememberPagerState(pageCount = { ads.size })
-
-    Box(modifier = Modifier.height(220.dp).fillMaxWidth()) {
+    Box(
+        modifier = Modifier
+            .height(220.dp)
+            .fillMaxWidth()
+    ) {
         HorizontalPager(state = pageState) { page ->
             val ad = ads[page]
             val painter = rememberAsyncImagePainter(model = ad.adImages.firstOrNull())
 
-            Card(modifier = Modifier.fillMaxSize().padding(8.dp).clickable {
-                navController.navigate("specific_ad/${ad.adId}")
-            }) {
+            Card(modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .clickable {
+                    navController.navigate("specific_ad/${ad.adId}")
+                }) {
                 Column {
                     Row(
                         modifier = Modifier
@@ -65,7 +72,10 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController) {
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(text = ad.adCategory)
-                            Text(text = ad.adPrice.toInt().toString() + stringResource(R.string.kr))
+                            Text(
+                                text = ad.adPrice.toInt()
+                                    .toString() + stringResource(R.string.kr)
+                            )
                             Button(
                                 onClick = {
                                     navController.navigate("specific_ad/${ad.adId}")
@@ -86,7 +96,7 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController) {
                                 .padding(top = 8.dp)
                                 .weight(1f)
                         )
-                        if (adNumber!=ads.size)
+                        if (adNumber != ads.size)
                             Icon(
                                 imageVector = Icons.Default.ArrowForward,
                                 contentDescription = "Swipe",
@@ -94,6 +104,17 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController) {
                     }
                 }
             }
+        }
+        IconButton(
+            onClick = { onClose() },
+            modifier = Modifier
+                .align(Alignment.TopEnd) // Aligns to the top-right corner
+                .padding(8.dp) // Optional padding to adjust position
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close"
+            )
         }
     }
 }

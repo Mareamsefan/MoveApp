@@ -67,7 +67,7 @@ fun MapScreen(navController: NavController) {
         Log.d("MapScreen", "User location on map $userLocation")
 
         if (hasLocationPermission && userLocation != null && ads.isNotEmpty()) {
-            Map_ads(userLocation!!, ads, navController, mapGeo)
+            Map_ads(userLocation!!, navController, mapGeo)
         } else {
             if (errorMessage.isNotEmpty()) {
                 Text(text = errorMessage)
@@ -80,11 +80,12 @@ fun MapScreen(navController: NavController) {
 }
 
 @Composable
-fun Map_ads(geoPoint: org.osmdroid.util.GeoPoint, ads: List<AdData>, navController: NavController, mapGeo: MutableMap<GeoPoint, MutableList<AdData>>) {
+fun Map_ads(geoPoint: org.osmdroid.util.GeoPoint, navController: NavController, mapGeo: MutableMap<GeoPoint, MutableList<AdData>>) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val allKeys: Set<GeoPoint> = mapGeo.keys
     val selectedAds = remember { mutableStateOf<List<AdData>?>(null) }
+    var isAdVisible by remember { mutableStateOf(true) }
 
     Configuration.getInstance()
         .load(context, context.getSharedPreferences("osmdroid", Activity.MODE_PRIVATE))
@@ -109,8 +110,9 @@ fun Map_ads(geoPoint: org.osmdroid.util.GeoPoint, ads: List<AdData>, navControll
                         val keyMarker = Marker(this).apply {
                             position = org.osmdroid.util.GeoPoint(key.latitude, key.longitude)
                             setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            setOnMarkerClickListener { marker, mapView ->
+                            setOnMarkerClickListener { _, _ ->
                                 selectedAds.value = mapGeo[key]
+                                isAdVisible = true
                                 Log.d("MapScreen", "ads in the geopoint $numberOfAds")
                                 true
                             }
@@ -122,9 +124,14 @@ fun Map_ads(geoPoint: org.osmdroid.util.GeoPoint, ads: List<AdData>, navControll
             },
             update = { mapView?.invalidate() }
         )
-        selectedAds.value?.let { ads ->
-            DisplayAdsInGeoPoint(selectedAds.value, navController)
-
+        if (isAdVisible) {
+            selectedAds.value?.let { ads ->
+                DisplayAdsInGeoPoint(
+                    ads = ads,
+                    navController = navController,
+                    onClose = { isAdVisible = false }
+                )
+            }
         }
 
         DisposableEffect(lifecycleOwner) {
