@@ -193,6 +193,7 @@ class AdRepo {
                     adPrice = it.adPrice,
                     adCategory = it.adCategory,
                     adDescription = it.adDescription,
+                    adUnderCategory = it.adUnderCategory,
                     userId = it.userId,
                     adImages = it.adImages,
                     city = it.city,
