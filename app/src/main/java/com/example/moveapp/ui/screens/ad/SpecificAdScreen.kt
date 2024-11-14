@@ -176,7 +176,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     text = stringResource(R.string.category),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
-                Text(text = ad!!.adCategory, Modifier.padding(bottom = 10.dp))
+                Text(text = ad!!.adCategory + ", " + ad!!.adUnderCategory, Modifier.padding(bottom = 10.dp))
                 Text(
                     text = stringResource(R.string.Seller),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
