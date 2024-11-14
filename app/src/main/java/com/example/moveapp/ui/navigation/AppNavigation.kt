@@ -48,7 +48,7 @@ fun AppNavigation() {
     val currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
     var isAuthChecked by remember { mutableStateOf(false) }
-  // State variables for filters
+    // State variables for filters
     val location = remember { mutableStateOf<String?>(null) }
     val category = remember { mutableStateOf<String?>(null) }
     val underCategory = remember { mutableStateOf<String?>(null) }
