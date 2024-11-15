@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -29,6 +28,7 @@ import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -36,7 +36,7 @@ import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit, onResetCategory: () -> Unit){
+fun TopBar(navController: NavController, category: String?, route: String? = null, onApplySearch: (String?)-> Unit, onResetCategory: () -> Unit){
 
     var currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
@@ -65,7 +65,6 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                                 stringResource(R.string.guest_denied)
                             }
                         }
-
                         AppScreens.POST_AD.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.post_ad)
@@ -77,6 +76,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                         AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
                         else -> ""
                     },
+                    style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
             },
@@ -102,7 +102,8 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                 }
                 if (currentScreen == AppScreens.HOME.name) {
                     Row(modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween){
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically){
                         IconButton(onClick = {
                             onResetCategory()
                             navController.navigate(AppScreens.WELCOME_SCREEN.name)
@@ -112,9 +113,15 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                                 contentDescription = stringResource(R.string.back_button)
                             )
                         }
+                        if (category != null) {
+                            Text(
+                                text = category,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                         IconButton(onClick = {
                             navController.navigate(AppScreens.MAP.name)
-                        }, modifier = Modifier.padding(bottom = 3.dp, end=8.dp)) {
+                        }, modifier = Modifier.padding(end=8.dp)) {
                             Icon(
                                 painter = painterResource(id = R.drawable.map),
                                 contentDescription = stringResource(R.string.map)
