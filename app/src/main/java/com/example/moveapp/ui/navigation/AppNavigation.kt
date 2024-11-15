@@ -66,10 +66,6 @@ fun AppNavigation() {
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
 
-    Log.e("filter results", "category  $category")
-
-
-
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()
@@ -94,7 +90,7 @@ fun AppNavigation() {
         Scaffold(
             topBar = {
                 if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
-                    TopBar(navController = navController, onApplySearch = { newSearchQuery ->
+                    TopBar(navController = navController, category.value, onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
                     }, onResetCategory = {
                         location.value = null
