@@ -8,12 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -33,10 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
-import com.example.moveapp.data.AdData
 import com.example.moveapp.data.UserData
-import com.example.moveapp.repository.AdRepo
-import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.ui.composables.ProfilePicture
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.getUsername
@@ -57,29 +50,16 @@ fun Profile(navController: NavController) {
     val currentUser = getCurrentUser()
     val userId = currentUser?.uid
     var userData = remember { mutableStateOf<UserData?>(null) }
-    var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
+    // TODO: Loading gjør ikke noe. Vurder å slette eller implementere funksjonalitet.
     var loading by remember { mutableStateOf(true) }
 
-    // Fetch user profile and ads only if userId is valid
+    // Fetch user profile only if userId is valid
     LaunchedEffect(userId) {
         if (userId != null) {
             try {
                 // Fetch user data asynchronously
                 userData.value = readDocument("users", userId, UserData::class.java)
                 profileImageUrl.value = userData.value?.profilePictureUrl ?: ""
-
-                // Fetch user ads asynchronously
-                AdRepo.getUserAds(
-                    userId,
-                    onSuccess = { fetchedAds ->
-                        ads = fetchedAds
-                        loading = false
-                    },
-                    onFailure = { exception ->
-                        errorMessage.value = exception.message ?: "Error fetching ads"
-                        loading = false
-                    }
-                )
             } catch (e: Exception) {
                 errorMessage.value = "An error occurred: ${e.message}"
                 loading = false
@@ -145,27 +125,6 @@ fun Profile(navController: NavController) {
                 } else {
                     Text(text = stringResource(R.string.update_image))
                 }
-            }
-
-            // Ads section
-            Text(text = stringResource(R.string.my_ads), style = MaterialTheme.typography.titleMedium)
-
-            if (ads.isNotEmpty()) {
-                // Nested scrollable for ads section
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    contentPadding = PaddingValues(8.dp),
-                ) {
-                    items(ads) { ad ->
-                        AdItem(navController, ad = ad)
-                    }
-                }
-            } else if (!loading) {
-                // Display message if no ads
-                Text(text = stringResource(R.string.no_ads))
             }
 
             // Display error message if any
