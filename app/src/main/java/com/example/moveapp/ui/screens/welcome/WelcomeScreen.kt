@@ -2,7 +2,10 @@ package com.example.moveapp.ui.screens.welcome
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +19,7 @@ import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
 fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Unit) {
+    val scrollState = rememberScrollState()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -24,7 +28,8 @@ fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Un
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.verticalScroll(scrollState)
         ) {
             Image(
                 painter = painterResource(id = R.mipmap.ic_launcher_foreground),
@@ -32,7 +37,7 @@ fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Un
                 modifier = Modifier.size(250.dp)
             )
 
-            Text(text = stringResource(id = R.string.what_looking_for))
+            Text(text = stringResource(id = R.string.what_looking_for), style = MaterialTheme.typography.titleLarge)
 
             Button(
                 onClick = {
