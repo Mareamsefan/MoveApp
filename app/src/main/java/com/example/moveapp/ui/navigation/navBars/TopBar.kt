@@ -1,6 +1,8 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -84,7 +86,7 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
             },
 
             navigationIcon = {
-                if (currentScreen != AppScreens.HOME.name) {
+                if (currentScreen != AppScreens.WELCOME_SCREEN.name && currentScreen != AppScreens.HOME.name) {
                     IconButton(onClick = {
                         if (route != null) {
                             navController.navigate(route)
@@ -99,13 +101,28 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                     }
                 }
                 if (currentScreen == AppScreens.HOME.name) {
-                    IconButton(onClick = {
-                        navController.navigate(AppScreens.MAP.name)
-                    }, modifier = Modifier.padding(bottom = 3.dp, start = 8.dp)) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.map),
-                            contentDescription = stringResource(R.string.map)
-                        )
+                    Row(modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween){
+                        IconButton(onClick = {
+                            if (route != null) {
+                                navController.navigate(route)
+                            } else {
+                                navController.popBackStack()
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back_button)
+                            )
+                        }
+                        IconButton(onClick = {
+                            navController.navigate(AppScreens.MAP.name)
+                        }, modifier = Modifier.padding(bottom = 3.dp, end=8.dp)) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.map),
+                                contentDescription = stringResource(R.string.map)
+                            )
+                        }
                     }
                 }
             }
@@ -122,7 +139,10 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                 },
                 active = false,
                 onActiveChange = { },
-                modifier = Modifier.height(60.dp).offset(y = (-22).dp).padding(5.dp),
+                modifier = Modifier
+                    .height(60.dp)
+                    .offset(y = (-22).dp)
+                    .padding(5.dp),
                 leadingIcon = {
                     IconButton(onClick = { onApplySearch(searchQuery.value) }) {
                         Icon(
