@@ -1,6 +1,5 @@
 package com.example.moveapp.ui.navigation.navBars
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,7 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -146,7 +144,8 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
                 modifier = Modifier
                     .height(60.dp)
                     .offset(y = (-22).dp)
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .padding(horizontal = 5.dp),
                 leadingIcon = {
                     IconButton(onClick = { onApplySearch(searchQuery.value) }) {
                         Icon(

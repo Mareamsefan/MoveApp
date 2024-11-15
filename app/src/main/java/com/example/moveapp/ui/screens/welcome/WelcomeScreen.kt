@@ -34,7 +34,7 @@ fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Un
             Image(
                 painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = stringResource(id = R.string.app_name),
-                modifier = Modifier.size(250.dp)
+                modifier = Modifier.size(200.dp)
             )
 
             Text(text = stringResource(id = R.string.what_looking_for), style = MaterialTheme.typography.titleLarge)

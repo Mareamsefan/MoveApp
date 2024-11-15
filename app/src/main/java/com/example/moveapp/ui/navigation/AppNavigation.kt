@@ -140,7 +140,7 @@ fun AppNavigation() {
                         },
                         sheetState = sheetState
                     ) {
-                        FilterBar(category.value,
+                        FilterBar(category.value, location.value, minPrice.value, maxPrice.value, underCategory.value,
                             onApplyFilter = {newLocation, newUnderCategory, newMinPrice, newMaxPrice ->
                                 location.value = newLocation
                                 underCategory.value = newUnderCategory
