@@ -164,7 +164,8 @@ fun Register(navController: NavController) {
                     Text(text = stringResource(R.string.register))
                 }
             }
-
+            /*
+            // Tror ikke jeg klarer å fikse google login
             // Google Sign-In Button
             Button(onClick = {
                 coroutineScope.launch {
@@ -181,6 +182,8 @@ fun Register(navController: NavController) {
             }) {
                 Text("Sign in with Google")
             }
+            */
+
 
 
 

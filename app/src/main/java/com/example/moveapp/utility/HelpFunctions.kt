@@ -52,7 +52,7 @@ class HelpFunctions {
         fun censorshipValidator(text: String) {
             val words = text.split("\\s+".toRegex())
             if (words.any { word -> blacklist.any { prohibited -> word.equals(prohibited, ignoreCase = true) } }) {
-                throw ProhibitedContentException("Behave yourself. Bitch..")
+                throw ProhibitedContentException("Inappropriate contented detected.")
             }
         }
 
