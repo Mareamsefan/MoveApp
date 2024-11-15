@@ -51,7 +51,9 @@
     <string name="Seller">Seller</string>
     <string name="contact_seller_above">Contact seller above</string>
     <string name="my_ads">My posted ads</string>
+    <string name="my_favorite_ads">My favorite ads</string>
     <string name="no_ads">You have no ads posted at this moment</string>
+    <string name="no_favorite_ads">You have no favorite ads at this moment.</string>
     <string name="take_photo">Take a photo</string>
     <string name="edit_ad">Edit</string>
     <string name="hide_filter">Hide Filter</string>

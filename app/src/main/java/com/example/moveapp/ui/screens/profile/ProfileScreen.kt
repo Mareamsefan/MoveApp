@@ -50,7 +50,6 @@ fun Profile(navController: NavController) {
     val currentUser = getCurrentUser()
     val userId = currentUser?.uid
     var userData = remember { mutableStateOf<UserData?>(null) }
-    // TODO: Loading gjør ikke noe. Vurder å slette eller implementere funksjonalitet.
     var loading by remember { mutableStateOf(true) }
 
     // Fetch user profile only if userId is valid
