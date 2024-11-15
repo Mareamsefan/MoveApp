@@ -184,6 +184,19 @@ class AdRepo {
                 onFailure(e)
             }
         }
+
+        // Function to retrieve all favorite ads by a specific user
+        suspend fun getUsersFavoriteAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit){
+            try{
+                FirestoreService.getUsersFavoriteAdsFlow().collect {
+                    favoriteAds ->
+                        onSuccess(favoriteAds)
+                }
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+        }
+
         suspend fun getAd(adId: String?): AdData? {
             val ad = adId?.let { FirestoreService.readDocument("ads", it, AdData::class.java) }
             return ad?.let {

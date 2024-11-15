@@ -20,16 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.data.AdData
-import com.example.moveapp.data.UserData
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
-import com.example.moveapp.utility.FirestoreService.readDocument
 
 @Composable
 fun MyAdsScreen(navController: NavController) {
@@ -37,9 +34,7 @@ fun MyAdsScreen(navController: NavController) {
     val errorMessage = remember { mutableStateOf("") }
     val currentUser = getCurrentUser()
     val userId = currentUser?.uid
-    var userData = remember { mutableStateOf<UserData?>(null) }
     var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
-    // TODO: Loading gjør ikke noe. Vurder å slette eller implementere funksjonalitet.
     var loading by remember { mutableStateOf(true) }
 
     // Fetch user profile and ads only if userId is valid
@@ -64,7 +59,6 @@ fun MyAdsScreen(navController: NavController) {
             }
         } else {
             errorMessage.value = "User not logged in"
-            loading = false
         }
     }
 
