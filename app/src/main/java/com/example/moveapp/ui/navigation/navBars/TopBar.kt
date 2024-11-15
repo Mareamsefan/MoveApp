@@ -36,7 +36,7 @@ import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit){
+fun TopBar(navController: NavController, route: String? = null, onApplySearch: (String?)-> Unit, onResetCategory: () -> Unit){
 
     var currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
@@ -104,11 +104,8 @@ fun TopBar(navController: NavController, route: String? = null, onApplySearch: (
                     Row(modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween){
                         IconButton(onClick = {
-                            if (route != null) {
-                                navController.navigate(route)
-                            } else {
-                                navController.popBackStack()
-                            }
+                            onResetCategory()
+                            navController.navigate(AppScreens.WELCOME_SCREEN.name)
                         }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,

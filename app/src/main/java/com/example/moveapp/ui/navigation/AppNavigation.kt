@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -65,6 +66,9 @@ fun AppNavigation() {
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
 
+    Log.e("filter results", "category  $category")
+
+
 
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
@@ -92,11 +96,20 @@ fun AppNavigation() {
                 if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
                     TopBar(navController = navController, onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
-                    })
+                    }, onResetCategory = {
+                        location.value = null
+                        category.value = null
+                        underCategory.value = null
+                        minPrice.value = null
+                        maxPrice.value = null
+                        searchQuery.value = null
+
+                    }
+                    )
                 }
             },
             bottomBar = {
-                BottomNavBar(navController)
+                BottomNavBar(navController, category.value)
             },
 
             floatingActionButton = {
@@ -105,7 +118,6 @@ fun AppNavigation() {
                         isListView = isListView,
                         onViewToggle = { newIsListView ->
                             isListView = newIsListView
-                            // Here you can also trigger any layout changes in your screen
                         },
                         onRightClick = {
                             scope.launch {

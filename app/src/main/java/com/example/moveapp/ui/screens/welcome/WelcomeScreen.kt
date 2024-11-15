@@ -13,7 +13,7 @@ import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
-fun WelcomeScreen(navController: NavController, onApplyCategory: (String) -> Unit) {
+fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
