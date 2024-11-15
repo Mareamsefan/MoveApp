@@ -34,6 +34,7 @@ import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 import com.example.moveapp.ui.screens.profile.MyAdsScreen
+import com.example.moveapp.ui.screens.profile.MyFavoritesScreen
 import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.ui.screens.welcome.WelcomeScreen
 import com.example.moveapp.utility.FireAuthService
@@ -252,6 +253,14 @@ fun AppNavigation() {
                     composable(AppScreens.MY_ADS.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
                             MyAdsScreen(navController)
+                        } else {
+                            GuestDenied(navController)
+                        }
+                    }
+
+                    composable(AppScreens.MY_FAVORITES.name) {
+                        if (currentUser != null && !currentUser.isAnonymous) {
+                            MyFavoritesScreen(navController)
                         } else {
                             GuestDenied(navController)
                         }

@@ -94,6 +94,11 @@ fun BottomNavBar(navController: NavController) {
                                 interactionSource = remember { MutableInteractionSource() }
                             )
                             DropdownMenuItem(
+                                text = { Text("My Favorites")},
+                                onClick = { navController.navigate(AppScreens.MY_FAVORITES.name) },
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Settings")},
                                 onClick = { navController.navigate(AppScreens.PROFILE_SETTINGS.name) },
                             )
