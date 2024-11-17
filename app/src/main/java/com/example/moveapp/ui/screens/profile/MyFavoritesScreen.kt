@@ -29,27 +29,26 @@ import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @Composable
-fun MyAdsScreen(navController: NavController) {
+fun MyFavoritesScreen(navController: NavController) {
     // Mutable states for UI data
     val errorMessage = remember { mutableStateOf("") }
     val currentUser = getCurrentUser()
     val userId = currentUser?.uid
-    var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
+    var favoriteAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
 
     // Fetch user profile and ads only if userId is valid
     LaunchedEffect(userId) {
         if (userId != null) {
             try {
-                // Fetch user ads asynchronously
-                AdRepo.getUserAds(
-                    userId,
+                // Fetch users favorite ads asynchronously
+                AdRepo.getUsersFavoriteAds(
                     onSuccess = { fetchedAds ->
-                        ads = fetchedAds
+                        favoriteAds = fetchedAds
                         loading = false
                     },
                     onFailure = { exception ->
-                        errorMessage.value = exception.message ?: "Error fetching ads"
+                        errorMessage.value = exception.message ?: "Error fetching favorite ads"
                         loading = false
                     }
                 )
@@ -72,10 +71,10 @@ fun MyAdsScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Ads section
-            Text(text = stringResource(R.string.my_ads), style = MaterialTheme.typography.titleMedium)
+            // Favorite ads section
+            Text(text = stringResource(R.string.my_favorite_ads), style = MaterialTheme.typography.titleMedium)
 
-            if (ads.isNotEmpty()) {
+            if (favoriteAds.isNotEmpty()) {
                 // Nested scrollable for ads section
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
@@ -84,13 +83,13 @@ fun MyAdsScreen(navController: NavController) {
                         .padding(8.dp),
                     contentPadding = PaddingValues(8.dp),
                 ) {
-                    items(ads) { ad ->
+                    items(favoriteAds) { ad ->
                         AdItem(navController, ad = ad)
                     }
                 }
             } else if (!loading) {
                 // Display message if no ads
-                Text(text = stringResource(R.string.no_ads))
+                Text(text = stringResource(R.string.no_favorite_ads))
             }
 
             // Display error message if any

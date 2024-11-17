@@ -110,6 +110,7 @@ object FirestoreService {
             }
         awaitClose { registration.remove() }
     }
+
     // Function to get a collection snapshot as a Flow for real-time updates
     fun getUserAdsFlow(userId: String): Flow<List<AdData>> = callbackFlow {
         val registration: ListenerRegistration = db.collection("ads")
@@ -127,6 +128,49 @@ object FirestoreService {
         awaitClose { registration.remove() }
     }
 
+    // Get a user's favorite ads
+    // Logic was made by Claude.ai
+    suspend fun getUsersFavoriteAdsFlow(): Flow<List<AdData>> = callbackFlow {
+        val userId = FireAuthService.getUserId() ?: throw SecurityException("User not logged in")
+
+        var adsListener: ListenerRegistration? = null
+
+        val favoritesListener = db.collection("users").document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val favoriteAdIds = snapshot?.get("favorites") as? List<String> ?: emptyList()
+
+                if (favoriteAdIds.isEmpty()) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                adsListener?.remove()
+
+                adsListener = db.collection("ads")
+                    .whereIn("adId", favoriteAdIds)
+                    .addSnapshotListener { adsSnapshot, adsError ->
+                        if (adsError != null) {
+                            close(adsError)
+                            return@addSnapshotListener
+                        }
+
+                        val ads = adsSnapshot?.documents?.mapNotNull {
+                            it.toObject(AdData::class.java)
+                        } ?: emptyList()
+
+                        trySend(ads)
+                    }
+            }
+        awaitClose {
+            adsListener?.remove()
+            favoritesListener.remove()
+        }
+    }
 
     // Function to get paginated ads
     suspend fun getPaginatedAds(lastVisible: DocumentSnapshot?, pageSize: Int = 10): Pair<List<AdData>, DocumentSnapshot?> {

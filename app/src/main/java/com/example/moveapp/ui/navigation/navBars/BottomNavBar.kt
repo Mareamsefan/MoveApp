@@ -40,7 +40,7 @@ data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringR
 fun BottomNavBar(navController: NavController, category: String?) {
     var isProfileMenuExpanded by remember { mutableStateOf(false) }
     var showLogoutConfirmation by remember { mutableStateOf(false) }
-    val currentShortcuts = remember(category) { getBottomNavShortcuts(category) }
+    val currentShortcuts = remember(category, isUserLoggedIn()) { getBottomNavShortcuts(category) }
     Log.d("filter bottom bar", "category: $category")
 
     NavigationBar () {
@@ -88,6 +88,11 @@ fun BottomNavBar(navController: NavController, category: String?) {
                             DropdownMenuItem(
                                 text = { Text("My Ads")},
                                 onClick = { navController.navigate(AppScreens.MY_ADS.name) },
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("My Favorites")},
+                                onClick = { navController.navigate(AppScreens.MY_FAVORITES.name) },
                                 interactionSource = remember { MutableInteractionSource() }
                             )
                             DropdownMenuItem(
