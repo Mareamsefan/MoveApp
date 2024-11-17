@@ -5,10 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.filled.ArrowForward
@@ -40,7 +42,7 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController, onClo
     Box(
         modifier = Modifier
             .height(220.dp)
-            .fillMaxWidth()
+            .fillMaxWidth().wrapContentHeight()
     ) {
         HorizontalPager(state = pageState) { page ->
             val ad = ads[page]
@@ -63,6 +65,7 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController, onClo
                             modifier = Modifier
                                 .height(150.dp)
                                 .padding(10.dp)
+                                .fillMaxHeight(0.4f)
                         )
 
                         Column(modifier = Modifier.padding(8.dp)) {
