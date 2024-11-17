@@ -232,7 +232,7 @@ fun AppNavigation() {
                     }
 
                     composable(AppScreens.MAP.name) {
-                        MapScreen(navController)
+                        MapScreen(navController, location.value, category.value, underCategory.value, minPrice.value, maxPrice.value, searchQuery.value)
                     }
 
                     composable(AppScreens.GUEST_DENIED.name) {

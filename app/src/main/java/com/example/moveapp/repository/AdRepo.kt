@@ -273,9 +273,7 @@ class AdRepo {
                     search,
                     currentLocation,
                 )
-                if (ads != null) {
-                    onSuccess(ads)
-                }
+                onSuccess(ads)
 
             } catch (e: Exception) {
                 onFailure(e)
