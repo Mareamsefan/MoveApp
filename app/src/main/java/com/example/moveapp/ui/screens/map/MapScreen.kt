@@ -52,7 +52,7 @@ fun MapScreen(
     LaunchedEffect(location, category, underCategory, minPrice, maxPrice, searchQuery, userLocation) {
         if (userLocation != null) {
             Log.d("MapScreen", "Fetching ads...")
-            loading = true // Start loading
+            loading = true
             filterAd(
                 location = location,
                 category = category,
@@ -63,11 +63,11 @@ fun MapScreen(
                 currentLocation = userLocation!!,
                 onSuccess = { fetchedAds ->
                     ads = fetchedAds
-                    loading = false // Stop loading
+                    loading = false
                 },
                 onFailure = { exception ->
                     errorMessage = exception.message ?: "Error fetching ads"
-                    loading = false // Stop loading on error
+                    loading = false
                 }
             )
         }
@@ -76,26 +76,25 @@ fun MapScreen(
     Log.d("MapScreen", "Loading: $loading, Ads size: ${ads.size}, Error: $errorMessage")
 
     // Organize ads into mapGeo
-    mapGeo.clear() // Clear previous map data
+    mapGeo.clear()
     ads.forEach { ad ->
         ad.position?.let { geoPoint ->
             mapGeo.getOrPut(geoPoint) { mutableListOf() }.add(ad)
         }
     }
 
-    // UI State Management
+    // display loading
     when {
         loading -> {
-            Text(text = "Loading map and ads...") // Show loading
+            Text(text = "Loading map and ads...")
         }
         errorMessage.isNotEmpty() -> {
-            Text(text = errorMessage) // Show error message
+            Text(text = errorMessage)
         }
         ads.isEmpty() -> {
-            Text(text = "No ads available.") // Show no ads message
+            Text(text = "No ads available.")
         }
         else -> {
-            // Show map with ads
             MapAllAds(
                 org.osmdroid.util.GeoPoint(userLocation!!.latitude, userLocation!!.longitude),
                 navController,
