@@ -1,6 +1,5 @@
 package com.example.moveapp.ui.screens.ad
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -8,10 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -163,13 +160,25 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     text = ad!!.adPrice.toInt().toString() + " " + stringResource(R.string.kr),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
-                Button(
-                    onClick = {
-                        startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = stringResource(R.string.contact_seller))
+                if(isUserLoggedIn()) {
+                    Button(
+                        onClick = {
+                            startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(R.string.contact_seller))
+                    }
+                }
+                else{
+                    Button(
+                        onClick = {
+                            navController.navigate(AppScreens.LOGIN.name)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(R.string.log_in_to_contact_seller))
+                    }
                 }
                 Text(text = ad!!.adDescription, Modifier.padding(bottom = 10.dp))
                 Text(

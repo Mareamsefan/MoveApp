@@ -85,7 +85,7 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
             },
 
             navigationIcon = {
-                if (currentScreen != AppScreens.WELCOME_SCREEN.name && currentScreen != AppScreens.HOME.name) {
+                if (currentScreen != AppScreens.WELCOME_SCREEN.name && currentScreen != AppScreens.HOME.name && currentScreen != AppScreens.LOGIN.name) {
                     IconButton(onClick = {
                         if (route != null) {
                             navController.navigate(route)

@@ -123,8 +123,8 @@ fun BottomNavBar(navController: NavController, category: String?) {
                     onClick = {
                         signOutUser()
                         showLogoutConfirmation = false
-                        navController.navigate(AppScreens.HOME.name) {
-                            popUpTo(AppScreens.HOME.name) { inclusive = true }
+                        navController.navigate(AppScreens.WELCOME_SCREEN.name) {
+                            popUpTo(AppScreens.WELCOME_SCREEN.name) { inclusive = true }
                         }
                     }
                 ) {
