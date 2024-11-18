@@ -88,5 +88,7 @@
     <string name="cancel">Cancel</string>
     <string name="subcategory">Subcategory</string>
 
+    <string name="log_in_to_contact_seller">Log in to contact seller</string>
+
 
 </resources>

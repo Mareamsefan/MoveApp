@@ -90,7 +90,6 @@ fun AppNavigation() {
     } else {
         Scaffold(
             topBar = {
-                if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
                     TopBar(navController = navController, category.value, onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
                     }, onResetCategory = {
@@ -102,8 +101,7 @@ fun AppNavigation() {
                         searchQuery.value = null
 
                     }
-                    )
-                }
+                )
             },
             bottomBar = {
                 BottomNavBar(navController, category.value)
