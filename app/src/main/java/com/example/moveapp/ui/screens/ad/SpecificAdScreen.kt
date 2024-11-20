@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.ad
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -56,6 +58,8 @@ import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
 import com.example.moveapp.utility.FirebaseRealtimeService
 import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
+import com.example.moveapp.viewModel.UserViewModel.Companion.isAdInFavorites
+import com.example.moveapp.viewModel.UserViewModel.Companion.removeFromFavorites
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,12 +68,23 @@ import java.util.UUID
 import kotlin.random.Random
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SpecificAdScreen(navController: NavController, adId: String?) {
     val scrollState = rememberScrollState()
     var ad by remember { mutableStateOf<AdData?>(null) }
     var showSuccessMessage by remember { mutableStateOf(false) }
+    var showSuccessMessageRemoved by remember { mutableStateOf(false) }
     val currentUser = getCurrentUser()
+    var isFavorites  by remember { mutableStateOf(false) }
+    LaunchedEffect(adId) {
+        adId?.let { id ->
+            currentUser?.uid?.let { userId ->
+                isFavorites = isAdInFavorites(userId, id)
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
          ad = getAd(adId)
     }
@@ -123,26 +138,61 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Start
                     ) {
-                        IconButton(
-                            onClick = {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    ad!!.adId?.let { addAdToFavorites(currentUser!!.uid, it) }
-                                    showSuccessMessage = true
-                                }
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.FavoriteBorder,
-                                contentDescription = stringResource(R.string.edit_ad)
+                        if (isFavorites) {
+                            IconButton(
+                                onClick = {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        ad!!.adId?.let { removeFromFavorites(currentUser!!.uid, it) }
+                                        isFavorites = false
+                                        showSuccessMessageRemoved = true
+                                        showSuccessMessage = false
+                                    }
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = stringResource(R.string.edit_ad)
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.remove_from_favorites),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
                         }
-                        Text(
-                            text = stringResource(R.string.add_to_favorites),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold
+                        else {
+                            IconButton(
+                                onClick = {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        ad!!.adId?.let { addAdToFavorites(currentUser!!.uid, it) }
+                                        isFavorites = true
+                                        showSuccessMessage = true
+                                        showSuccessMessageRemoved = false
+                                    }
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.FavoriteBorder,
+                                    contentDescription = stringResource(R.string.edit_ad)
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.add_to_favorites),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
+                        }
+                    }
+                    if (showSuccessMessageRemoved){
+                        Text(
+                            text = stringResource(R.string.favorite_removed),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
+
                     if (showSuccessMessage) {
                         Text(
                             text = stringResource(R.string.favorite_added),
