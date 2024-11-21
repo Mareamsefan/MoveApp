@@ -123,6 +123,22 @@ class UserViewModel {
             }
         }
 
+        suspend fun removeFromFavorites(userId: String, adId: String){
+            val userDocument = readDocument("users", userId, UserData::class.java)
+            val currentFavorites = userDocument?.favorites?.toMutableList()
+            if (currentFavorites != null) {
+                if (currentFavorites.contains(adId)) {
+                    currentFavorites.remove(adId)
+                }
+            }
+            updateDocument("users", userId, mapOf("favorites" to currentFavorites))
+        }
+
+        suspend fun isAdInFavorites(userId: String, adId: String): Boolean {
+            val userDocument = readDocument("users", userId, UserData::class.java)
+            return userDocument?.favorites?.contains(adId) == true
+        }
+
     }
 
 }

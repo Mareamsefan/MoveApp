@@ -53,13 +53,6 @@ fun Image_swipe(imageList: List<String?>){
                             .weight(1f)
                             .padding(bottom = 8.dp)
                     )
-                    if (imageNumber != imageList.size) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "Swipe",
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                    }
                 }
             }
 

@@ -34,6 +34,65 @@ class AdRepo {
 
         // FUNCTIONS TO UPDATE EXISTING ADS
 
+        suspend fun updateAdInDatabase(
+            adId: String,
+            newTitle: String? = null,
+            newPrice: Double? = null,
+            newCategory: String? = null,
+            newSubcategory: String? = null,
+            newDescription: String? = null,
+            newImages: List<String>? = null,
+            newAddress: String? = null,
+            newPostalCode: String? = null,
+            newCity: String? = null
+        ): Boolean {
+            return try {
+                // Hent annonsen fra databasen
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+
+                ad?.let {
+                    // Oppdater bare feltene som er sendt inn (ikke-null verdier)
+                    if (newTitle != null) {
+                        it.adTitle = newTitle
+                    }
+                    if (newPrice != null) {
+                        it.adPrice = newPrice
+                    }
+                    if (newCategory != null) {
+                        it.adCategory = newCategory
+                    }
+                    if (newSubcategory != null) {
+                        it.adUnderCategory = newSubcategory
+                    }
+                    if (newDescription != null) {
+                        it.adDescription = newDescription
+                    }
+                    newImages?.let { newImageList ->
+                        // Kombiner eksisterende bilder med nye bilder, om nødvendig
+                        val updatedImages = it.adImages.toMutableList() ?: mutableListOf()
+                        updatedImages.addAll(newImageList.filterNotNull()) // Unngå null-verdier
+                        it.adImages = updatedImages
+                    }
+                    if (newAddress != null) {
+                        it.address = newAddress
+                    }
+                    if (newPostalCode != null) {
+                        it.postalCode = newPostalCode
+                    }
+                    if (newCity != null) {
+                        it.city = newCity
+                    }
+
+                    // Send oppdatert objekt til databasen
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                } ?: false // Returner false hvis annonsen ikke eksisterer
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+
         suspend fun updateAdTitleInDatabase(adId: String, newTitle: String): Boolean {
             return try {
                 // Retrieve the ad from the collection
@@ -184,6 +243,19 @@ class AdRepo {
                 onFailure(e)
             }
         }
+
+        // Function to retrieve all favorite ads by a specific user
+        suspend fun getUsersFavoriteAds(onSuccess: (List<AdData>) -> Unit, onFailure: (Exception) -> Unit){
+            try{
+                FirestoreService.getUsersFavoriteAdsFlow().collect {
+                    favoriteAds ->
+                        onSuccess(favoriteAds)
+                }
+            } catch (e: Exception) {
+                onFailure(e)
+            }
+        }
+
         suspend fun getAd(adId: String?): AdData? {
             val ad = adId?.let { FirestoreService.readDocument("ads", it, AdData::class.java) }
             return ad?.let {
@@ -193,6 +265,7 @@ class AdRepo {
                     adPrice = it.adPrice,
                     adCategory = it.adCategory,
                     adDescription = it.adDescription,
+                    adUnderCategory = it.adUnderCategory,
                     userId = it.userId,
                     adImages = it.adImages,
                     city = it.city,
@@ -259,9 +332,7 @@ class AdRepo {
                     search,
                     currentLocation,
                 )
-                if (ads != null) {
-                    onSuccess(ads)
-                }
+                onSuccess(ads)
 
             } catch (e: Exception) {
                 onFailure(e)

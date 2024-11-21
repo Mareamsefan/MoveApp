@@ -8,15 +8,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,59 +25,56 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
-import com.example.moveapp.data.AdData
 import com.example.moveapp.data.UserData
-import com.example.moveapp.repository.AdRepo
-import com.example.moveapp.ui.composables.AdItem
 import com.example.moveapp.ui.composables.ProfilePicture
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
+import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
+import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
+import com.example.moveapp.utility.FireAuthService.updateDataInUserTable
+import com.example.moveapp.utility.FireAuthService.updateUserEmail
+import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.utility.FirestoreService.readDocument
 import com.example.moveapp.viewModel.UserViewModel.Companion.uploadAndSetUserProfilePicture
 import kotlinx.coroutines.launch
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Profile(navController: NavController) {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope() // Use a single CoroutineScope
 
     // Mutable states for UI data
     val username = remember { mutableStateOf(getUsername() ?: "") }
     val errorMessage = remember { mutableStateOf("") }
-    val profileImageUrl = remember { mutableStateOf<String>("") }
+    val profileImageUrl = remember { mutableStateOf("") }
     val currentUser = getCurrentUser()
     val userId = currentUser?.uid
-    var userData = remember { mutableStateOf<UserData?>(null) }
-    var ads by remember { mutableStateOf<List<AdData>>(emptyList()) }
+    val userData = remember { mutableStateOf<UserData?>(null) }
     var loading by remember { mutableStateOf(true) }
+    val updatedUsername = remember { mutableStateOf("") }
+    val userEmail = remember {mutableStateOf("")}
+    val updatedEmail = remember {mutableStateOf("")}
 
-    // Fetch user profile and ads only if userId is valid
+    // Henter email
+    LaunchedEffect(Unit) {
+        getDataFromUserTable("email") { fetchedEmail ->
+            if (fetchedEmail != null) {
+                userEmail.value = fetchedEmail
+            }
+        }
+    }
+
+    // Fetch user profile only if userId is valid
     LaunchedEffect(userId) {
         if (userId != null) {
             try {
                 // Fetch user data asynchronously
                 userData.value = readDocument("users", userId, UserData::class.java)
                 profileImageUrl.value = userData.value?.profilePictureUrl ?: ""
-
-                // Fetch user ads asynchronously
-                AdRepo.getUserAds(
-                    userId,
-                    onSuccess = { fetchedAds ->
-                        ads = fetchedAds
-                        loading = false
-                    },
-                    onFailure = { exception ->
-                        errorMessage.value = exception.message ?: "Error fetching ads"
-                        loading = false
-                    }
-                )
             } catch (e: Exception) {
                 errorMessage.value = "An error occurred: ${e.message}"
                 loading = false
@@ -120,7 +115,7 @@ fun Profile(navController: NavController) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
         ) {
             // Username
             val formattedUsername = username.value.replaceFirstChar { it.uppercase() }
@@ -131,7 +126,7 @@ fun Profile(navController: NavController) {
                 modifier = Modifier.padding(vertical = 16.dp)
             )
             // Profile image
-            ProfilePicture(imageState = profileImageUrl )
+            ProfilePicture(imageState = profileImageUrl)
 
             // Upload or update image button
             Button(
@@ -147,25 +142,110 @@ fun Profile(navController: NavController) {
                 }
             }
 
-            // Ads section
-            Text(text = stringResource(R.string.my_ads), style = MaterialTheme.typography.titleMedium)
+            // --- Oppdater Username ---
+            Text(text = "Current Username: ${username.value}")
 
-            if (ads.isNotEmpty()) {
-                // Nested scrollable for ads section
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    contentPadding = PaddingValues(8.dp),
-                ) {
-                    items(ads) { ad ->
-                        AdItem(navController, ad = ad)
+
+            OutlinedTextField(
+                value = updatedUsername.value,
+                onValueChange = { updatedUsername.value = it },
+                label = { Text(text = "Update your username...") }
+            )
+
+
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        if (updatedUsername.value.isNotEmpty()) {
+
+                            val updateSuccess = updateUsername(updatedUsername.value)
+                            errorMessage.value =
+                                if (updateSuccess) {
+                                    username.value = updatedUsername.value
+                                    "Username was updated successfully"
+                                } else {
+                                    "Something went wrong while updating your username."
+                                }
+                        } else {
+                            errorMessage.value = "Username cannot be empty."
+                        }
+                    }
+                },
+            ) {
+                Text(text = "Change Username")
+            }
+
+            // --- Oppdater Email ---
+            if (userEmail.value != "") {
+                Text(text = "Current Email: ${userEmail.value}")
+            } else {
+                Text(text = "Current Email: Unknown")
+            }
+
+            OutlinedTextField(
+                value = updatedEmail.value,
+                onValueChange = { updatedEmail.value = it },
+                label = { Text(text = "Update your email...") }
+            )
+
+            Button(onClick = {
+                coroutineScope.launch {
+                    val emailRegex = Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+                    val newEmail = updatedEmail.value
+                    /* TODO:
+                        Problem:
+                            Her vises Current Email som hentes fra tabellen i Firestore Database
+                            (se over button, rett under kommentaren // ---Oppdater Email---)
+                            Dette er ikke nødvendigvis emailen du bruker.
+                            Denne koden sender en verification email for å bytte email,
+                            men bytter samtidig emailen i Firestore Database umiddelbart,
+                            FØR brukeren faktisk har trykket på "verified" eposten de får.
+                        Hva kan gjøres:
+                            1. Fjerne email fra "Firestore Database", slik at det kun eksisterer i
+                               "Firestore Authentication". Da kan du fjerne updateDataInUserTable() herfra
+                            eller
+                            2. Legge til en sjekk som venter på at brukeren trykker verify før den
+                               oppdaterer epost verdi i Firestore Database.
+                     */
+
+                    if (updatedEmail.value.isNotEmpty()) {
+                        if (emailRegex.matches(updatedEmail.value)) {
+                            if ( updateUserEmail(newEmail) ){
+                                updateDataInUserTable("email", updatedEmail.value) { updateSuccess ->
+                                    if (updateSuccess) {
+                                        userEmail.value = updatedEmail.value
+                                        errorMessage.value = "Check your email: ${newEmail}, to verify the change."
+                                    } else {
+                                        errorMessage.value = "Something went wrong while updating your Email."
+                                    }
+                                }
+                            }
+                            errorMessage.value = "Email updated!"
+                        } else {
+                            errorMessage.value = "Please enter a valid email address."
+                        }
+                    } else {
+                        errorMessage.value = "Email cannot be empty."
                     }
                 }
-            } else if (!loading) {
-                // Display message if no ads
-                Text(text = stringResource(R.string.no_ads))
+            },
+            ) {
+                Text(text = "Change Email")
+            }
+
+            // --- Send Password Reset Email ---
+            Button(onClick = {
+                val email = userEmail.value
+
+                if (email.isNotEmpty()){
+                    sendUserPasswordResetEmail(email)
+                    errorMessage.value = "Email sent! If you do not see the email shortly, please check your spam folder."
+                } else {
+                    errorMessage.value = "Something went wrong. Please wait a few seconds and try again."
+                }
+            })
+            {
+                Text(text = stringResource(R.string.send_password_reset_email))
             }
 
             // Display error message if any

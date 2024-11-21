@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -29,7 +30,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
-import com.example.moveapp.utility.FireAuthService.fetchUserEmail
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
 import com.example.moveapp.utility.FireAuthService.signOutUser
 
@@ -37,14 +37,13 @@ import com.example.moveapp.utility.FireAuthService.signOutUser
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
 
 @Composable
-fun BottomNavBar(navController: NavController) {
+fun BottomNavBar(navController: NavController, category: String?) {
     var isProfileMenuExpanded by remember { mutableStateOf(false) }
     var showLogoutConfirmation by remember { mutableStateOf(false) }
-    var currentShortcuts = remember(isUserLoggedIn()) { getBottomNavShortcuts() }
+    val currentShortcuts = remember(category, isUserLoggedIn()) { getBottomNavShortcuts(category) }
+    Log.d("filter bottom bar", "category: $category")
 
-    NavigationBar (
-
-    ) {
+    NavigationBar () {
         currentShortcuts.forEach { shortcut ->
             if (shortcut.route != AppScreens.PROFILE) {
                 NavigationBarItem(
@@ -58,14 +57,12 @@ fun BottomNavBar(navController: NavController) {
                 )
             }
             else {
-
                 NavigationBarItem(
                     icon = { Icon(shortcut.icon, contentDescription = stringResource(shortcut.label)) },
                     label = { Text(stringResource(shortcut.label)) },
                     selected = getCurrentScreen(navController) == shortcut.route.name,
                     onClick = { isProfileMenuExpanded = true }
                 )
-
                 Box {
                     DropdownMenu(
                         expanded = isProfileMenuExpanded,
@@ -94,10 +91,14 @@ fun BottomNavBar(navController: NavController) {
                                 interactionSource = remember { MutableInteractionSource() }
                             )
                             DropdownMenuItem(
+                                text = { Text("My Favorites")},
+                                onClick = { navController.navigate(AppScreens.MY_FAVORITES.name) },
+                                interactionSource = remember { MutableInteractionSource() }
+                            )
+                            DropdownMenuItem(
                                 text = { Text("Settings")},
                                 onClick = { navController.navigate(AppScreens.PROFILE_SETTINGS.name) },
                             )
-
                             DropdownMenuItem(
                                 text = { Text("Logout") },
                                 onClick = {
@@ -105,8 +106,6 @@ fun BottomNavBar(navController: NavController) {
                                     isProfileMenuExpanded = false
                                 }
                             )
-
-
                         }
                         }
                     }
@@ -124,8 +123,8 @@ fun BottomNavBar(navController: NavController) {
                     onClick = {
                         signOutUser()
                         showLogoutConfirmation = false
-                        navController.navigate(AppScreens.HOME.name) {
-                            popUpTo(AppScreens.HOME.name) { inclusive = true }
+                        navController.navigate(AppScreens.WELCOME_SCREEN.name) {
+                            popUpTo(AppScreens.WELCOME_SCREEN.name) { inclusive = true }
                         }
                     }
                 ) {
@@ -153,18 +152,25 @@ fun getCurrentScreen(navController: NavController): String {
 @Preview
 @Composable
 fun BottomNavBarPreview() {
-    BottomNavBar(rememberNavController())
+    BottomNavBar(rememberNavController(), category = null)
 }
 
-fun getBottomNavShortcuts(): List<BottomNavItems> {
+fun getBottomNavShortcuts(category: String?): List<BottomNavItems> {
+    Log.d("filter in nav shortcuts", "filter $category")
+    val homescreen = if (category != null) {
+        AppScreens.HOME
+    } else {
+        AppScreens.WELCOME_SCREEN
+    }
+    Log.d("filter in nav shortcuts", "homescreen: $homescreen")
     if (!isUserLoggedIn()){
         return listOf(
-            BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
+            BottomNavItems(homescreen, Icons.Default.Home, R.string.home),
             BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile),
         )
     } else {
         return listOf(
-            BottomNavItems(AppScreens.HOME, Icons.Default.Home, R.string.home),
+            BottomNavItems(homescreen, Icons.Default.Home, R.string.home),
             BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
             BottomNavItems(AppScreens.POST_AD, Icons.Default.AddCircle, R.string.post_ad),
             BottomNavItems(AppScreens.PROFILE, Icons.Default.AccountCircle, R.string.my_profile),

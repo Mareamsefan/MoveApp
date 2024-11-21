@@ -11,6 +11,7 @@ enum class AppScreens {
     MAP,
     GUEST_DENIED,
     MY_ADS,
+    MY_FAVORITES,
     WELCOME_SCREEN
 
 

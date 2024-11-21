@@ -51,7 +51,9 @@
     <string name="Seller">Seller</string>
     <string name="contact_seller_above">Contact seller above</string>
     <string name="my_ads">My posted ads</string>
+    <string name="my_favorite_ads">My favorite ads</string>
     <string name="no_ads">You have no ads posted at this moment</string>
+    <string name="no_favorite_ads">You have no favorite ads at this moment.</string>
     <string name="take_photo">Take a photo</string>
     <string name="edit_ad">Edit</string>
     <string name="hide_filter">Hide Filter</string>
@@ -59,7 +61,9 @@
     <string name="guest_text">You need to login to view this page.</string>
     <string name="access_denied">Access denied</string>
     <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
     <string name="favorite_added">The ad has been added to your favorites!</string>
+    <string name="favorite_removed">The ad has been removed from your favorites!</string>
     <string name="browse">Just browse</string>
     <string name="what_looking_for">What are you looking for?</string>
 
@@ -85,6 +89,8 @@
     <string name="save_changes">Save changes</string>
     <string name="cancel">Cancel</string>
     <string name="subcategory">Subcategory</string>
+
+    <string name="log_in_to_contact_seller">Log in to contact seller</string>
 
 
 </resources>

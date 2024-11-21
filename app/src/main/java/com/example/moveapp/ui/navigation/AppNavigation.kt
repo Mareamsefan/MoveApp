@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -34,6 +35,7 @@ import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
 import com.example.moveapp.ui.screens.profile.MyAdsScreen
+import com.example.moveapp.ui.screens.profile.MyFavoritesScreen
 import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.ui.screens.welcome.WelcomeScreen
 import com.example.moveapp.utility.FireAuthService
@@ -48,7 +50,7 @@ fun AppNavigation() {
     val currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
     var isAuthChecked by remember { mutableStateOf(false) }
-  // State variables for filters
+    // State variables for filters
     val location = remember { mutableStateOf<String?>(null) }
     val category = remember { mutableStateOf<String?>(null) }
     val underCategory = remember { mutableStateOf<String?>(null) }
@@ -64,7 +66,6 @@ fun AppNavigation() {
 
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
-
 
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
@@ -89,14 +90,21 @@ fun AppNavigation() {
     } else {
         Scaffold(
             topBar = {
-                if (currentScreen != AppScreens.REGISTER.name && currentScreen != AppScreens.LOGIN.name) {
-                    TopBar(navController = navController, onApplySearch = { newSearchQuery ->
+                    TopBar(navController = navController, category.value, onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
-                    })
-                }
+                    }, onResetCategory = {
+                        location.value = null
+                        category.value = null
+                        underCategory.value = null
+                        minPrice.value = null
+                        maxPrice.value = null
+                        searchQuery.value = null
+
+                    }
+                )
             },
             bottomBar = {
-                BottomNavBar(navController)
+                BottomNavBar(navController, category.value)
             },
 
             floatingActionButton = {
@@ -105,7 +113,6 @@ fun AppNavigation() {
                         isListView = isListView,
                         onViewToggle = { newIsListView ->
                             isListView = newIsListView
-                            // Here you can also trigger any layout changes in your screen
                         },
                         onRightClick = {
                             scope.launch {
@@ -132,7 +139,7 @@ fun AppNavigation() {
                         },
                         sheetState = sheetState
                     ) {
-                        FilterBar(category.value,
+                        FilterBar(category.value, location.value, minPrice.value, maxPrice.value, underCategory.value,
                             onApplyFilter = {newLocation, newUnderCategory, newMinPrice, newMaxPrice ->
                                 location.value = newLocation
                                 underCategory.value = newUnderCategory
@@ -223,7 +230,7 @@ fun AppNavigation() {
                     }
 
                     composable(AppScreens.MAP.name) {
-                        MapScreen(navController)
+                        MapScreen(navController, location.value, category.value, underCategory.value, minPrice.value, maxPrice.value, searchQuery.value)
                     }
 
                     composable(AppScreens.GUEST_DENIED.name) {
@@ -252,6 +259,14 @@ fun AppNavigation() {
                     composable(AppScreens.MY_ADS.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
                             MyAdsScreen(navController)
+                        } else {
+                            GuestDenied(navController)
+                        }
+                    }
+
+                    composable(AppScreens.MY_FAVORITES.name) {
+                        if (currentUser != null && !currentUser.isAnonymous) {
+                            MyFavoritesScreen(navController)
                         } else {
                             GuestDenied(navController)
                         }

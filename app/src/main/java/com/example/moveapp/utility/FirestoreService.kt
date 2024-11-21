@@ -45,13 +45,7 @@ object FirestoreService {
         return snapshot.toObject(className)
     }
     suspend fun filteredAdsFromDatabase(location: String?, category: String?, underCategory: String?, minPrice: Double?, maxPrice: Double?, search: String?, currentLocation: GeoPoint): List<AdData> {
-        var query: Query = db.collection("ads")
-        if (category!=null && category!="")
-            query = query.whereEqualTo("adCategory", category)
-        if (minPrice!=null)
-            query = query.whereGreaterThan("adPrice", minPrice)
-        if (maxPrice!=null)
-            query = query.whereLessThan("adPrice", maxPrice)
+        val query: Query = db.collection("ads")
         val querySnapshot: QuerySnapshot = query.get().await()
         var ads = querySnapshot.toObjects(AdData::class.java)
 
@@ -64,7 +58,19 @@ object FirestoreService {
         }
 
         if (underCategory!=null && underCategory!="") {
-            ads = ads.filter { it.adUnderCategory.contains(underCategory, ignoreCase = true) }
+            ads = ads.filter { it.adUnderCategory.contains(underCategory) }
+        }
+
+        if (category!=null && category!="") {
+            ads = ads.filter { it.adCategory.contains(category) }
+        }
+
+        if (minPrice != null) {
+            ads = ads.filter { it.adPrice >= minPrice }
+        }
+
+        if (maxPrice != null) {
+            ads = ads.filter { it.adPrice <= maxPrice }
         }
 
         if (location.isNullOrEmpty()) {
@@ -104,6 +110,7 @@ object FirestoreService {
             }
         awaitClose { registration.remove() }
     }
+
     // Function to get a collection snapshot as a Flow for real-time updates
     fun getUserAdsFlow(userId: String): Flow<List<AdData>> = callbackFlow {
         val registration: ListenerRegistration = db.collection("ads")
@@ -121,6 +128,49 @@ object FirestoreService {
         awaitClose { registration.remove() }
     }
 
+    // Get a user's favorite ads
+    // Logic was made by Claude.ai
+    suspend fun getUsersFavoriteAdsFlow(): Flow<List<AdData>> = callbackFlow {
+        val userId = FireAuthService.getUserId() ?: throw SecurityException("User not logged in")
+
+        var adsListener: ListenerRegistration? = null
+
+        val favoritesListener = db.collection("users").document(userId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                val favoriteAdIds = snapshot?.get("favorites") as? List<String> ?: emptyList()
+
+                if (favoriteAdIds.isEmpty()) {
+                    trySend(emptyList())
+                    return@addSnapshotListener
+                }
+
+                adsListener?.remove()
+
+                adsListener = db.collection("ads")
+                    .whereIn("adId", favoriteAdIds)
+                    .addSnapshotListener { adsSnapshot, adsError ->
+                        if (adsError != null) {
+                            close(adsError)
+                            return@addSnapshotListener
+                        }
+
+                        val ads = adsSnapshot?.documents?.mapNotNull {
+                            it.toObject(AdData::class.java)
+                        } ?: emptyList()
+
+                        trySend(ads)
+                    }
+            }
+        awaitClose {
+            adsListener?.remove()
+            favoritesListener.remove()
+        }
+    }
 
     // Function to get paginated ads
     suspend fun getPaginatedAds(lastVisible: DocumentSnapshot?, pageSize: Int = 10): Pair<List<AdData>, DocumentSnapshot?> {

@@ -5,34 +5,30 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.moveapp.R
-import com.example.moveapp.ui.navigation.AppScreens
 
 @Composable
-fun FilterBar(category: String?,
+fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice: Double?, underCategory: String?,
     onApplyFilter: (String?, String?, Double?, Double?) -> Unit
 ) {
-    var tempLocation by remember { mutableStateOf<String?>(null) }
-    var tempMinPrice by remember { mutableStateOf<Double?>(null) }
-    var tempMaxPrice by remember { mutableStateOf<Double?>(null) }
-
-    var selectedCategory by remember { mutableStateOf(R.string.Select_a_category) }
+    var tempLocation by remember { mutableStateOf(location) }
+    var tempMinPrice by remember { mutableStateOf(minPrice) }
+    var tempMaxPrice by remember { mutableStateOf(maxPrice) }
+    var tempUnderCategory by remember { mutableStateOf(underCategory) }
 
     var underCategoryExpanded by remember { mutableStateOf(false) }
-    var selectedUnderCategory by remember { mutableIntStateOf(R.string.Select_a_subcategory) }
-    var underCategory by remember { mutableStateOf<String?>(null) }
+    var selectedUnderCategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
+
     Log.d("filter", "category arrived in filter: $category")
-    Log.d("filter", "category arrived in filter: $underCategory")
+    Log.d("filter", "category arrived in filter: $tempUnderCategory")
 
     val unwantedItemsOptions = listOf(
         R.string.Furniture,
@@ -84,7 +80,7 @@ fun FilterBar(category: String?,
 
             Box {
                 OutlinedTextField(
-                    value = stringResource(selectedUnderCategory),
+                    value = tempUnderCategory ?: stringResource(selectedUnderCategory),
                     onValueChange = {},
                     label = { Text(stringResource(R.string.Options)) },
                     trailingIcon = {
@@ -113,7 +109,7 @@ fun FilterBar(category: String?,
                                 underCategoryExpanded = false
                             }
                         )
-                        underCategory = stringResource(selectedUnderCategory)
+                        tempUnderCategory = stringResource(selectedUnderCategory)
 
                     }
                 }
@@ -140,7 +136,7 @@ fun FilterBar(category: String?,
                 )
                 Button(
                     onClick = {
-                        onApplyFilter(tempLocation, underCategory, tempMinPrice, tempMaxPrice)
+                        onApplyFilter(tempLocation, tempUnderCategory, tempMinPrice, tempMaxPrice)
 
                     }
                 ) {
@@ -151,8 +147,8 @@ fun FilterBar(category: String?,
                         tempLocation = null
                         tempMinPrice = null
                         tempMaxPrice = null
-                        underCategory = null
-                        selectedCategory = R.string.Select_a_category
+                        tempUnderCategory = null
+                        selectedUnderCategory = R.string.Select_a_subcategory
                         onApplyFilter(null, null, null, null)
 
                     }
