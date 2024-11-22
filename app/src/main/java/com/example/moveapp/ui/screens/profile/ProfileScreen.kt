@@ -46,6 +46,11 @@ import kotlinx.coroutines.launch
 import com.example.moveapp.viewModel.UserViewModel.Companion.validateEmail
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.example.moveapp.ui.composables.ShowReauthenticationDialog
+import com.example.moveapp.utility.FireStorageService.deleteFileFromStorage
+
+fun deleteFileFromStorage(storagePath: MutableState<String>) {
+
+}
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -155,6 +160,10 @@ fun Profile(navController: NavController) {
                         stringResource(R.string.update_image)
                     }
                 )
+            }
+
+            Button(onClick = {deleteFileFromStorage(profileImageUrl)}){
+                Text(text= stringResource(R.string.remove_image)
             }
 
             // Update Username
