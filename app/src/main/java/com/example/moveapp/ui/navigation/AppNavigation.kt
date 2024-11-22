@@ -86,10 +86,10 @@ fun AppNavigation() {
             isAuthChecked = true
         }
     }
-    LaunchedEffect(Unit) {
-        ad.value = getAd(adId.value)
-        ad.value?.let { Log.d("AD:", it.adTitle) }
+    LaunchedEffect(adId.value) {
+         ad.value  = getAd(adId.value)
     }
+
 
     if (!isAuthChecked) {
         // Du kan vise en loader her om du vil
