@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -201,36 +202,15 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     text = ad!!.adPrice.toInt().toString() + " " + stringResource(R.string.kr),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
-                if(isUserLoggedIn()) {
-                    Button(
-                        onClick = {
-                            startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = stringResource(R.string.contact_seller))
-                    }
-                }
-                else{
-                    Button(
-                        onClick = {
-                            navController.navigate(AppScreens.LOGIN.name)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = stringResource(R.string.log_in_to_contact_seller))
-                    }
-                }
+
                 Text(text = ad!!.adDescription, Modifier.padding(bottom = 10.dp))
                 Text(
                     text = stringResource(R.string.category),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(text = ad!!.adCategory + ", " + ad!!.adUnderCategory, Modifier.padding(bottom = 10.dp))
-                Text(
-                    text = stringResource(R.string.Seller),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-                )
+
+
                 Box(
                     modifier = Modifier
                         .border(
@@ -257,10 +237,32 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                             owner?.let {
                                 Text(text = it.username, fontWeight = FontWeight.Bold)
                             }
-                            Text(text = stringResource(R.string.contact_seller_above), color = Color.Gray)
+                            Text(text = stringResource(R.string.Seller), color = Color.Gray)
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
+                if(isUserLoggedIn()) {
+                    Button(
+                        onClick = {
+                            startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(R.string.contact_seller))
+                    }
+                }
+                else{
+                    Button(
+                        onClick = {
+                            navController.navigate(AppScreens.LOGIN.name)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(R.string.log_in_to_contact_seller))
+                    }
+                }
+
                 Spacer(modifier = Modifier.padding(top = 10.dp))
                 Text(
                     text = stringResource(R.string.address),
