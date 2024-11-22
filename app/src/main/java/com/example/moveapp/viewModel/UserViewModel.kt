@@ -139,6 +139,14 @@ class UserViewModel {
             return userDocument?.favorites?.contains(adId) == true
         }
 
+        fun validateEmail(email: String): Boolean {
+            val emailRegex = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+            if (emailRegex.matches(email)) {
+                return true
+            }
+            return false
+        }
+
     }
 
 }

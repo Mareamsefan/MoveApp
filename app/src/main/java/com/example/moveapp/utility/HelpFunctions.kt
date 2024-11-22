@@ -15,9 +15,13 @@ class HelpFunctions {
         val blacklist = setOf("Cunt", "Penis", "Dick", "Cock", "Fag", "Faggot", "Tranny", "Whore", "Fuck", "Damn", "Porn", "Sex", "Fucking", "Hentai")
 
         @Throws(InvalidPasswordException::class)
-        fun validatePassword(context: Context, password: String) {
+        fun validatePassword(context: Context, password: String, confirmPassword: String) {
             val specialCharsRegex = Regex("[^A-Za-z0-9]")
             val numbersRegex = Regex("[0-9]")
+
+            if (password != confirmPassword) {
+                throw InvalidPasswordException("Passwords must match.")
+            }
 
             if (password.length <= 7) {
                 throw InvalidPasswordException("Password must be longer than 7 characters")
