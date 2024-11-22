@@ -58,7 +58,6 @@ class UserViewModel {
                 return null
             }
             return user
-
         }
 
         suspend fun logoutUser(context: Context): FirebaseUser? {

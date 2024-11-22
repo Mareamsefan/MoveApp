@@ -75,7 +75,7 @@ fun LoginScreen(navController: NavController) {
                                 navController.navigate(AppScreens.HOME.name)
                             }
                             else {
-                                dialogMessage = "Login failed. Either the email is not registred, or the password is not correct. Please check your credentials"
+                                dialogMessage = "Login failed. Either the email is not registered, or the password is not correct. Please check your credentials"
                                 showErrorDialog = true
                             }
                         } else {

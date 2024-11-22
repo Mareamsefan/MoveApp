@@ -1,14 +1,11 @@
 package com.example.moveapp.ui.screens.messages
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -22,7 +19,6 @@ import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.ui.composables.MessageItem
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FirebaseRealtimeService
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
 import com.example.moveapp.utility.ProhibitedContentException

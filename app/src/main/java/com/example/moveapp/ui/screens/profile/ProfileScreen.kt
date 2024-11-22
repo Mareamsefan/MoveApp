@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.data.UserData
 import com.example.moveapp.ui.composables.ProfilePicture
-import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.reauthenticateUser
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
