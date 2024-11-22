@@ -276,7 +276,7 @@ fun Profile(navController: NavController) {
     if (showErrorDialog) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = false },
-            title = { Text("Error") },
+            title = { Text("Notice") },
             text = { Text(dialogMessage) },
             confirmButton = {
                 Button(onClick = { showErrorDialog = false }) {
