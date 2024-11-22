@@ -2,6 +2,7 @@ package com.example.moveapp.ui.screens.profile
 
 import android.annotation.SuppressLint
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,10 +49,8 @@ import com.example.moveapp.viewModel.UserViewModel.Companion.validateEmail
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.example.moveapp.ui.composables.ShowReauthenticationDialog
 import com.example.moveapp.utility.FireStorageService.deleteFileFromStorage
-
-fun deleteFileFromStorage(storagePath: MutableState<String>) {
-
-}
+import com.example.moveapp.utility.FirestoreService.removeProfilePictureUrl
+import java.net.URLDecoder
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
@@ -113,11 +113,12 @@ fun Profile(navController: NavController) {
                 coroutineScope.launch {
                     if (userId != null) {
                         val success = uploadAndSetUserProfilePicture(userId, it)
-                        profileImageUrl.value = it.toString()
-                        errorMessage.value = if (success) {
-                            "Image uploaded successfully."
+                        if (success) {
+                            userData.value = readDocument("users", userId, UserData::class.java)
+                            profileImageUrl.value = userData.value?.profilePictureUrl ?: ""
+                            errorMessage.value = "Image uploaded successfully."
                         } else {
-                            "Failed to upload image."
+                            errorMessage.value = "Failed to upload image."
                         }
                     } else {
                         errorMessage.value = "User is not logged in."
@@ -149,7 +150,11 @@ fun Profile(navController: NavController) {
             )
 
             // Profile image
-            ProfilePicture(imageState = profileImageUrl)
+            if (profileImageUrl.value.isNotEmpty()) {
+                ProfilePicture(imageState = profileImageUrl)
+            } else {
+                Text(text = stringResource(R.string.no_profile_image))
+            }
 
             // Upload or update image button
             Button(onClick = { launcher.launch("image/*") }) {
@@ -162,9 +167,36 @@ fun Profile(navController: NavController) {
                 )
             }
 
-            Button(onClick = {deleteFileFromStorage(profileImageUrl)}){
-                Text(text= stringResource(R.string.remove_image)
-            }
+            // Fikk hjelp av chatGPT for å omforme URL
+            // til å passe med deleteFileFromStorage funksjonen.
+            if (profileImageUrl.value.isNotEmpty()){
+            Button(onClick = {
+                coroutineScope.launch {
+                    userData.value?.profilePictureUrl?.let { fullUrl ->
+                        // Decode the URL to get the correct path
+                        val decodedUrl = URLDecoder.decode(fullUrl, "UTF-8")
+
+                        // Extract the storage path after "images/users/"
+                        val storagePath = "/images/users/" + decodedUrl
+                            .substringAfter("images/users/") // Extract the path after "images/users/"
+                            .substringBefore("?") // Remove any query parameters
+                        Log.d("StoragePath", "Path to delete: $storagePath")
+                        val success = deleteFileFromStorage(storagePath)
+                        if (success) {
+                            profileImageUrl.value = ""  // Clear the profile image URL
+                            removeProfilePictureUrl()
+                            errorMessage.value = "Profile image removed successfully"
+                        } else {
+                            errorMessage.value = "Failed to remove profile image"
+                        }
+                    }
+                }
+            }) {
+                Text(text = stringResource(R.string.remove_image))
+            }}
+
+
+
 
             // Update Username
             Text(text = "Current Username: ${username.value}")

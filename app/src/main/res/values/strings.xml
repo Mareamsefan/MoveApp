@@ -37,6 +37,7 @@
     <string name="upload_image">Upload image</string>
     <string name="update_image">Update image</string>
     <string name="remove_image">Remove image</string>
+    <string name="no_profile_image">Your profile picture will appear here once uploaded.</string>
     <string name="address">Address</string>
     <string name="city">City</string>
     <string name="postal_code">Postal code</string>
