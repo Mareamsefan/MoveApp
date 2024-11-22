@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.MessageData
+import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FirebaseRealtimeService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -147,12 +148,12 @@ class ChatRepo {
                             val newChat = findChatBetweenUsers(currentUserId, sellerId, adId)
                             if (newChat != null) {
                                 withContext(Dispatchers.Main) {
-                                    navController.navigate("specificMessageScreen/${newChat.chatId}")
+                                    navController.navigate("${AppScreens.SPECIFIC_MESSAGE_SCREEN}/${newChat.chatId}")
                                 }
                             }
                         } else {
                             withContext(Dispatchers.Main) {
-                                navController.navigate("specificMessageScreen/$chatId")
+                                navController.navigate("${AppScreens.SPECIFIC_MESSAGE_SCREEN}/$chatId")
                             }
                         }
                     } catch (e: Exception) {

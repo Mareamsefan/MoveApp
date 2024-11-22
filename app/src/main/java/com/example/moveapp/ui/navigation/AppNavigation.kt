@@ -238,18 +238,18 @@ fun AppNavigation() {
                         GuestDenied(navController)
                     }
 
-                    composable("specific_ad/{adId}") { backStackEntry ->
+                    composable("${AppScreens.SPECIFIC_AD.name}/{adId}") { backStackEntry ->
                         val adId = backStackEntry.arguments?.getString("adId")
                         adId?.let { SpecificAdScreen(navController, it) }
                     }
 
-                    composable("editAd/{adId}") { backStackEntry ->
+                    composable("${AppScreens.EDIT_AD_SCREEN.name}/{adId}") { backStackEntry ->
                         val adId = backStackEntry.arguments?.getString("adId")
                         adId?.let { EditAdScreen(navController, it) }
                     }
 
                     composable(
-                        route = "specificMessageScreen/{chatId}",
+                        route = "${AppScreens.SPECIFIC_MESSAGE_SCREEN}/{chatId}",
                         arguments = listOf(navArgument("chatId") { type = NavType.StringType })
                     ) { backStackEntry ->
                         val chatId = backStackEntry.arguments?.getString("chatId") ?: ""

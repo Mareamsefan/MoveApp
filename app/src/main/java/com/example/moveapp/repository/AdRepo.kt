@@ -34,6 +34,66 @@ class AdRepo {
 
         // FUNCTIONS TO UPDATE EXISTING ADS
 
+        suspend fun updateAdInDatabase(
+            adId: String,
+            newTitle: String? = null,
+            newPrice: Double? = null,
+            newCategory: String? = null,
+            newSubcategory: String? = null,
+            newDescription: String? = null,
+            newImages: List<String>? = null,
+            newAddress: String? = null,
+            newPostalCode: String? = null,
+            newCity: String? = null
+        ): Boolean {
+            return try {
+                // Hent annonsen fra databasen
+                var ad = FirestoreService.readDocument("ads", adId, AdData::class.java)
+
+                ad?.let {
+                    // Oppdater bare feltene som er sendt inn (ikke-null verdier)
+                    if (newTitle != null) {
+                        it.adTitle = newTitle
+                    }
+                    if (newPrice != null) {
+                        it.adPrice = newPrice
+                    }
+                    if (newCategory != null) {
+                        it.adCategory = newCategory
+                    }
+                    if (newSubcategory != null) {
+                        it.adUnderCategory = newSubcategory
+                    }
+                    if (newDescription != null) {
+                        it.adDescription = newDescription
+                    }
+                    newImages?.let { newImageList ->
+                        val updatedImages = it.adImages.toMutableList() ?: mutableListOf()
+                        newImageList.filterNot { image -> updatedImages.contains(image) }
+                            .forEach { updatedImages.add(it) }
+                        it.adImages = updatedImages
+                    }
+
+                    if (newAddress != null) {
+                        it.address = newAddress
+                    }
+                    if (newPostalCode != null) {
+                        it.postalCode = newPostalCode
+                    }
+                    if (newCity != null) {
+                        it.city = newCity
+                    }
+
+                    // Send oppdatert objekt til databasen
+                    FirestoreService.updateDocument("ads", adId, it)
+                    true
+                } ?: false // Returner false hvis annonsen ikke eksisterer
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+        }
+
         suspend fun updateAdTitleInDatabase(adId: String, newTitle: String): Boolean {
             return try {
                 // Retrieve the ad from the collection
