@@ -48,8 +48,15 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
             ),
             title = {
                 Text(
-                    text = when (currentScreen) {
-                        AppScreens.PROFILE.name -> {
+                    text = when  {
+                        currentScreen.startsWith(AppScreens.EDIT_AD_SCREEN.name) -> {  // Check if screen starts with EDIT_AD_SCREEN
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.edit_ad)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+                        currentScreen === AppScreens.PROFILE.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.my_profile)
                             } else {
@@ -57,14 +64,14 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
                             }
                         }
 
-                        AppScreens.ALL_MESSAGES.name -> {
+                        currentScreen === AppScreens.ALL_MESSAGES.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.messages)
                             } else {
                                 stringResource(R.string.guest_denied)
                             }
                         }
-                        AppScreens.POST_AD.name -> {
+                        currentScreen === AppScreens.POST_AD.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.post_ad)
                             } else {
@@ -72,15 +79,9 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
                             }
                         }
 
-                        AppScreens.EDIT_AD_SCREEN.name -> {
-                            if (currentUser != null && !currentUser.isAnonymous) {
-                                stringResource(R.string.edit_ad)
-                            } else {
-                                stringResource(R.string.guest_denied)
-                            }
-                        }
 
-                        AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
+
+                        currentScreen === AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
                         else -> ""
                     },
                     style = MaterialTheme.typography.titleLarge,
