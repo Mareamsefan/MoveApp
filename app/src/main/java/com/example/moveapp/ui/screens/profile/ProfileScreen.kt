@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.data.UserData
 import com.example.moveapp.ui.composables.ProfilePicture
+import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
@@ -42,6 +43,7 @@ import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.utility.FirestoreService.readDocument
 import com.example.moveapp.viewModel.UserViewModel.Companion.uploadAndSetUserProfilePicture
 import kotlinx.coroutines.launch
+import com.example.moveapp.viewModel.UserViewModel.Companion.validateEmail
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun Profile(navController: NavController) {
@@ -177,7 +179,8 @@ fun Profile(navController: NavController) {
 
             // --- Oppdater Email ---
             if (userEmail.value != "") {
-                Text(text = "Current Email: ${userEmail.value}")
+                val currentAuthEmail = FireAuthService.getCurrentUser()?.email
+                Text(text = "Current Email: ${currentAuthEmail}")
             } else {
                 Text(text = "Current Email: Unknown")
             }
@@ -209,11 +212,11 @@ fun Profile(navController: NavController) {
                      */
 
                     if (updatedEmail.value.isNotEmpty()) {
-                        if (emailRegex.matches(updatedEmail.value)) {
+                        if (validateEmail(newEmail)) {
                             if ( updateUserEmail(newEmail) ){
-                                updateDataInUserTable("email", updatedEmail.value) { updateSuccess ->
+                                updateDataInUserTable("email", newEmail) { updateSuccess ->
                                     if (updateSuccess) {
-                                        userEmail.value = updatedEmail.value
+                                        userEmail.value = newEmail
                                         errorMessage.value = "Check your email: ${newEmail}, to verify the change."
                                     } else {
                                         errorMessage.value = "Something went wrong while updating your Email."

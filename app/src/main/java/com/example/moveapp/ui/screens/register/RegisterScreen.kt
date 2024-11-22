@@ -145,17 +145,17 @@ fun Register(navController: NavController) {
                                 if (user != null) {
                                     navController.navigate(AppScreens.WELCOME_SCREEN.name)
                                 } else {
-                                    errorMessage = "Registration failed. Please try again."
+                                    errorMessage = "Registration failed. Please check your internet connection or try again later."
                                 }
                             }
                         } catch (e: InvalidPasswordException) {
                             errorMessage = e.message
                             isLoading = false
                         } catch (e: ProhibitedContentException) {
-                            errorMessage = e.message
+                            errorMessage = "$e.message}. Please choose a different username."
                             isLoading = false
                         } catch (e: Exception) {
-                            errorMessage = "An unexpected error occurred."
+                            errorMessage = "An unexpected error occurred: ${e.message}. Please try again later."
                             isLoading = false
                         }
 
