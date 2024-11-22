@@ -17,7 +17,7 @@ fun ProfilePicture(imageState: MutableState<String>) {
     val image = imageState.value
     if (image.isEmpty()) return
 
-    Box(modifier = Modifier.height(300.dp)) {
+    Box(modifier = Modifier.height(230.dp)) {
         Card(modifier = Modifier.fillMaxWidth()) {
             val painter = rememberAsyncImagePainter(model = image)
 
@@ -27,7 +27,6 @@ fun ProfilePicture(imageState: MutableState<String>) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(230.dp)
-                    .padding(8.dp)
             )
         }
     }
