@@ -14,6 +14,8 @@ enum class AppScreens {
     MY_FAVORITES,
     WELCOME_SCREEN,
     EDIT_AD_SCREEN,
+    SPECIFIC_AD,
+    SPECIFIC_MESSAGE_SCREEN,
 
 
 }

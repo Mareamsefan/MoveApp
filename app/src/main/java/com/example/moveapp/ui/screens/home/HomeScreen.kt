@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import kotlinx.coroutines.launch
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import com.example.moveapp.ui.navigation.AppScreens
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,7 +152,7 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        navController.navigate("specific_ad/${ad.adId}")
+                                        navController.navigate("${AppScreens.SPECIFIC_AD.name}/${ad.adId}")
                                     }
                                     .padding(8.dp) // Optional padding around the card
                             ) {

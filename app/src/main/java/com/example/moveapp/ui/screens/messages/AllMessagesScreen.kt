@@ -17,6 +17,7 @@ import com.example.moveapp.data.ChatData
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.repository.ChatRepo
+import com.example.moveapp.ui.navigation.AppScreens
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,7 +115,7 @@ fun AllMessagesScreen(navController: NavController) {
 
                         if(chatMessages.isNotEmpty()){
                             ChatItemWithAd(navController, chat = chat, ad = ad, onClick = {
-                                navController.navigate("specificMessageScreen/$chatId")
+                                navController.navigate("${AppScreens.SPECIFIC_MESSAGE_SCREEN}/$chatId")
                             })
                         }
 
