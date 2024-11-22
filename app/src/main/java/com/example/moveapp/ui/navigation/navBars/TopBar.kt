@@ -38,6 +38,7 @@ import com.example.moveapp.utility.FireAuthService.getCurrentUser
 fun TopBar(navController: NavController,
            category: String?,
            adTitle: String?,
+           chatUsername: String?,
            route: String? = null,
            onApplySearch: (String?)-> Unit,
            onResetCategory: () -> Unit){
@@ -69,6 +70,14 @@ fun TopBar(navController: NavController,
                                 stringResource(R.string.guest_denied)
                             }
                         }
+
+                        currentScreen.startsWith(AppScreens.SPECIFIC_MESSAGE_SCREEN.name) -> {  // Check if screen starts with EDIT_AD_SCREEN
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                chatUsername.toString()
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
                         currentScreen === AppScreens.PROFILE.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.my_profile)
@@ -91,8 +100,6 @@ fun TopBar(navController: NavController,
                                 stringResource(R.string.guest_denied)
                             }
                         }
-
-
 
                         currentScreen === AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
                         else -> ""

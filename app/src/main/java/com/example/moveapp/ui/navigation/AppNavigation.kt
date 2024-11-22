@@ -20,6 +20,8 @@ import androidx.navigation.navArgument
 import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
+import com.example.moveapp.repository.ChatRepo
+import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.SplitFloatingActionButton
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.FilterBar
@@ -45,6 +47,7 @@ import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,10 +71,11 @@ fun AppNavigation() {
     val coroutineScope = MainScope()
     val adId = remember { mutableStateOf<String?>(null) }
     val ad = remember { mutableStateOf<AdData?>(null) }
-
+    val chatId = remember { mutableStateOf<String?>(null) }
+    val chatUsername = remember { mutableStateOf<String?>(null) }
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
-    Log.d("CURRENTSCREEN:", currentScreen)
+
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()
@@ -86,8 +90,23 @@ fun AppNavigation() {
             isAuthChecked = true
         }
     }
+
     LaunchedEffect(adId.value) {
          ad.value  = getAd(adId.value)
+    }
+
+    LaunchedEffect(chatId.value) {
+        val chat = chatId.value?.let { ChatRepo.getChatById(it) }
+        val names = chat?.users?.mapNotNull { userId ->
+            getUserNameById(userId)?.replaceFirstChar{
+                it.titlecase(Locale.getDefault())
+            }
+        }
+        if (currentUser != null) {
+            if (names != null) {
+                chatUsername.value = names.find { it != getUserNameById(currentUser.uid) }
+            }
+        }
     }
 
 
@@ -100,7 +119,7 @@ fun AppNavigation() {
         Scaffold(
             topBar = {
                     TopBar(navController = navController,
-                          category.value, ad.value?.adTitle,  onApplySearch = { newSearchQuery ->
+                          category.value, ad.value?.adTitle, chatUsername.value, onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
                     }, onResetCategory = {
                         location.value = null
@@ -261,8 +280,8 @@ fun AppNavigation() {
                         route = "${AppScreens.SPECIFIC_MESSAGE_SCREEN}/{chatId}",
                         arguments = listOf(navArgument("chatId") { type = NavType.StringType })
                     ) { backStackEntry ->
-                        val chatId = backStackEntry.arguments?.getString("chatId") ?: ""
-                        SpecificMessageScreen(navController, chatId)
+                        chatId.value = backStackEntry.arguments?.getString("chatId") ?: ""
+                        SpecificMessageScreen(navController, chatId.value!!)
                     }
 
 
