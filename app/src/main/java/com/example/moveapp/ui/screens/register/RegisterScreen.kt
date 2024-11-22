@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -22,16 +21,7 @@ import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.viewModel.UserViewModel.Companion.registeringUser
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineScope
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.PublicKeyCredential
-import androidx.credentials.GetPublicKeyCredentialOption
-import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.example.moveapp.utility.HelpFunctions.Companion.validatePassword
 import com.example.moveapp.utility.InvalidPasswordException
 import com.example.moveapp.utility.ProhibitedContentException
@@ -45,8 +35,8 @@ fun Register(navController: NavController) {
     val confirmPassword = remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
     var showErrorDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
 
     Box(
