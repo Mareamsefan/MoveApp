@@ -1,19 +1,25 @@
 package com.example.moveapp.ui.navigation.navBars
 
+import android.content.Intent
+import android.provider.Settings
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.example.moveapp.R
+import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireAuthService.signOutUser
+import com.example.moveapp.utility.LocationUtil
 
 @Composable
 fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice: Double?, underCategory: String?,
@@ -23,9 +29,12 @@ fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice:
     var tempMinPrice by remember { mutableStateOf(minPrice) }
     var tempMaxPrice by remember { mutableStateOf(maxPrice) }
     var tempUnderCategory by remember { mutableStateOf(underCategory) }
+    var leadToLocation by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     var underCategoryExpanded by remember { mutableStateOf(false) }
     var selectedUnderCategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
+    var locationUtil = LocationUtil()
 
     Log.d("filter", "category arrived in filter: $category")
     Log.d("filter", "category arrived in filter: $tempUnderCategory")
@@ -70,13 +79,27 @@ fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice:
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.Start,
         ) {
-            OutlinedTextField(
-                value = tempLocation ?: "",
-                onValueChange = { newValue ->
-                    tempLocation = newValue
-                },
-                label = { Text(text = stringResource(R.string.location)) }
-            )
+            Row() {
+                OutlinedTextField(
+                    value = tempLocation ?: "",
+                    onValueChange = { newValue ->
+                        tempLocation = newValue
+                    },
+                    label = { Text(text = stringResource(R.string.location)) }
+                )
+                if(!locationUtil.isLocationOn()) {
+                    IconButton(
+                        onClick = {
+                            leadToLocation = true
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.LocationOn,
+                            contentDescription = stringResource(R.string.edit_ad)
+                        )
+                    }
+                }
+            }
 
             Box {
                 OutlinedTextField(
@@ -158,5 +181,24 @@ fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice:
             }
         }
 
-
+    if (leadToLocation) {
+        AlertDialog(
+            onDismissRequest = { leadToLocation = false },
+            title = { Text("How to turn location on") },
+            text = { Text("Go to device settings -> Apps -> MoveApp -> Permissions -> Location -> Allow.") },
+            confirmButton = {
+                Button(onClick = { leadToLocation = false }) {
+                    Text("OK")
+                }
+                Button(onClick = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = android.net.Uri.fromParts("package", context.packageName, null)
+                    intent.data = uri
+                    context.startActivity(intent)
+                }) {
+                    Text(stringResource(R.string.take_me_to_settings))
+                }
+            }
+        )
+    }
 }
