@@ -57,7 +57,7 @@ fun TopBar(navController: NavController,
                     text = when  {
                         currentScreen.startsWith(AppScreens.EDIT_AD_SCREEN.name) -> {  // Check if screen starts with EDIT_AD_SCREEN
                             if (currentUser != null && !currentUser.isAnonymous) {
-                                stringResource(R.string.edit_ad)
+                                "Editing: $adTitle"
                             } else {
                                 stringResource(R.string.guest_denied)
                             }

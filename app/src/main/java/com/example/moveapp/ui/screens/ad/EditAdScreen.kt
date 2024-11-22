@@ -190,6 +190,11 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                )
            }
 
+
+            item {
+                Image_swipe_delete(imageList = adImages)
+            }
+
             item{
                 // Upload Image button
                 Row(
@@ -205,10 +210,6 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                     }
                     CameraPermission(onImageCaptured = onImageCaptured)
                 }
-            }
-
-            item {
-                Image_swipe_delete(imageList = adImages)
             }
 
 
