@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -64,7 +65,9 @@ fun Profile(navController: NavController) {
     val userEmail = remember { mutableStateOf("") }
     val updatedEmail = remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
-    var tempEmailForUpdate by remember { mutableStateOf("") } // Store email for retry
+    var tempEmailForUpdate by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
 
     // Fetch user email
     LaunchedEffect(Unit) {
@@ -88,6 +91,13 @@ fun Profile(navController: NavController) {
         } else {
             errorMessage.value = "User not logged in"
             loading = false
+        }
+    }
+
+    LaunchedEffect(errorMessage.value) {
+        if (errorMessage.value.isNotEmpty()) {
+            dialogMessage = errorMessage.value
+            showErrorDialog = true
         }
     }
 
@@ -197,6 +207,7 @@ fun Profile(navController: NavController) {
                                     updateDataInUserTable("email", newEmail) { updateSuccess ->
                                         errorMessage.value = if (updateSuccess) {
                                             userEmail.value = newEmail
+                                            updatedEmail.value = ""
                                             "Check your email: $newEmail to verify the change."
                                         } else {
                                             "Failed to update email in database."
@@ -233,11 +244,6 @@ fun Profile(navController: NavController) {
             }) {
                 Text(text = stringResource(R.string.send_password_reset_email))
             }
-
-            // Display error message
-            if (errorMessage.value.isNotEmpty()) {
-                Text(text = errorMessage.value, color = MaterialTheme.colorScheme.error)
-            }
         }
     }
 
@@ -264,6 +270,19 @@ fun Profile(navController: NavController) {
                 }
             },
             onDismiss = { showDialog = false }
+        )
+    }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { Text("Error") },
+            text = { Text(dialogMessage) },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = false }) {
+                    Text("OK")
+                }
+            }
         )
     }
 }
