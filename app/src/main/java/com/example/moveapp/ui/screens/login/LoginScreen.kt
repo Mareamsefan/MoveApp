@@ -78,6 +78,13 @@ fun LoginScreen(navController: NavController) {
             ) {
                 Text(text = stringResource(R.string.register))
             }
+
+            Button (
+                onClick = { navController.navigate(AppScreens.FORGOT_PASSWORD.name) }
+            ) {
+                Text(text = stringResource(R.string.forgotPassword))
+            }
+
         }
     }
 }
