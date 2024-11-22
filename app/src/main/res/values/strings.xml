@@ -95,5 +95,10 @@
 
     <string name="log_in_to_contact_seller">Log in to contact seller</string>
 
+    <string name="allow_in_settings">Allow in settings</string>
+    <string name="dont_allow">Don\'t allow</string>
+    <string name="turn_location_on">Turn location on</string>
+    <string name="Find_ads_near_you">Find ads near you</string>
+
 
 </resources>

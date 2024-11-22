@@ -40,32 +40,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
-import com.example.compose.outlineDark
 import com.example.moveapp.R
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.data.AdData
-import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.UserData
-import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.repository.ChatRepo.Companion.startOrOpenChat
 import com.example.moveapp.repository.UserRepo.Companion.getUser
-import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
-import com.example.moveapp.ui.composables.AdMap
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
-import com.example.moveapp.utility.FirebaseRealtimeService
 import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
 import com.example.moveapp.viewModel.UserViewModel.Companion.isAdInFavorites
 import com.example.moveapp.viewModel.UserViewModel.Companion.removeFromFavorites
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.UUID
-import kotlin.random.Random
 
 
 @SuppressLint("CoroutineCreationDuringComposition")

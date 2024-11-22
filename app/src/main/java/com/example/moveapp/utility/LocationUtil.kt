@@ -126,6 +126,19 @@ class LocationUtil() {
         return earthRadius * c
     }
 
+    @OptIn(ExperimentalPermissionsApi::class)
+    @Composable
+    fun isLocationOn(): Boolean {
+        val permissionState = rememberMultiplePermissionsState(
+            listOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
+        return (permissionState.permissions.all { it.status.isGranted })
+
+    }
+
 }
 
 // https://medium.com/@munbonecci/how-to-get-your-location-in-jetpack-compose-f085031df4c1

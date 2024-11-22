@@ -108,5 +108,16 @@ fun DisplayAdsInGeoPoint(ads: List<AdData>?, navController: NavController, onClo
                 }
             }
         }
+        IconButton(
+            onClick = { onClose() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Close"
+            )
+        }
     }
 }
