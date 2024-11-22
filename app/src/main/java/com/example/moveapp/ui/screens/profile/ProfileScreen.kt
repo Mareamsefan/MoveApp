@@ -213,7 +213,8 @@ fun Profile(navController: NavController) {
 
                     if (updatedEmail.value.isNotEmpty()) {
                         if (validateEmail(newEmail)) {
-                            if ( updateUserEmail(newEmail) ){
+                            print(newEmail)
+                            if (updateUserEmail(newEmail)){
                                 updateDataInUserTable("email", newEmail) { updateSuccess ->
                                     if (updateSuccess) {
                                         userEmail.value = newEmail
