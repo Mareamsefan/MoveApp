@@ -67,6 +67,7 @@ fun PostAdScreen(navController: NavController) {
     var showErrorDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
     var redirect by remember { mutableStateOf(false) }
+    var formSubmitted by remember { mutableStateOf(false) }
 
     // State for sending request to database
     var isPosting by remember { mutableStateOf(false) }
@@ -136,6 +137,29 @@ fun PostAdScreen(navController: NavController) {
         photoFile
     )
 
+    // Helper Functions
+    @Composable
+    fun showHelperMessage(value: String?, formSubmitted: Boolean) {
+        if (value.isNullOrEmpty() && formSubmitted) {
+            Text(
+                text = "This field is required",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+
+    @Composable
+    fun showHelperMessageForDropdown(formSubmitted: Boolean, selectedStringResource: Int, defaultStringResource: Int) {
+        if (formSubmitted && selectedStringResource == defaultStringResource) {
+            Text(
+                text = "This field is required",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+
     // PostAdScreen UI
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -158,9 +182,11 @@ fun PostAdScreen(navController: NavController) {
                 onExpandedChange = { expanded = !expanded }
             ) {
                 TextField(
-                    value = stringResource(selectedOption),
+                    value = if (selectedOption == R.string.Select_an_ad_type)
+                        stringResource(selectedOption) + " *"
+                    else stringResource(selectedOption),
                     onValueChange = {},
-                    label = { Text(text = stringResource(R.string.Options) + " *")},
+                    label = { Text(text = stringResource(R.string.Options))},
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
@@ -183,6 +209,9 @@ fun PostAdScreen(navController: NavController) {
                             onClick = {
                                 selectedOption = option
                                 expanded = false
+                                // Reset subcategory when ad type changes
+                                selectedUnderCategory = R.string.Select_a_subcategory
+                                underCategory.value = ""
                             }
 
                         )
@@ -191,6 +220,7 @@ fun PostAdScreen(navController: NavController) {
                     }
                 }
             }
+            showHelperMessageForDropdown(formSubmitted, selectedOption, R.string.Select_an_ad_type)
 
             // underCategory
             ExposedDropdownMenuBox(
@@ -198,9 +228,11 @@ fun PostAdScreen(navController: NavController) {
                 onExpandedChange = { underCategoryExpanded = !underCategoryExpanded }
             ) {
                 TextField(
-                    value = stringResource(selectedUnderCategory),
+                    value = if (selectedUnderCategory == R.string.Select_a_subcategory)
+                        stringResource(selectedUnderCategory) + " *"
+                    else stringResource(selectedUnderCategory),
                     onValueChange = {},
-                    label = { Text(text = stringResource(R.string.Options) + " *") },
+                    label = { Text(text = stringResource(R.string.Options)) },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
@@ -230,32 +262,43 @@ fun PostAdScreen(navController: NavController) {
                     }
                 }
             }
+            showHelperMessageForDropdown(formSubmitted, selectedUnderCategory, R.string.Select_a_subcategory)
 
             // Title, address, postal code fields
             OutlinedTextField(
                 value = title.value,
                 onValueChange = { title.value = it },
                 label = { Text(text = stringResource(R.string.title) + " *") },
+                isError = title.value.isEmpty() && formSubmitted
             )
+            showHelperMessage(title.value, formSubmitted)
 
             OutlinedTextField(
                 value = address.value,
                 onValueChange = { address.value = it },
-                label = { Text(text = stringResource(R.string.address) + " *") }
+                label = { Text(text = stringResource(R.string.address) + " *") },
+                isError = address.value.isEmpty() && formSubmitted
             )
+            showHelperMessage(address.value, formSubmitted)
+
             OutlinedTextField(
                 value = city.value,
                 onValueChange = { city.value = it },
-                label = { Text(text = stringResource(R.string.city) + " *") }
+                label = { Text(text = stringResource(R.string.city) + " *") },
+                isError = city.value.isEmpty() && formSubmitted
             )
+            showHelperMessage(city.value, formSubmitted)
+
             OutlinedTextField(
                 value = postalCode.value,
                 onValueChange = { postalCode.value = it },
-                label = { Text(text = stringResource(R.string.postal_code) + " *") }
+                label = { Text(text = stringResource(R.string.postal_code) + " *") },
+                isError = postalCode.value.isEmpty() && formSubmitted
             )
+            showHelperMessage(postalCode.value, formSubmitted)
+
 
             // Button to launch the gallery image picker
-
             Row(
                 modifier = Modifier
                     .padding(5.dp)
@@ -286,14 +329,20 @@ fun PostAdScreen(navController: NavController) {
                         errorMessage = "Please enter a valid number for price"
                     }
                 },
-                label = { Text(text = stringResource(R.string.price) + " *") }
-
+                label = { Text(text = stringResource(R.string.price) + " *") },
+                isError = price.value.isEmpty() && formSubmitted
             )
+            showHelperMessage(price.value, formSubmitted)
+
+
             OutlinedTextField(
                 value = description.value,
                 onValueChange = { description.value = it },
-                label = { Text(text = stringResource(R.string.description) + "*") }
+                label = { Text(text = stringResource(R.string.description) + "*") },
+                isError = description.value.isEmpty() && formSubmitted
             )
+            showHelperMessage(description.value, formSubmitted)
+
 
             // turn the location information to a geopoint that gets saved in the database
             val fullAddress = "${address}, ${postalCode}, ${city}"
@@ -303,6 +352,8 @@ fun PostAdScreen(navController: NavController) {
             Button(
                 modifier = Modifier,
                 onClick = {
+                    formSubmitted = true
+
                     if (
                         title.value.isEmpty() ||
                         price.value.isEmpty() ||
@@ -312,8 +363,9 @@ fun PostAdScreen(navController: NavController) {
                         postalCode.value.isEmpty() ||
                         adType.value.isEmpty() ||
                         underCategory.value.isEmpty()
-                    ) { errorMessage = "Please complete all the required fields marked with an asterisk (*)." }
-                    else if (!isPosting && currentUser != null) {
+                    ) {
+                        errorMessage = "Please complete all the required fields marked with an asterisk (*)."
+                    } else if (!isPosting && currentUser != null) {
                         try {
                             censorshipValidator(title.value)
                             censorshipValidator(description.value)
