@@ -51,20 +51,13 @@ class UserViewModel {
 
 
 
-        suspend fun loginUser(context: Context, email: String, password: String): FirebaseUser? {
+        suspend fun loginUser(email: String, password: String): FirebaseUser? {
             val user = FireAuthService.signInUser(email, password)
 
             if (user == null) {
-                Toast.makeText(
-                    context,
-                    "Sign-in failed. Please check your credentials.",
-                    Toast.LENGTH_SHORT
-                ).show()
                 return null
             }
-
             return user
-
         }
 
         suspend fun logoutUser(context: Context): FirebaseUser? {
@@ -137,6 +130,14 @@ class UserViewModel {
         suspend fun isAdInFavorites(userId: String, adId: String): Boolean {
             val userDocument = readDocument("users", userId, UserData::class.java)
             return userDocument?.favorites?.contains(adId) == true
+        }
+
+        fun validateEmail(email: String): Boolean {
+            val emailRegex = Regex("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+            if (emailRegex.matches(email)) {
+                return true
+            }
+            return false
         }
 
     }

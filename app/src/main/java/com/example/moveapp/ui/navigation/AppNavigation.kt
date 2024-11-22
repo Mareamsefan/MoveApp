@@ -27,6 +27,7 @@ import com.example.moveapp.ui.screens.ad.EditAdScreen
 import com.example.moveapp.ui.screens.ad.SpecificAdScreen
 import com.example.moveapp.ui.screens.guest.GuestDenied
 import com.example.moveapp.ui.screens.home.HomeScreen
+import com.example.moveapp.ui.screens.login.ForgotPassword
 import com.example.moveapp.ui.screens.login.LoginScreen
 import com.example.moveapp.ui.screens.map.MapScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
@@ -270,6 +271,10 @@ fun AppNavigation() {
                         } else {
                             GuestDenied(navController)
                         }
+                    }
+
+                    composable(AppScreens.FORGOT_PASSWORD.name) {
+                        ForgotPassword(navController)
                     }
                 }
             }

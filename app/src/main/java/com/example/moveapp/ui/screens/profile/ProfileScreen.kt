@@ -2,7 +2,7 @@ package com.example.moveapp.ui.screens.profile
 
 import android.annotation.SuppressLint
 import android.net.Uri
-
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +34,7 @@ import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.data.UserData
 import com.example.moveapp.ui.composables.ProfilePicture
+import com.example.moveapp.utility.FireAuthService.reauthenticateUser
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
@@ -42,6 +45,13 @@ import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.utility.FirestoreService.readDocument
 import com.example.moveapp.viewModel.UserViewModel.Companion.uploadAndSetUserProfilePicture
 import kotlinx.coroutines.launch
+import com.example.moveapp.viewModel.UserViewModel.Companion.validateEmail
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import com.example.moveapp.ui.composables.ShowReauthenticationDialog
+import com.example.moveapp.utility.FireStorageService.deleteFileFromStorage
+import com.example.moveapp.utility.FirestoreService.removeProfilePictureUrl
+import java.net.URLDecoder
+
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun Profile(navController: NavController) {
@@ -56,10 +66,14 @@ fun Profile(navController: NavController) {
     val userData = remember { mutableStateOf<UserData?>(null) }
     var loading by remember { mutableStateOf(true) }
     val updatedUsername = remember { mutableStateOf("") }
-    val userEmail = remember {mutableStateOf("")}
-    val updatedEmail = remember {mutableStateOf("")}
+    val userEmail = remember { mutableStateOf("") }
+    val updatedEmail = remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var tempEmailForUpdate by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
 
-    // Henter email
+    // Fetch user email
     LaunchedEffect(Unit) {
         getDataFromUserTable("email") { fetchedEmail ->
             if (fetchedEmail != null) {
@@ -72,7 +86,6 @@ fun Profile(navController: NavController) {
     LaunchedEffect(userId) {
         if (userId != null) {
             try {
-                // Fetch user data asynchronously
                 userData.value = readDocument("users", userId, UserData::class.java)
                 profileImageUrl.value = userData.value?.profilePictureUrl ?: ""
             } catch (e: Exception) {
@@ -85,6 +98,13 @@ fun Profile(navController: NavController) {
         }
     }
 
+    LaunchedEffect(errorMessage.value) {
+        if (errorMessage.value.isNotEmpty()) {
+            dialogMessage = errorMessage.value
+            showErrorDialog = true
+        }
+    }
+
     // Handle image upload
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -93,8 +113,9 @@ fun Profile(navController: NavController) {
                 coroutineScope.launch {
                     if (userId != null) {
                         val success = uploadAndSetUserProfilePicture(userId, it)
-                        profileImageUrl.value = it.toString()
                         if (success) {
+                            userData.value = readDocument("users", userId, UserData::class.java)
+                            profileImageUrl.value = userData.value?.profilePictureUrl ?: ""
                             errorMessage.value = "Image uploaded successfully."
                         } else {
                             errorMessage.value = "Failed to upload image."
@@ -115,7 +136,9 @@ fun Profile(navController: NavController) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             // Username
             val formattedUsername = username.value.replaceFirstChar { it.uppercase() }
@@ -125,59 +148,86 @@ fun Profile(navController: NavController) {
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
-            // Profile image
-            ProfilePicture(imageState = profileImageUrl)
 
-            // Upload or update image button
-            Button(
-                onClick = {
-                    launcher.launch("image/*")
-                },
-                modifier = Modifier.padding(bottom = 16.dp)
-            ) {
-                if (profileImageUrl.value.isEmpty()) {
-                    Text(text = stringResource(R.string.upload_image))
-                } else {
-                    Text(text = stringResource(R.string.update_image))
-                }
+            // Profile image
+            if (profileImageUrl.value.isNotEmpty()) {
+                ProfilePicture(imageState = profileImageUrl)
+            } else {
+                Text(text = stringResource(R.string.no_profile_image))
             }
 
-            // --- Oppdater Username ---
+            // Upload or update image button
+            Button(onClick = { launcher.launch("image/*") }) {
+                Text(
+                    text = if (profileImageUrl.value.isEmpty()) {
+                        stringResource(R.string.upload_image)
+                    } else {
+                        stringResource(R.string.update_image)
+                    }
+                )
+            }
+
+            // Fikk hjelp av chatGPT for å omforme URL
+            // til å passe med deleteFileFromStorage funksjonen.
+            if (profileImageUrl.value.isNotEmpty()){
+            Button(onClick = {
+                coroutineScope.launch {
+                    userData.value?.profilePictureUrl?.let { fullUrl ->
+                        // Decode the URL to get the correct path
+                        val decodedUrl = URLDecoder.decode(fullUrl, "UTF-8")
+
+                        // Extract the storage path after "images/users/"
+                        val storagePath = "/images/users/" + decodedUrl
+                            .substringAfter("images/users/") // Extract the path after "images/users/"
+                            .substringBefore("?") // Remove any query parameters
+                        Log.d("StoragePath", "Path to delete: $storagePath")
+                        val success = deleteFileFromStorage(storagePath)
+                        if (success) {
+                            profileImageUrl.value = ""  // Clear the profile image URL
+                            removeProfilePictureUrl()
+                            errorMessage.value = "Profile image removed successfully"
+                        } else {
+                            errorMessage.value = "Failed to remove profile image"
+                        }
+                    }
+                }
+            }) {
+                Text(text = stringResource(R.string.remove_image))
+            }}
+
+
+
+
+            // Update Username
             Text(text = "Current Username: ${username.value}")
-
-
             OutlinedTextField(
                 value = updatedUsername.value,
                 onValueChange = { updatedUsername.value = it },
-                label = { Text(text = "Update your username...") }
+                label = { Text("Update your username...") }
             )
-
-
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        if (updatedUsername.value.isNotEmpty()) {
-
-                            val updateSuccess = updateUsername(updatedUsername.value)
-                            errorMessage.value =
-                                if (updateSuccess) {
-                                    username.value = updatedUsername.value
-                                    "Username was updated successfully"
-                                } else {
-                                    "Something went wrong while updating your username."
-                                }
-                        } else {
-                            errorMessage.value = "Username cannot be empty."
-                        }
+            Button(onClick = {
+                coroutineScope.launch {
+                    if (updatedUsername.value.isNotEmpty()) {
+                        val updateSuccess = updateUsername(updatedUsername.value)
+                        errorMessage.value =
+                            if (updateSuccess) {
+                                username.value = updatedUsername.value
+                                "Username updated successfully."
+                            } else {
+                                "Failed to update username."
+                            }
+                    } else {
+                        errorMessage.value = "Username cannot be empty."
                     }
-                },
-            ) {
-                Text(text = "Change Username")
+                }
+            }) {
+                Text("Change Username")
             }
 
             // --- Oppdater Email ---
             if (userEmail.value != "") {
-                Text(text = "Current Email: ${userEmail.value}")
+                val currentAuthEmail = getCurrentUser()?.email
+                Text(text = "Current Email: ${currentAuthEmail}")
             } else {
                 Text(text = "Current Email: Unknown")
             }
@@ -187,71 +237,92 @@ fun Profile(navController: NavController) {
                 onValueChange = { updatedEmail.value = it },
                 label = { Text(text = "Update your email...") }
             )
-
             Button(onClick = {
                 coroutineScope.launch {
-                    val emailRegex = Regex("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
                     val newEmail = updatedEmail.value
-                    /* TODO:
-                        Problem:
-                            Her vises Current Email som hentes fra tabellen i Firestore Database
-                            (se over button, rett under kommentaren // ---Oppdater Email---)
-                            Dette er ikke nødvendigvis emailen du bruker.
-                            Denne koden sender en verification email for å bytte email,
-                            men bytter samtidig emailen i Firestore Database umiddelbart,
-                            FØR brukeren faktisk har trykket på "verified" eposten de får.
-                        Hva kan gjøres:
-                            1. Fjerne email fra "Firestore Database", slik at det kun eksisterer i
-                               "Firestore Authentication". Da kan du fjerne updateDataInUserTable() herfra
-                            eller
-                            2. Legge til en sjekk som venter på at brukeren trykker verify før den
-                               oppdaterer epost verdi i Firestore Database.
-                     */
-
-                    if (updatedEmail.value.isNotEmpty()) {
-                        if (emailRegex.matches(updatedEmail.value)) {
-                            if ( updateUserEmail(newEmail) ){
-                                updateDataInUserTable("email", updatedEmail.value) { updateSuccess ->
-                                    if (updateSuccess) {
-                                        userEmail.value = updatedEmail.value
-                                        errorMessage.value = "Check your email: ${newEmail}, to verify the change."
-                                    } else {
-                                        errorMessage.value = "Something went wrong while updating your Email."
+                    if (newEmail.isNotEmpty()) {
+                        if (validateEmail(newEmail)) {
+                            try {
+                                if (updateUserEmail(newEmail)) {
+                                    updateDataInUserTable("email", newEmail) { updateSuccess ->
+                                        errorMessage.value = if (updateSuccess) {
+                                            userEmail.value = newEmail
+                                            updatedEmail.value = ""
+                                            "Check your email: $newEmail to verify the change."
+                                        } else {
+                                            "Failed to update email in database."
+                                        }
                                     }
                                 }
+                            } catch (e: FirebaseAuthRecentLoginRequiredException) {
+                                showDialog = true
+                                tempEmailForUpdate = newEmail
+                            } catch (e: Exception) {
+                                errorMessage.value = "An error occurred: ${e.message}"
                             }
-                            errorMessage.value = "Email updated!"
                         } else {
-                            errorMessage.value = "Please enter a valid email address."
+                            errorMessage.value = "Invalid email address."
                         }
                     } else {
                         errorMessage.value = "Email cannot be empty."
                     }
                 }
-            },
-            ) {
-                Text(text = "Change Email")
+            }) {
+                Text("Change Email")
             }
 
-            // --- Send Password Reset Email ---
+            // Send Password Reset Email
             Button(onClick = {
-                val email = userEmail.value
-
-                if (email.isNotEmpty()){
-                    sendUserPasswordResetEmail(email)
-                    errorMessage.value = "Email sent! If you do not see the email shortly, please check your spam folder."
-                } else {
-                    errorMessage.value = "Something went wrong. Please wait a few seconds and try again."
+                coroutineScope.launch {
+                    if (userEmail.value.isNotEmpty()) {
+                        sendUserPasswordResetEmail(userEmail.value)
+                        errorMessage.value = "Password reset email sent!"
+                    } else {
+                        errorMessage.value = "Failed to send password reset email."
+                    }
                 }
-            })
-            {
+            }) {
                 Text(text = stringResource(R.string.send_password_reset_email))
             }
-
-            // Display error message if any
-            if (errorMessage.value.isNotEmpty()) {
-                Text(text = errorMessage.value, color = MaterialTheme.colorScheme.error)
-            }
         }
+    }
+
+    // Reauthentication dialog
+    if (showDialog) {
+        ShowReauthenticationDialog(
+            onReauthenticate = { email, password ->
+                coroutineScope.launch {
+                    if (reauthenticateUser(email, password)) {
+                        if (updateUserEmail(tempEmailForUpdate)) {
+                            updateDataInUserTable("email", tempEmailForUpdate) { updateSuccess ->
+                                errorMessage.value = if (updateSuccess) {
+                                    userEmail.value = tempEmailForUpdate
+                                    "Email updated successfully. Check your email to verify the change."
+                                } else {
+                                    "Failed to update email in database."
+                                }
+                            }
+                        }
+                    } else {
+                        errorMessage.value = "Reauthentication failed."
+                    }
+                    showDialog = false
+                }
+            },
+            onDismiss = { showDialog = false }
+        )
+    }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = false },
+            title = { Text("Notice") },
+            text = { Text(dialogMessage) },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }

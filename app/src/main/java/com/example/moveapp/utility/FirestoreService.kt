@@ -201,6 +201,19 @@ object FirestoreService {
         return uploadTasks.mapNotNull { it } // Return non-null URLs
     }
 
+    // Remove the profile picture url from a user's collection
+    suspend fun removeProfilePictureUrl(): Boolean {
+        return try {
+            val userId = FireAuthService.getUserId() ?: throw SecurityException("User not logged in")
+            val userDocRef = db.collection("users").document(userId)
+            userDocRef.update("profilePictureUrl", "").await()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
 
 
 }

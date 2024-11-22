@@ -39,6 +39,7 @@ object FireStorageService {
             true
         } catch (e: Exception) {
             e.printStackTrace()
+            Log.e("FireStorageService", "Error deleting file: ${e.message}")
             false
         }
     }
