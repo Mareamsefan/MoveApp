@@ -6,13 +6,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,6 +37,9 @@ fun LoginScreen(navController: NavController) {
     val password = remember { mutableStateOf("")}
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -67,6 +73,10 @@ fun LoginScreen(navController: NavController) {
                         if (user != null) {
                             navController.navigate(AppScreens.HOME.name)
                         }
+                        else {
+                            dialogMessage = "Login failed. Either the email is not registred, or the password is not correct. Please check your credentials"
+                            showErrorDialog = true
+                        }
                     }
                 }
             ) {
@@ -77,6 +87,19 @@ fun LoginScreen(navController: NavController) {
                 onClick = { navController.navigate(AppScreens.REGISTER.name) }
             ) {
                 Text(text = stringResource(R.string.register))
+            }
+
+            if (showErrorDialog) {
+                AlertDialog(
+                    onDismissRequest = { showErrorDialog = false },
+                    title = { Text("Notice") },
+                    text = { Text(dialogMessage) },
+                    confirmButton = {
+                        Button(onClick = { showErrorDialog = false }) {
+                            Text("OK")
+                        }
+                    }
+                )
             }
         }
     }
