@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,12 +24,17 @@ import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FirebaseRealtimeService
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
+import com.example.moveapp.utility.ProhibitedContentException
+
 @Composable
 fun SpecificMessageScreen(navController: NavController, chatId: String) {
     val chat = remember { mutableStateOf<ChatData?>(null) }
     val messageText = remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val currentUserId = FireAuthService.getUserId()
+    var errorMessage by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(chatId) {
         scope.launch {
@@ -77,27 +83,45 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                 Button(onClick = {
                     scope.launch {
                         if (messageText.value.isNotEmpty()) {
-                            val receiverId = currentChat.users.first { it != currentUserId }
+                            try {
+                                censorshipValidator(messageText.value)
+                                val receiverId = currentChat.users.first { it != currentUserId }
+                                val newMessage = MessageData(
+                                    messageId = FirebaseRealtimeService.db.child("chats/$chatId/messages").push().key ?: "",
+                                    senderId = currentUserId ?: "",
+                                    receiverId = receiverId,
+                                    messageText = messageText.value,
+                                    messageTimestamp = System.currentTimeMillis(),
+                                    messageImageUrl = null
+                                )
 
-                            val newMessage = MessageData(
-                                messageId = FirebaseRealtimeService.db.child("chats/$chatId/messages").push().key ?: "",
-                                senderId = currentUserId ?: "",
-                                receiverId = receiverId,
-                                messageText = messageText.value,
-                                messageTimestamp = System.currentTimeMillis(),
-                                messageImageUrl = null
-                            )
 
-                            ChatRepo.addMessageToChat(chatId, newMessage)
+                                ChatRepo.addMessageToChat(chatId, newMessage)
+                                chat.value = ChatRepo.getChatById(chatId)
 
-                            chat.value = ChatRepo.getChatById(chatId)
-
-                            messageText.value = ""
+                                messageText.value = ""
+                            } catch (e: ProhibitedContentException) {
+                                errorMessage = e.message.toString()
+                                showErrorDialog = true
+                            }
                         }
                     }
                 }) {
                     Text(text = "Send")
                 }
+            }
+
+            if (showErrorDialog) {
+                AlertDialog(
+                    onDismissRequest = { showErrorDialog = false },
+                    title = { Text("Error") },
+                    text = { Text(errorMessage) },
+                    confirmButton = {
+                        Button(onClick = { showErrorDialog = false }) {
+                            Text("OK")
+                        }
+                    }
+                )
             }
         }
     }

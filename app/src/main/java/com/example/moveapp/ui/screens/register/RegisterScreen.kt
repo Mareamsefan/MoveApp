@@ -45,8 +45,8 @@ fun Register(navController: NavController) {
     val confirmPassword = remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
     var showErrorDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
 
     Box(
