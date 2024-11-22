@@ -17,8 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.moveapp.R
-import com.example.moveapp.ui.navigation.AppScreens
-import com.example.moveapp.utility.FireAuthService.signOutUser
 import com.example.moveapp.utility.LocationUtil
 
 @Composable
@@ -182,23 +180,44 @@ fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice:
         }
 
     if (leadToLocation) {
-        AlertDialog(
-            onDismissRequest = { leadToLocation = false },
-            title = { Text("How to turn location on") },
-            text = { Text("Go to device settings -> Apps -> MoveApp -> Permissions -> Location -> Allow.") },
-            confirmButton = {
-                Button(onClick = { leadToLocation = false }) {
-                    Text("OK")
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            AlertDialog(
+                onDismissRequest = { leadToLocation = false },
+                title = { Text(stringResource(R.string.turn_location_on)) },
+                text = { Text(stringResource(R.string.Find_ads_near_you)) },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(onClick = {
+                            leadToLocation = false
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                            val uri = android.net.Uri.fromParts("package", context.packageName, null)
+                            intent.data = uri
+                            context.startActivity(intent)
+                        }) {
+                            Text(stringResource(R.string.allow_in_settings))
+                        }
+                    }
+                },
+                dismissButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(onClick = { leadToLocation = false }) {
+                            Text(stringResource(R.string.dont_allow))
+                        }
+                    }
                 }
-                Button(onClick = {
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                    val uri = android.net.Uri.fromParts("package", context.packageName, null)
-                    intent.data = uri
-                    context.startActivity(intent)
-                }) {
-                    Text(stringResource(R.string.take_me_to_settings))
-                }
-            }
-        )
+            )
+        }
     }
+
+
 }
