@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail
 import com.example.moveapp.utility.FirestoreService.db
 import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -228,6 +229,22 @@ object FireAuthService {
             false // Return false if an error occurs
         }
     }
+
+    suspend fun reauthenticateUser(email: String, password: String): Boolean {
+        return try {
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                return false
+            }
+            val credential = EmailAuthProvider.getCredential(email, password)
+            currentUser.reauthenticate(credential).await()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
 
     // Function to update the current user's email
     suspend fun updateUserPassword(newPassword: String): Boolean {
