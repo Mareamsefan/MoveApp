@@ -64,6 +64,9 @@ fun PostAdScreen(navController: NavController) {
     val postalCode = remember { mutableStateOf("") }
     val adImages = remember { mutableStateListOf<String>() }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
+    var redirect by remember { mutableStateOf(false) }
 
     // State for sending request to database
     var isPosting by remember { mutableStateOf(false) }
@@ -143,6 +146,12 @@ fun PostAdScreen(navController: NavController) {
                 .verticalScroll(scrollState)
                 .padding(20.dp)
         ) {
+            Text(
+                text = "* Required fields",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
             // Dropdown for ad type
             ExposedDropdownMenuBox(
                 expanded = expanded,
@@ -151,7 +160,7 @@ fun PostAdScreen(navController: NavController) {
                 TextField(
                     value = stringResource(selectedOption),
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.Options)) },
+                    label = { Text(text = stringResource(R.string.Options) + " *")},
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
@@ -191,7 +200,7 @@ fun PostAdScreen(navController: NavController) {
                 TextField(
                     value = stringResource(selectedUnderCategory),
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.Options)) },
+                    label = { Text(text = stringResource(R.string.Options) + " *") },
                     trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
@@ -226,23 +235,23 @@ fun PostAdScreen(navController: NavController) {
             OutlinedTextField(
                 value = title.value,
                 onValueChange = { title.value = it },
-                label = { Text(text = stringResource(R.string.title)) },
+                label = { Text(text = stringResource(R.string.title) + " *") },
             )
 
             OutlinedTextField(
                 value = address.value,
                 onValueChange = { address.value = it },
-                label = { Text(text = stringResource(R.string.address)) }
+                label = { Text(text = stringResource(R.string.address) + " *") }
             )
             OutlinedTextField(
                 value = city.value,
                 onValueChange = { city.value = it },
-                label = { Text(text = stringResource(R.string.city)) }
+                label = { Text(text = stringResource(R.string.city) + " *") }
             )
             OutlinedTextField(
                 value = postalCode.value,
                 onValueChange = { postalCode.value = it },
-                label = { Text(text = stringResource(R.string.postal_code)) }
+                label = { Text(text = stringResource(R.string.postal_code) + " *") }
             )
 
             // Button to launch the gallery image picker
@@ -277,17 +286,14 @@ fun PostAdScreen(navController: NavController) {
                         errorMessage = "Please enter a valid number for price"
                     }
                 },
-                label = { Text(text = stringResource(R.string.price)) }
+                label = { Text(text = stringResource(R.string.price) + " *") }
 
             )
             OutlinedTextField(
                 value = description.value,
                 onValueChange = { description.value = it },
-                label = { Text(text = stringResource(R.string.description)) }
+                label = { Text(text = stringResource(R.string.description) + "*") }
             )
-
-            Text(text = adType.value) // Display the selected ad type
-            Text(text = underCategory.value)
 
             // turn the location information to a geopoint that gets saved in the database
             val fullAddress = "${address}, ${postalCode}, ${city}"
@@ -295,9 +301,19 @@ fun PostAdScreen(navController: NavController) {
 
 
             Button(
-                modifier = Modifier.offset(y = (-35).dp),
+                modifier = Modifier,
                 onClick = {
-                    if (!isPosting && currentUser != null) {
+                    if (
+                        title.value.isEmpty() ||
+                        price.value.isEmpty() ||
+                        description.value.isEmpty() ||
+                        city.value.isEmpty() ||
+                        address.value.isEmpty() ||
+                        postalCode.value.isEmpty() ||
+                        adType.value.isEmpty() ||
+                        underCategory.value.isEmpty()
+                    ) { errorMessage = "Please complete all the required fields marked with an asterisk (*)." }
+                    else if (!isPosting && currentUser != null) {
                         try {
                             censorshipValidator(title.value)
                             censorshipValidator(description.value)
@@ -349,8 +365,9 @@ fun PostAdScreen(navController: NavController) {
                                                 Log.e("PostAdScreen", "No URLs returned from upload.")
                                             }
 
-                                            // Navigate after everything is completed
-                                            navController.navigate(AppScreens.HOME.name)
+                                            // After everything is completed
+                                            redirect = true
+                                            errorMessage = "Ad posted successfully."
                                         }
                                         else {
                                             errorMessage = "Please enter a valid number for price"
@@ -370,10 +387,36 @@ fun PostAdScreen(navController: NavController) {
             ) {
                 Text(text = stringResource(R.string.post_ad))
             }
-            errorMessage?.let { Text(text = it, color = Color.Red) }
+            // errorMessage?.let { Text(text = it, color = Color.Red) }
         }
 
 
+    }
+    LaunchedEffect(errorMessage) {
+        if (!errorMessage.isNullOrEmpty()) {
+            dialogMessage = errorMessage.toString()
+            showErrorDialog = true
+        }
+    }
+
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+                errorMessage = ""
+            },
+            title = { Text("Notice") },
+            text = { Text(dialogMessage) },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = false }) {
+                    errorMessage = ""
+                    if (redirect) {
+                        navController.navigate(AppScreens.MY_ADS.name)
+                    }
+                    Text("OK")
+                }
+            }
+        )
     }
 
 
