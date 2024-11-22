@@ -67,7 +67,7 @@ fun AppNavigation() {
 
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
-
+    Log.d("CURRENTSCREEN:", currentScreen)
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()

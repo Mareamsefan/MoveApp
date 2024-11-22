@@ -181,11 +181,6 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         ) {
 
            item {
-               Text(
-                   text = stringResource(R.string.edit_ad),
-                   style = MaterialTheme.typography.labelLarge
-               )
-
                // Title
                OutlinedTextField(
                    value = title,
