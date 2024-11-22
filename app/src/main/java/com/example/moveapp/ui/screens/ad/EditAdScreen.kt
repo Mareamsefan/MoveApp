@@ -15,7 +15,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -27,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -46,6 +49,8 @@ import com.example.moveapp.repository.AdRepo.Companion.updateAdInDatabase
 import com.example.moveapp.ui.composables.CameraPermission
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.composables.Image_swipe_delete
+import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FirestoreService
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -82,11 +87,13 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         var subcategoryExpanded by remember { mutableStateOf(false) }
         var selectedSubcategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
 
+        var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
         val galleryLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetContent(),
             onResult = { uri: Uri? -> uri?.let { adImages.add(it.toString()) } }
         )
+
 
 
         // Camera image handling
@@ -171,229 +178,268 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         }
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) }
-        ){ paddingValues ->
+        ) { paddingValues ->
             LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp)
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp)
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
 
-           item {
-               // Title
-               OutlinedTextField(
-                   value = title,
-                   onValueChange = { title = it },
-                   label = { Text(stringResource(R.string.title)) },
-                   modifier = Modifier.fillMaxWidth()
-               )
-           }
-
-
-            item {
-                Image_swipe_delete(imageList = adImages)
-            }
-
-            item{
-                // Upload Image button
-                Row(
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .offset(x = (-10).dp)
-                ) {
-                    Button(
-                        modifier = Modifier.padding(5.dp),
-                        onClick = { galleryLauncher.launch("image/*") },
-                    ) {
-                        Text(text = stringResource(R.string.upload_image))
-                    }
-                    CameraPermission(onImageCaptured = onImageCaptured)
-                }
-            }
-
-
-            item {
-                // Price
-                OutlinedTextField(
-                    value = price.toString(),
-                    onValueChange = { price = it.toDouble() },
-                    label = { Text(stringResource(R.string.price))},
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-            }
-
-
-            item{
-                // Category dropdown
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
-                    TextField(
-                        value = stringResource(id = selectedCategory),
-                        onValueChange = {},
-                        label = { Text(stringResource(R.string.category)) },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null
-                            )
-                        },
-                        readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-
+                item {
+                    // Title
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text(stringResource(R.string.title)) },
+                        modifier = Modifier.fillMaxWidth()
                     )
+                }
 
-                    ExposedDropdownMenu(
+
+                item {
+                    Image_swipe_delete(imageList = adImages)
+                }
+
+                item {
+                    // Upload Image button
+                    Row(
+                        modifier = Modifier
+                            .padding(5.dp)
+                            .offset(x = (-10).dp)
+                    ) {
+                        Button(
+                            modifier = Modifier.padding(5.dp),
+                            onClick = { galleryLauncher.launch("image/*") },
+                        ) {
+                            Text(text = stringResource(R.string.upload_image))
+                        }
+                        CameraPermission(onImageCaptured = onImageCaptured)
+                    }
+                }
+
+
+                item {
+                    // Price
+                    OutlinedTextField(
+                        value = price.toString(),
+                        onValueChange = { price = it.toDouble() },
+                        label = { Text(stringResource(R.string.price)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+
+
+                item {
+                    // Category dropdown
+                    ExposedDropdownMenuBox(
                         expanded = expanded,
-                        onDismissRequest = { expanded = false }
+                        onExpandedChange = { expanded = !expanded }
                     ) {
-                        categoryOptions.forEach { category ->
-                            DropdownMenuItem(
-                                text = { Text(stringResource(category)) },
-                                onClick = {
-                                    selectedCategory = category
-                                    expanded = false
-                                    selectedSubcategory = currentSubcategoryOptions.firstOrNull() ?: R.string.Select_a_subcategory
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+                        TextField(
+                            value = stringResource(id = selectedCategory),
+                            onValueChange = {},
+                            label = { Text(stringResource(R.string.category)) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null
+                                )
+                            },
+                            readOnly = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
 
-            item {
-                // Subcategory dropdown
-                ExposedDropdownMenuBox(
-                    expanded = subcategoryExpanded,
-                    onExpandedChange = { subcategoryExpanded = !subcategoryExpanded }
-                ) {
-                    TextField(
-                        value = stringResource(id = selectedSubcategory),
-                        onValueChange = {},
-                        label = { Text(stringResource(R.string.subcategory)) },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null
-                            )
-                        },
-                        readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                    )
+                        )
 
-                    ExposedDropdownMenu(
-                        expanded = subcategoryExpanded,
-                        onDismissRequest = { subcategoryExpanded = false }
-                    ) {
-                        currentSubcategoryOptions.forEach { subcategory ->
-                            DropdownMenuItem(
-                                text = { Text(stringResource(subcategory)) },
-                                onClick = {
-                                    selectedSubcategory = subcategory
-                                    subcategoryExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            item{
-                // Description
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text(stringResource(R.string.description)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 4
-                )
-            }
-
-            item{
-                // Address, postal code, and city fields
-                OutlinedTextField(
-                    value = address,
-                    onValueChange = { address = it },
-                    label = { Text(stringResource(R.string.address)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-            }
-
-            item {
-                OutlinedTextField(
-                    value = postalCode,
-                    onValueChange = { postalCode = it },
-                    label = { Text(stringResource(R.string.postal_code)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            item {
-                OutlinedTextField(
-                    value = city,
-                    onValueChange = { city = it },
-                    label = { Text(stringResource(R.string.city)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item{
-                // Save button
-                Button(
-
-                    onClick = {
-
-                        coroutineScope.launch {
-                            val success = updateAdInDatabase(
-                                adId = adId.toString(),
-                                newTitle = title,
-                                newPrice = price,
-                                newCategory = context.getString(selectedCategory),
-                                newSubcategory = context.getString(selectedSubcategory),
-                                newDescription = description,
-                                newImages = adImages.toList(),
-                                newAddress = address,
-                                newPostalCode = postalCode,
-                                newCity = city
-                            )
-
-                            if (success) {
-                                // Vis snackbar for suksess
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Changes saved successfully!")
-                                }
-                            } else {
-                                // Vis snackbar for feil
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("Failed to save changes.")
-                                }
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            categoryOptions.forEach { category ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(category)) },
+                                    onClick = {
+                                        selectedCategory = category
+                                        expanded = false
+                                        selectedSubcategory =
+                                            currentSubcategoryOptions.firstOrNull()
+                                                ?: R.string.Select_a_subcategory
+                                    }
+                                )
                             }
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.save_changes))
+                    }
+                }
+
+                item {
+                    // Subcategory dropdown
+                    ExposedDropdownMenuBox(
+                        expanded = subcategoryExpanded,
+                        onExpandedChange = { subcategoryExpanded = !subcategoryExpanded }
+                    ) {
+                        TextField(
+                            value = stringResource(id = selectedSubcategory),
+                            onValueChange = {},
+                            label = { Text(stringResource(R.string.subcategory)) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null
+                                )
+                            },
+                            readOnly = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = subcategoryExpanded,
+                            onDismissRequest = { subcategoryExpanded = false }
+                        ) {
+                            currentSubcategoryOptions.forEach { subcategory ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(subcategory)) },
+                                    onClick = {
+                                        selectedSubcategory = subcategory
+                                        subcategoryExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    // Description
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text(stringResource(R.string.description)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 4
+                    )
+                }
+
+                item {
+                    // Address, postal code, and city fields
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        label = { Text(stringResource(R.string.address)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                }
+
+                item {
+                    OutlinedTextField(
+                        value = postalCode,
+                        onValueChange = { postalCode = it },
+                        label = { Text(stringResource(R.string.postal_code)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                item {
+                    OutlinedTextField(
+                        value = city,
+                        onValueChange = { city = it },
+                        label = { Text(stringResource(R.string.city)) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                item {
+                    // Save button
+                    Button(
+
+                        onClick = {
+
+                            coroutineScope.launch {
+                                val success = updateAdInDatabase(
+                                    adId = adId.toString(),
+                                    newTitle = title,
+                                    newPrice = price,
+                                    newCategory = context.getString(selectedCategory),
+                                    newSubcategory = context.getString(selectedSubcategory),
+                                    newDescription = description,
+                                    newImages = adImages.toList(),
+                                    newAddress = address,
+                                    newPostalCode = postalCode,
+                                    newCity = city
+                                )
+
+                                if (success) {
+                                    // Vis snackbar for suksess
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Changes saved successfully!")
+                                    }
+                                } else {
+                                    // Vis snackbar for feil
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Failed to save changes.")
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.save_changes))
+                    }
+                }
+
+                item {
+
+                    Button(
+                        onClick = { showDeleteConfirmationDialog = true },
+                        colors = ButtonDefaults.buttonColors( MaterialTheme.colorScheme.error),
+                        modifier = Modifier.fillMaxWidth()
+
+                    ) {
+                        Text(stringResource(R.string.delete))
+                    }
+
+                }
+
+                item {
+                    // Cancel button
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
                 }
             }
 
-            item{
-                // Cancel button
-                Button(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
         }
 
+
+        if (showDeleteConfirmationDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteConfirmationDialog = false },
+                title = { Text(stringResource(R.string.delete_ad)) },
+                text = { Text(stringResource(R.string.confirm_delete)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        coroutineScope.launch {
+                            ad!!.adId?.let { FirestoreService.deleteDocument("ads", it) }
+                            navController.navigate(AppScreens.MY_ADS.name)
+                        }
+                    }) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteConfirmationDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                }
+            )
         }
     }
 }
