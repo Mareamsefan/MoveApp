@@ -79,6 +79,7 @@ fun PostAdScreen(navController: NavController) {
     var underCategoryExpanded by remember { mutableStateOf(false) }
     var selectedUnderCategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
     val underCategory = remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
 
 
     val unwantedItemsOptions = listOf(
@@ -134,10 +135,16 @@ fun PostAdScreen(navController: NavController) {
         photoFile
     )
 
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ){ paddingValues ->
     // PostAdScreen UI
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
         contentAlignment = Alignment.Center
+
     ) {
         Column(
             modifier = Modifier
@@ -336,34 +343,41 @@ fun PostAdScreen(navController: NavController) {
                                                     uploadedImageUrls
                                                 )
                                                 if (updateSuccess) {
-                                                    Log.d(
-                                                        "PostAdScreen",
-                                                        "Ad images updated successfully."
-                                                    )
+                                                    // Vis suksessmelding
+                                                    snackbarHostState.showSnackbar("Ad posted successfully!")
+                                                    navController.navigate(AppScreens.HOME.name)
                                                 } else {
-                                                    Log.e("PostAdScreen", "Failed to update ad images.")
+                                                    // Vis feil ved bildeoppdatering
+                                                    snackbarHostState.showSnackbar("Failed to update ad images.")
                                                 }
                                             } else {
-                                                Log.e("PostAdScreen", "No URLs returned from upload.")
+                                                // Vis feil ved bildeopplasting
+                                                snackbarHostState.showSnackbar("No URLs returned from upload.")
                                             }
-
-                                            // Navigate after everything is completed
-                                            navController.navigate(AppScreens.HOME.name)
+                                        } else {
+                                            // Feil ved oppretting av annonsen
+                                            snackbarHostState.showSnackbar("Failed to create ad. Please try again.")
                                         }
-                                        else {
-                                            errorMessage = "Please enter a valid number for price"
-                                        }
+                                    } else {
+                                        snackbarHostState.showSnackbar("Invalid price. Please enter a valid number.")
                                     }
                                 } finally {
                                     isPosting = false
                                 }
                             }
-                        } catch (e: ProhibitedContentException){
-                            errorMessage = e.message
+                        } catch (e: ProhibitedContentException) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    e.message ?: "Prohibited content detected."
+                                )
+                            }
                         }
-                    }
-                },
-                enabled = !isPosting
+
+                        }
+
+                    },
+
+                    enabled = !isPosting
 
             ) {
                 Text(text = stringResource(R.string.post_ad))
@@ -371,8 +385,8 @@ fun PostAdScreen(navController: NavController) {
             errorMessage?.let { Text(text = it, color = Color.Red) }
         }
 
-
     }
 
-
+    }
 }
+

@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.ad
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -22,6 +23,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -38,15 +42,18 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
+import com.example.moveapp.repository.AdRepo.Companion.updateAdInDatabase
 import com.example.moveapp.ui.composables.CameraPermission
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.composables.Image_swipe_delete
+import kotlinx.coroutines.launch
 import java.io.File
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditAdScreen(navController: NavController, adId: String?) {
-
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     // Initialiser ad data hvis adId finnes
     var ad by remember { mutableStateOf<AdData?>(null) }
@@ -61,7 +68,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         // State for form fields
         var adImages = remember { mutableStateListOf(*ad?.adImages?.toTypedArray() ?: arrayOf()) }
         var title by remember { mutableStateOf(ad?.adTitle ?: "" )}
-        var price by remember { mutableStateOf(ad?.adPrice ?: "") }
+        var price by remember { mutableStateOf(ad?.adPrice ?: 0.0) }
         var description by remember { mutableStateOf(ad?.adDescription ?: "") }
         var address by remember { mutableStateOf(ad?.address ?: "") }
         var postalCode by remember { mutableStateOf(ad?.postalCode ?: "") }
@@ -94,6 +101,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
             "${context.packageName}.provider", // Ensure the authority matches your manifest
             photoFile
         )
+        val snackbarHostState = remember { SnackbarHostState() }
 
         // Map eksisterende ad-data til ressurser
         LaunchedEffect(ad) {
@@ -161,11 +169,14 @@ fun EditAdScreen(navController: NavController, adId: String?) {
             R.string.Delivery_service -> deliveryServiceOptions
             else -> emptyList()
         }
-
-        LazyColumn(
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ){ paddingValues ->
+            LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
+                .padding(20.dp)
+                .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
@@ -210,7 +221,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                 // Price
                 OutlinedTextField(
                     value = price.toString(),
-                    onValueChange = { price = it },
+                    onValueChange = { price = it.toDouble() },
                     label = { Text(stringResource(R.string.price))},
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -340,8 +351,35 @@ fun EditAdScreen(navController: NavController, adId: String?) {
             item{
                 // Save button
                 Button(
+
                     onClick = {
 
+                        coroutineScope.launch {
+                            val success = updateAdInDatabase(
+                                adId = adId.toString(),
+                                newTitle = title,
+                                newPrice = price,
+                                newCategory = context.getString(selectedCategory),
+                                newSubcategory = context.getString(selectedSubcategory),
+                                newDescription = description,
+                                newImages = adImages.toList(),
+                                newAddress = address,
+                                newPostalCode = postalCode,
+                                newCity = city
+                            )
+
+                            if (success) {
+                                // Vis snackbar for suksess
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Changes saved successfully!")
+                                }
+                            } else {
+                                // Vis snackbar for feil
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Failed to save changes.")
+                                }
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -358,6 +396,7 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                     Text(stringResource(R.string.cancel))
                 }
             }
+        }
 
         }
     }

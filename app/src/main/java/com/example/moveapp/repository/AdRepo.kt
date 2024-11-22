@@ -68,11 +68,12 @@ class AdRepo {
                         it.adDescription = newDescription
                     }
                     newImages?.let { newImageList ->
-                        // Kombiner eksisterende bilder med nye bilder, om nødvendig
                         val updatedImages = it.adImages.toMutableList() ?: mutableListOf()
-                        updatedImages.addAll(newImageList.filterNotNull()) // Unngå null-verdier
+                        newImageList.filterNot { image -> updatedImages.contains(image) }
+                            .forEach { updatedImages.add(it) }
                         it.adImages = updatedImages
                     }
+
                     if (newAddress != null) {
                         it.address = newAddress
                     }

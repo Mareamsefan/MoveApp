@@ -172,7 +172,7 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        navController.navigate("specific_ad/${ad.adId}")
+                                        navController.navigate("${AppScreens.SPECIFIC_AD}/${ad.adId}")
                                     }
                                     .padding(8.dp)
                             ) {
