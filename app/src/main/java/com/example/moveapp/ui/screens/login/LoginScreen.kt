@@ -69,12 +69,17 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     coroutineScope.launch() {
-                        val user = loginUser(context, email.value, password.value)
-                        if (user != null) {
-                            navController.navigate(AppScreens.HOME.name)
-                        }
-                        else {
-                            dialogMessage = "Login failed. Either the email is not registred, or the password is not correct. Please check your credentials"
+                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                            val user = loginUser(email.value, password.value)
+                            if (user != null) {
+                                navController.navigate(AppScreens.HOME.name)
+                            }
+                            else {
+                                dialogMessage = "Login failed. Either the email is not registred, or the password is not correct. Please check your credentials"
+                                showErrorDialog = true
+                            }
+                        } else {
+                            dialogMessage = "Please fill in both email and password"
                             showErrorDialog = true
                         }
                     }

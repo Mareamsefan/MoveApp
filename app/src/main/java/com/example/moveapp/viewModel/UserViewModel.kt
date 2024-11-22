@@ -51,18 +51,12 @@ class UserViewModel {
 
 
 
-        suspend fun loginUser(context: Context, email: String, password: String): FirebaseUser? {
+        suspend fun loginUser(email: String, password: String): FirebaseUser? {
             val user = FireAuthService.signInUser(email, password)
 
             if (user == null) {
-                Toast.makeText(
-                    context,
-                    "Sign-in failed. Please check your credentials.",
-                    Toast.LENGTH_SHORT
-                ).show()
                 return null
             }
-
             return user
 
         }
