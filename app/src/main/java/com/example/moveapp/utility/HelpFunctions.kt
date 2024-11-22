@@ -15,7 +15,7 @@ class HelpFunctions {
         val blacklist = setOf("Cunt", "Penis", "Dick", "Cock", "Fag", "Faggot", "Tranny", "Whore", "Fuck", "Damn", "Porn", "Sex", "Fucking", "Hentai")
 
         @Throws(InvalidPasswordException::class)
-        fun validatePassword(context: Context, password: String, confirmPassword: String) {
+        fun validatePassword(context: Context, password: String, confirmPassword: String): Boolean {
             val specialCharsRegex = Regex("[^A-Za-z0-9]")
             val numbersRegex = Regex("[0-9]")
 
@@ -34,24 +34,9 @@ class HelpFunctions {
             if (!numbersRegex.containsMatchIn(password)) {
                 throw InvalidPasswordException("Password must contain at least one number")
             }
+            return true
         }
 
-        /* Not in use for now
-        suspend fun checkIfUserExist(email: String): Boolean {
-            return try {
-                // Use the generic getCollection to retrieve the "users" collection
-                val querySnapshot = getCollection("users").await()
-                    .whereEqualTo("email", email)
-                    .get()
-                    .await() // Wait for the query to complete
-
-                // Return true if the user exists (i.e., the query is not empty)
-                !querySnapshot.isEmpty
-            } catch (e: Exception) {
-                println("Error by request: ${e.message}")
-                false // Return false if an exception occurs
-            }
-        }*/
         @Throws(ProhibitedContentException::class)
         fun censorshipValidator(text: String) {
             val words = text.split("\\s+".toRegex())

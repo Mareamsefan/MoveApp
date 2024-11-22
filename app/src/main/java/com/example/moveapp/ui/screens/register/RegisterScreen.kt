@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,16 +21,7 @@ import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.viewModel.UserViewModel.Companion.registeringUser
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineScope
-import androidx.credentials.CredentialManager
-import androidx.credentials.GetCredentialRequest
-import androidx.credentials.GetCredentialResponse
-import androidx.credentials.PublicKeyCredential
-import androidx.credentials.GetPublicKeyCredentialOption
-import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.example.moveapp.utility.HelpFunctions.Companion.validatePassword
 import com.example.moveapp.utility.InvalidPasswordException
 import com.example.moveapp.utility.ProhibitedContentException
@@ -43,62 +34,9 @@ fun Register(navController: NavController) {
     val password = remember { mutableStateOf("") }
     val confirmPassword = remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var googleSignInErrorMessage by remember { mutableStateOf<String?>(null) }
+    var errorMessage by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val firebaseAuth = FirebaseAuth.getInstance()
-    val credentialManager = CredentialManager.create(LocalContext.current)
-
-    // Google Sign-In Configuration
-    val getPublicKeyCredentialOption = GetPublicKeyCredentialOption(
-        requestJson = "{ \"challenge\": \"YOUR_CHALLENGE\" }"
-    )
-    val getCredRequest = GetCredentialRequest(listOf(getPublicKeyCredentialOption))
-
-    // Handle Google Sign-In Result
-    fun handleSignIn(result: GetCredentialResponse, navController: NavController, coroutineScope: CoroutineScope) {
-        val credential = result.credential
-        when (credential) {
-            is PublicKeyCredential -> {
-                val responseJson = credential.authenticationResponseJson
-                val googleCredential = GoogleAuthProvider.getCredential(responseJson, null)
-
-                FirebaseAuth.getInstance().signInWithCredential(googleCredential)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            // User signed in successfully
-                            navController.navigate(AppScreens.WELCOME_SCREEN.name)
-
-                            // Register the user in Firestore with basic details
-                            val user = FirebaseAuth.getInstance().currentUser
-                            user?.let {
-                                val userId = it.uid
-                                val email = it.email ?: ""
-                                val username = it.displayName ?: ""
-
-                                // Launch a coroutine to save the user data in Firestore
-                                coroutineScope.launch {
-                                    try {
-                                        val userData = mapOf(
-                                            "userId" to userId,
-                                            "email" to email,
-                                            "displayName" to username,
-                                            "profilePicture" to it.photoUrl?.toString()
-                                        )
-                                        FirestoreService.createDocument("users", userId, userData)
-                                    } catch (e: Exception) {
-                                        Log.e("Register", "Failed to save user data: ${e.message}")
-                                    }
-                                }
-                            }
-                        } else {
-                            Log.e("Register", "Google Sign-In failed: ${task.exception?.message}")
-                        }
-                    }
-            }
-            else -> Log.e("Register", "Unexpected credential type")
-        }
-    }
 
 
     Box(
@@ -144,7 +82,6 @@ fun Register(navController: NavController) {
                             validatePassword(context, password.value, confirmPassword.value)
 
                             isLoading = true
-                            errorMessage = null
 
                             coroutineScope.launch {
                                 val user = registeringUser(context, username.value, email.value, password.value)
@@ -153,16 +90,22 @@ fun Register(navController: NavController) {
                                     navController.navigate(AppScreens.WELCOME_SCREEN.name)
                                 } else {
                                     errorMessage = "Registration failed. Please check your internet connection or try again later."
+                                    showErrorDialog = true
                                 }
                             }
                         } catch (e: InvalidPasswordException) {
-                            errorMessage = e.message
+                            errorMessage = e.message.toString()
+                            password.value = ""
+                            confirmPassword.value = ""
+                            showErrorDialog = true
                             isLoading = false
                         } catch (e: ProhibitedContentException) {
                             errorMessage = "$e.message}. Please choose a different username."
+                            showErrorDialog = true
                             isLoading = false
                         } catch (e: Exception) {
                             errorMessage = "An unexpected error occurred: ${e.message}. Please try again later."
+                            showErrorDialog = true
                             isLoading = false
                         }
 
@@ -171,32 +114,19 @@ fun Register(navController: NavController) {
                     Text(text = stringResource(R.string.register))
                 }
             }
-            /*
-            // Tror ikke jeg klarer å fikse google login
-            // Google Sign-In Button
-            Button(onClick = {
-                coroutineScope.launch {
-                    try {
-                        val result = credentialManager.getCredential(
-                            context = context,
-                            request = getCredRequest
-                        )
-                        handleSignIn(result, navController, coroutineScope)
-                    } catch (e: Exception) {
-                        googleSignInErrorMessage = "Google Sign-in failed: ${e.message}"
+
+            if (showErrorDialog) {
+                AlertDialog(
+                    onDismissRequest = { showErrorDialog = false },
+                    title = { Text("Error") },
+                    text = { Text(errorMessage) },
+                    confirmButton = {
+                        Button(onClick = { showErrorDialog = false }) {
+                            Text("OK")
+                        }
                     }
-                }
-            }) {
-                Text("Sign in with Google")
+                )
             }
-            */
-
-
-
-
-            // Display error messages
-            errorMessage?.let { Text(text = it, color = Color.Red) }
-            googleSignInErrorMessage?.let { Text(text = it, color = Color.Red) }
         }
     }
 }
