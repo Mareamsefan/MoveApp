@@ -41,6 +41,7 @@ fun Register(navController: NavController) {
     val username = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val confirmPassword = remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var googleSignInErrorMessage by remember { mutableStateOf<String?>(null) }
@@ -125,6 +126,12 @@ fun Register(navController: NavController) {
                 label = { Text(text = stringResource(R.string.password)) },
                 visualTransformation = PasswordVisualTransformation()
             )
+            OutlinedTextField(
+                value = confirmPassword.value,
+                onValueChange = { confirmPassword.value = it },
+                label = { Text(text = stringResource(R.string.confirmPassword)) },
+                visualTransformation = PasswordVisualTransformation()
+            )
 
             // Register Button for email/password registration
             if (isLoading) {
@@ -134,7 +141,7 @@ fun Register(navController: NavController) {
                     onClick = {
                         try {
                             censorshipValidator(username.value)
-                            validatePassword(context, password.value)
+                            validatePassword(context, password.value, confirmPassword.value)
 
                             isLoading = true
                             errorMessage = null
