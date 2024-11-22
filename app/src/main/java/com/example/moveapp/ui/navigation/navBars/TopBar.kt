@@ -72,6 +72,14 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
                             }
                         }
 
+                        AppScreens.EDIT_AD_SCREEN.name -> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.edit_ad)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+
                         AppScreens.PROFILE_SETTINGS.name -> stringResource(R.string.settings)
                         else -> ""
                     },

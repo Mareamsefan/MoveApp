@@ -19,6 +19,7 @@ object FireStorageService {
     }
     suspend fun uploadFileToStorage(fileUri: Uri, storagePath: String): String? {
         return try {
+            Log.d("PATH IMAGES:", storagePath )
             val storageRef = storage.reference.child(storagePath)
             storageRef.putFile(fileUri).await()
             val downloadUrl = storageRef.downloadUrl.await()

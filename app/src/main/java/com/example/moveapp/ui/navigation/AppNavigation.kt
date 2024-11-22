@@ -242,7 +242,7 @@ fun AppNavigation() {
                         adId?.let { SpecificAdScreen(navController, it) }
                     }
 
-                    composable("editAd/{adId}") { backStackEntry ->
+                    composable("${AppScreens.EDIT_AD_SCREEN.name}/{adId}") { backStackEntry ->
                         val adId = backStackEntry.arguments?.getString("adId")
                         adId?.let { EditAdScreen(navController, it) }
                     }

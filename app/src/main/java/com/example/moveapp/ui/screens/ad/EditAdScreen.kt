@@ -25,24 +25,30 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.R
 import com.example.moveapp.data.AdData
-import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.repository.AdRepo.Companion.getAd
+import com.example.moveapp.ui.composables.CameraPermission
 import com.example.moveapp.ui.composables.Image_swipe
-import java.util.UUID
+import com.example.moveapp.ui.composables.Image_swipe_delete
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditAdScreen(navController: NavController, adId: String?) {
 
+    val context = LocalContext.current
+    // Initialiser ad data hvis adId finnes
     var ad by remember { mutableStateOf<AdData?>(null) }
     if (adId != null) {
         LaunchedEffect(Unit) {
@@ -51,10 +57,9 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         }
     }
 
-
     if (ad !== null){
         // State for form fields
-        var adImages by remember { mutableStateOf<List<String>>(ad?.adImages ?: emptyList()) }
+        var adImages = remember { mutableStateListOf(*ad?.adImages?.toTypedArray() ?: arrayOf()) }
         var title by remember { mutableStateOf(ad?.adTitle ?: "" )}
         var price by remember { mutableStateOf(ad?.adPrice ?: "") }
         var description by remember { mutableStateOf(ad?.adDescription ?: "") }
@@ -71,20 +76,24 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         var selectedSubcategory by remember { mutableStateOf(R.string.Select_a_subcategory) }
 
 
-
-
         val galleryLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetMultipleContents(),
-            onResult = { uris ->
-                Log.d("DEBUG", "Selected images: $uris")
-                adImages = listOf(uris.toString() + adImages)
-            }
+            contract = ActivityResultContracts.GetContent(),
+            onResult = { uri: Uri? -> uri?.let { adImages.add(it.toString()) } }
         )
 
-        fun removeImage(uri: Uri) {
-            adImages = adImages.filter { Uri.parse(it)  != uri }
+
+        // Camera image handling
+        val onImageCaptured: (Uri) -> Unit = { uri ->
+            adImages.add(uri.toString())  // Add the captured image to the list
         }
 
+        // Prepare URI for storing the camera image
+        val photoFile = File(context.cacheDir, "photo.jpg")
+        val contentUri: Uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider", // Ensure the authority matches your manifest
+            photoFile
+        )
 
         // Map eksisterende ad-data til ressurser
         LaunchedEffect(ad) {
@@ -156,8 +165,8 @@ fun EditAdScreen(navController: NavController, adId: String?) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 
            item {
@@ -188,39 +197,14 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                     ) {
                         Text(text = stringResource(R.string.upload_image))
                     }
+                    CameraPermission(onImageCaptured = onImageCaptured)
                 }
             }
 
             item {
-                Image_swipe(imageList = adImages.map { it.toString() })
+                Image_swipe_delete(imageList = adImages)
             }
-            item {
-                // Displaying the images and delete option
-                Column {
-                    adImages.forEach { imageUri ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(4.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            val painter: Painter = rememberAsyncImagePainter(model = imageUri.toUri())
-                            Image(
-                                painter = painter,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .height(100.dp)
-                                    .width(100.dp)
-                            )
 
-                            IconButton(onClick = { removeImage(Uri.parse(imageUri))}) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete image"
-                                )
-                            }
-                        }
-                    }
-                }
-            }
 
             item {
                 // Price

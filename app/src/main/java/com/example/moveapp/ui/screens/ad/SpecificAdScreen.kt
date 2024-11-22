@@ -118,7 +118,8 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     ) {
                         IconButton(
                             onClick = {
-                                navController.navigate("editAd/${ad!!.adId}")
+                                navController.navigate("${AppScreens.EDIT_AD_SCREEN.name}/$adId")
+
                             },
                         ) {
                             Icon(

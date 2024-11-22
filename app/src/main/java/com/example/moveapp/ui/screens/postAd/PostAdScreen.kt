@@ -32,6 +32,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.ui.composables.CameraPermission
+import com.example.moveapp.ui.composables.Image_swipe_delete
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.LocationUtil
@@ -264,7 +265,7 @@ fun PostAdScreen(navController: NavController) {
             }
 
             // Display images in the ad
-            Image_swipe(imageList = adImages.map { it.toString() })
+            Image_swipe_delete(adImages)
 
             // Price and description fields
             OutlinedTextField(
@@ -320,7 +321,7 @@ fun PostAdScreen(navController: NavController) {
                                             geoPoint
                                         )
                                         val adId = ad?.adId
-                                        Log.d("PostADIMAGESlocal", "Ad IMAGES: $adImages")
+                                        Log.d("PostADIMAGESlocal", "Local ad images: $adImages")
 
                                         if (adId != null) {
                                             val uriImagesList = adImages.map { it.toUri() }
