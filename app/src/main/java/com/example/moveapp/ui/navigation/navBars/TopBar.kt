@@ -172,20 +172,20 @@ fun TopBar(navController: NavController,
                 active = false,
                 onActiveChange = { },
                 modifier = Modifier
-                    .height(60.dp)
-                    .offset(y = (-22).dp)
-                    .padding(5.dp)
+                    .height(70.dp)
+                    .padding(10.dp)
                     .padding(horizontal = 5.dp),
                 leadingIcon = {
                     IconButton(onClick = { onApplySearch(searchQuery.value) }) {
                         Icon(
+
                             imageVector = Icons.Filled.Search,
                             contentDescription = stringResource(R.string.search)
                         )
                     }
                 }
             ) {}
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
 
     }
