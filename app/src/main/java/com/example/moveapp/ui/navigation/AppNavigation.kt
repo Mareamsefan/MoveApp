@@ -18,6 +18,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.moveapp.R
+import com.example.moveapp.data.AdData
+import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.ui.composables.SplitFloatingActionButton
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.FilterBar
@@ -64,6 +66,8 @@ fun AppNavigation() {
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     val coroutineScope = MainScope()
+    val adId = remember { mutableStateOf<String?>(null) }
+    val ad = remember { mutableStateOf<AdData?>(null) }
 
     // State variable for Grid <-> List view
     var isListView by remember { mutableStateOf(true) }
@@ -82,6 +86,10 @@ fun AppNavigation() {
             isAuthChecked = true
         }
     }
+    LaunchedEffect(Unit) {
+        ad.value = getAd(adId.value)
+        ad.value?.let { Log.d("AD:", it.adTitle) }
+    }
 
     if (!isAuthChecked) {
         // Du kan vise en loader her om du vil
@@ -91,7 +99,8 @@ fun AppNavigation() {
     } else {
         Scaffold(
             topBar = {
-                    TopBar(navController = navController, category.value, onApplySearch = { newSearchQuery ->
+                    TopBar(navController = navController,
+                          category.value, ad.value?.adTitle,  onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
                     }, onResetCategory = {
                         location.value = null
@@ -239,13 +248,13 @@ fun AppNavigation() {
                     }
 
                     composable("${AppScreens.SPECIFIC_AD.name}/{adId}") { backStackEntry ->
-                        val adId = backStackEntry.arguments?.getString("adId")
-                        adId?.let { SpecificAdScreen(navController, it) }
+                        adId.value = backStackEntry.arguments?.getString("adId")
+                        SpecificAdScreen(navController, adId.value)
                     }
 
                     composable("${AppScreens.EDIT_AD_SCREEN.name}/{adId}") { backStackEntry ->
-                        val adId = backStackEntry.arguments?.getString("adId")
-                        adId?.let { EditAdScreen(navController, it) }
+                        val adIdE = backStackEntry.arguments?.getString("adId")
+                        adIdE?.let { EditAdScreen(navController, it) }
                     }
 
                     composable(

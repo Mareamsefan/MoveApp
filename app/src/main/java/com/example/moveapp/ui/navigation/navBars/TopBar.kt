@@ -35,7 +35,12 @@ import com.example.moveapp.utility.FireAuthService.getCurrentUser
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(navController: NavController, category: String?, route: String? = null, onApplySearch: (String?)-> Unit, onResetCategory: () -> Unit){
+fun TopBar(navController: NavController,
+           category: String?,
+           adTitle: String?,
+           route: String? = null,
+           onApplySearch: (String?)-> Unit,
+           onResetCategory: () -> Unit){
 
     var currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
@@ -52,6 +57,14 @@ fun TopBar(navController: NavController, category: String?, route: String? = nul
                         currentScreen.startsWith(AppScreens.EDIT_AD_SCREEN.name) -> {  // Check if screen starts with EDIT_AD_SCREEN
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.edit_ad)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+
+                        currentScreen.startsWith(AppScreens.SPECIFIC_AD.name) -> {  // Check if screen starts with EDIT_AD_SCREEN
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                adTitle.toString()
                             } else {
                                 stringResource(R.string.guest_denied)
                             }
