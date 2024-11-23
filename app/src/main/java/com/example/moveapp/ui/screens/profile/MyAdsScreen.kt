@@ -72,8 +72,6 @@ fun MyAdsScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Ads section
-            Text(text = stringResource(R.string.my_ads), style = MaterialTheme.typography.titleMedium)
 
             if (ads.isNotEmpty()) {
                 // Nested scrollable for ads section
