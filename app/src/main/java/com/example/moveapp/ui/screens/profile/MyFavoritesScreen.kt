@@ -71,8 +71,6 @@ fun MyFavoritesScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Favorite ads section
-            Text(text = stringResource(R.string.my_favorite_ads), style = MaterialTheme.typography.titleMedium)
 
             if (favoriteAds.isNotEmpty()) {
                 // Nested scrollable for ads section

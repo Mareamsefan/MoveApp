@@ -86,6 +86,23 @@ fun TopBar(navController: NavController,
                             }
                         }
 
+                        currentScreen === AppScreens.MY_ADS.name -> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.my_ads)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+
+                        currentScreen === AppScreens.MY_FAVORITES.name-> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.my_favorite_ads)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+
+
                         currentScreen === AppScreens.ALL_MESSAGES.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.messages)
@@ -93,9 +110,18 @@ fun TopBar(navController: NavController,
                                 stringResource(R.string.guest_denied)
                             }
                         }
+
                         currentScreen === AppScreens.POST_AD.name -> {
                             if (currentUser != null && !currentUser.isAnonymous) {
                                 stringResource(R.string.post_ad)
+                            } else {
+                                stringResource(R.string.guest_denied)
+                            }
+                        }
+
+                        currentScreen === AppScreens.WELCOME_SCREEN.name -> {
+                            if (currentUser != null && !currentUser.isAnonymous) {
+                                stringResource(R.string.welcome)
                             } else {
                                 stringResource(R.string.guest_denied)
                             }

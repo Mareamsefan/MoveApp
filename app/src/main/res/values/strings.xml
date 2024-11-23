@@ -6,7 +6,7 @@
     <string name="back_button">Back button</string>
     <string name="dropdown_menu_button">Dropdown menu button</string>
     <string name="post_ad">Post ad</string>
-    <string name="my_profile">Profile</string>
+    <string name="my_profile">My profile</string>
     <string name="messages">Messages</string>
     <string name="filter">Filter</string>
     <string name="email">Email</string>
@@ -105,6 +105,7 @@
     <string name="delete_ad">Delete Ad</string>
     <string name="confirm_delete">Confirm delete</string>
     <string name="confirm">Confirm</string>
+    <string name="welcome">Welcome</string>
 
 
 </resources>
