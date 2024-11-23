@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -45,9 +46,11 @@ import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.ui.screens.welcome.WelcomeScreen
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
+import com.example.moveapp.utility.PreferencesHelper
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,8 +77,11 @@ fun AppNavigation() {
     val chatId = remember { mutableStateOf<String?>(null) }
     val chatUsername = remember { mutableStateOf<String?>(null) }
     // State variable for Grid <-> List view
-    var isListView by remember { mutableStateOf(true) }
 
+    val context = LocalContext.current
+    var isListView by remember { mutableStateOf(PreferencesHelper.getViewType(context)) }
+
+    Log.d("ISLISTVIEW:::", isListView.toString())
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()
@@ -138,10 +144,11 @@ fun AppNavigation() {
 
             floatingActionButton = {
                 if (currentScreen == AppScreens.HOME.name) {
-                    SplitFloatingActionButton (
+                    SplitFloatingActionButton(
                         isListView = isListView,
                         onViewToggle = { newIsListView ->
                             isListView = newIsListView
+                            PreferencesHelper.saveViewType(context, newIsListView)
                         },
                         onRightClick = {
                             scope.launch {
@@ -218,8 +225,7 @@ fun AppNavigation() {
                             underCategory = underCategory.value,
                             minPrice = minPrice.value,
                             maxPrice = maxPrice.value,
-                            isListView = isListView
-
+                            initialIsListView = isListView,
                         )
                     }
 
