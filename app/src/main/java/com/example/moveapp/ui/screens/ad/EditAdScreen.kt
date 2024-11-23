@@ -426,6 +426,8 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                 text = { Text(stringResource(R.string.confirm_delete)) },
                 confirmButton = {
                     TextButton(onClick = {
+
+                        //TODO: LEGG TIL FUNKSJONALITET SOM SLETTER ALLE BILDENE FRA FIRESTORAGE TIL AD-EN
                         coroutineScope.launch {
                             ad!!.adId?.let { FirestoreService.deleteDocument("ads", it) }
                             navController.navigate(AppScreens.MY_ADS.name)

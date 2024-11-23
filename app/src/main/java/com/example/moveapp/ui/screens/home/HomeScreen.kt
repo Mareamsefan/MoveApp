@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.PreferencesHelper
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +44,7 @@ fun HomeScreen(
     underCategory: String?,
     minPrice: Double?,
     maxPrice: Double?,
-    isListView: Boolean
+    initialIsListView: Boolean,
 ) {
     // States to store filtered ads, loading status, and error messages
     var filteredAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
@@ -52,11 +53,13 @@ fun HomeScreen(
     var userLocation by remember { mutableStateOf<GeoPoint?>(null) }
     val context = LocalContext.current
 
+
     val refreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    var isListView by remember { mutableStateOf(initialIsListView) }
 
-
+    Log.d("LISTVIEW234:",isListView.toString())
     // request for user location
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation(navController)
@@ -121,7 +124,8 @@ fun HomeScreen(
         onRefresh = {
             fetchAds()
         }
-    ) {
+    )
+    { Column {
         when {
             loading -> {
                 Text(text = "Loading")
@@ -141,7 +145,7 @@ fun HomeScreen(
                 }
             }
             filteredAds.isNotEmpty() -> {
-                if (isListView) {
+                if (initialIsListView) {
                     // List View
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -186,5 +190,6 @@ fun HomeScreen(
                 Text(text = "No ads available.")
             }
         }
+    }
     }
 }
