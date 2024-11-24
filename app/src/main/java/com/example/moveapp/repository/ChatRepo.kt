@@ -51,7 +51,7 @@ class ChatRepo {
                 users = userIds,
                 lastMessageTimestamp = System.currentTimeMillis(),
                 messages = emptyMap(),
-                adId = adId // Legg til adId her
+                adId = adId
             )
 
             addChatToDatabase(chat)

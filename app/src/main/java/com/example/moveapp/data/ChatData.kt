@@ -13,7 +13,7 @@ data class ChatData (
     var users: List<String>,
     val adId: String,
     var lastMessageTimestamp: Long,
-    var messages: Map<String, MessageData>
+    var messages: Map<String, MessageData>,
 ) {
     // No-argument constructor with default values
     constructor() : this("", emptyList(), "", 0L, emptyMap())

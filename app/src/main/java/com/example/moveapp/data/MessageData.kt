@@ -9,10 +9,11 @@ data class MessageData (
     var receiverId: String,
     var messageText: String,
     var messageTimestamp: Long,
-    var messageImageUrl: String?,  // ? -> you likely will not need an img for every message.
+    var messageImageUrl: String?,
+    var isRead: Boolean,// ? -> you likely will not need an img for every message.
 )
 {
-    constructor() : this("", "", "", "", 0L, null)
+    constructor() : this("", "", "", "", 0L, null, false)
 
     fun compareTo(other: MessageData): Int {
         return other.messageTimestamp.compareTo(this.messageTimestamp) // Nyeste først

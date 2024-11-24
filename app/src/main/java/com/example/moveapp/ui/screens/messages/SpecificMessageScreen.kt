@@ -21,6 +21,8 @@ import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FirebaseRealtimeService
 import kotlinx.coroutines.launch
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
+import com.example.moveapp.utility.HelpFunctions.Companion.validateMessageLength
+import com.example.moveapp.utility.MessageTooLongException
 import com.example.moveapp.utility.ProhibitedContentException
 
 @Composable
@@ -81,6 +83,7 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                         if (messageText.value.isNotEmpty()) {
                             try {
                                 censorshipValidator(messageText.value)
+                                validateMessageLength(messageText.value)
                                 val receiverId = currentChat.users.first { it != currentUserId }
                                 val newMessage = MessageData(
                                     messageId = FirebaseRealtimeService.db.child("chats/$chatId/messages").push().key ?: "",
@@ -88,7 +91,8 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                                     receiverId = receiverId,
                                     messageText = messageText.value,
                                     messageTimestamp = System.currentTimeMillis(),
-                                    messageImageUrl = null
+                                    messageImageUrl = null,
+                                    isRead = false,
                                 )
 
 
@@ -100,6 +104,11 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                                 errorMessage = e.message.toString()
                                 showErrorDialog = true
                             }
+                            catch (e: MessageTooLongException){
+                                errorMessage = e.message.toString()
+                                showErrorDialog = true
+                            }
+
                         }
                     }
                 }) {

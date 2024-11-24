@@ -28,7 +28,8 @@ class ChatViewModel {
                 receiverId = receiverId,
                 messageText = messageText,
                 messageTimestamp = timestamp,
-                messageImageUrl = null
+                messageImageUrl = null,
+                isRead = false,
             )
 
             // Update the message in the chat
