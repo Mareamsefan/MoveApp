@@ -6,6 +6,7 @@ import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.MessageData
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FirebaseRealtimeService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -95,9 +96,14 @@ class ChatRepo {
 
         suspend fun getChatById(chatId: String): ChatData? {
             return try {
+                val currentUserId = getCurrentUser()?.uid
                 val chatRef = FirebaseRealtimeService.db.child("chats").child(chatId)
                 val snapshot = chatRef.get().await()
                 if (snapshot.exists()) {
+                    if (currentUserId != null) {
+                        Log.d("KJØRER DENNE?:", chatId)
+                        markMessagesAsRead(chatId, currentUserId)
+                    }
                     snapshot.getValue(ChatData::class.java)
                 } else {
                     Log.d("ChatRepo", "Chat not found for chatId: $chatId")
@@ -151,6 +157,8 @@ class ChatRepo {
                             }
                         } else {
                             withContext(Dispatchers.Main) {
+                                markMessagesAsRead(chatId, currentUserId)
+                                Log.d("KJØRER DENNE:", chatId)
                                 navController.navigate("${AppScreens.SPECIFIC_MESSAGE_SCREEN}/$chatId")
                             }
                         }
@@ -160,6 +168,43 @@ class ChatRepo {
                 }
             }
         }
+
+        suspend fun markMessagesAsRead(chatId: String, userId: String) {
+            try {
+                val messagesSnapshot = FirebaseRealtimeService.getData("chats/$chatId/messages")
+
+                if (messagesSnapshot == null) {
+                    Log.e("markMessagesAsRead", "No messages found for chatId: $chatId")
+                    return
+                }
+
+                Log.d("markMessagesAsRead", "Fetched ${messagesSnapshot.childrenCount} messages for chatId: $chatId")
+
+                messagesSnapshot.children.forEach { messageSnapshot ->
+                    val receiverId = messageSnapshot.child("receiverId").getValue(String::class.java)
+                    val isRead = messageSnapshot.child("read").getValue(Boolean::class.java) ?: false
+                    val messageId = messageSnapshot.key
+
+                    Log.d("markMessagesAsRead", "Processing messageId: $messageId, receiverId: $receiverId, isRead: $isRead")
+                    Log.d("currentUser: ", "Processing messageId: $messageId, receiverId: $receiverId, isRead: $isRead")
+
+                    if (receiverId?.trim() == userId.trim() && !isRead) {
+                        if (messageId != null) {
+
+                            val path = "chats/$chatId/messages/$messageId/read"
+                            Log.d("markMessagesAsRead", "Marking message as read at path: $path")
+                            FirebaseRealtimeService.updateData(path, true)
+                        } else {
+                            Log.e("markMessagesAsRead", "Message ID is null for receiverId: $receiverId")
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("markMessagesAsRead", "Error marking messages as read: ${e.message}", e)
+            }
+        }
+
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.moveapp.utility
 
 
+import android.util.Log
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
@@ -32,6 +33,7 @@ object FirebaseRealtimeService {
     suspend fun <T: Any> updateData(path: String, data: T) {
         try {
             db.child(path).setValue(data).await()
+            Log.d("THE PATH:", path )
         } catch (e: Exception) {
             e.printStackTrace()
         }
