@@ -40,7 +40,6 @@ import com.example.moveapp.ui.screens.login.LoginScreen
 import com.example.moveapp.ui.screens.map.MapScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
-import com.example.moveapp.ui.screens.notification.NotificationScreen
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
@@ -92,7 +91,7 @@ fun AppNavigation() {
             "${network.isUserConnectedToInternet(context)}")
 
 
-    Log.d("ISLISTVIEW:::", isListView.toString())
+
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()
@@ -309,13 +308,6 @@ fun AppNavigation() {
                             NoInternet()
                         }
 
-                    }
-                    composable(AppScreens.NOTIFICATIONS.name) {
-                        if(isConnected) {
-                            NotificationScreen(navController)
-                        }else{
-                            NoInternet()
-                        }
                     }
 
                     composable(AppScreens.MAP.name) {
