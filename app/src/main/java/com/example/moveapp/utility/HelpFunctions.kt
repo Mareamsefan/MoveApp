@@ -41,6 +41,13 @@ class HelpFunctions {
             }
         }
 
+        @Throws(MessageTooLongException::class)
+        fun validateMessageLength(message: String, maxLength: Int = 200) {
+            if (message.length > maxLength) {
+                throw MessageTooLongException("Message is too long. Maximum length is $maxLength characters.")
+            }
+        }
+
         // Helper function to validate progressive numeric input
         fun isNumericInput(input: String): Boolean {
             return input.matches(Regex("^-?\\d*(\\.\\d*)?$")) // Allows digits, optional decimal, optional leading minus
