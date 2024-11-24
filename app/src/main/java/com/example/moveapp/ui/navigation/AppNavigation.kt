@@ -61,10 +61,10 @@ import kotlinx.coroutines.launch
 fun AppNavigation() {
     val navController = rememberNavController()
     val currentScreen = getCurrentScreen(navController)
+    val context = LocalContext.current
     val currentUser = getCurrentUser()
     var isAuthChecked by remember { mutableStateOf(false) }
     val network = NetworkUtil()
-    val context = LocalContext.current
     val isConnected by rememberUpdatedState(network.isUserConnectedToInternet(context))
     // State variables for filters
     val location = remember { mutableStateOf<String?>(null) }
@@ -86,7 +86,6 @@ fun AppNavigation() {
 
     val hasUnreadMessages = remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
     var isListView by remember { mutableStateOf(PreferencesHelper.getViewType(context)) }
 
     Log.d("Network", "network status: " +
