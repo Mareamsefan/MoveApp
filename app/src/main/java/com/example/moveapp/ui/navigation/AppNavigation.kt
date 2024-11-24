@@ -42,6 +42,7 @@ import com.example.moveapp.ui.screens.login.LoginScreen
 import com.example.moveapp.ui.screens.map.MapScreen
 import com.example.moveapp.ui.screens.messages.AllMessagesScreen
 import com.example.moveapp.ui.screens.messages.SpecificMessageScreen
+import com.example.moveapp.ui.screens.notification.NotificationScreen
 import com.example.moveapp.ui.screens.postAd.PostAdScreen
 import com.example.moveapp.ui.screens.profile.Profile
 import com.example.moveapp.ui.screens.profile.ProfileSettingsScreen
@@ -264,6 +265,13 @@ fun AppNavigation() {
                     composable(AppScreens.POST_AD.name) {
                         if (currentUser != null && !currentUser.isAnonymous) {
                             PostAdScreen(navController)
+                        } else {
+                            GuestDenied(navController)
+                        }
+                    }
+                    composable(AppScreens.NOTIFICATIONS.name) {
+                        if (currentUser != null && !currentUser.isAnonymous) {
+                            NotificationScreen(navController)
                         } else {
                             GuestDenied(navController)
                         }
