@@ -140,7 +140,17 @@ fun TopBar(navController: NavController,
             },
 
             navigationIcon = {
-                if (currentScreen != AppScreens.WELCOME_SCREEN.name && currentScreen != AppScreens.HOME.name && currentScreen != AppScreens.LOGIN.name) {
+                if (currentScreen == AppScreens.MAP.name){
+                    IconButton(onClick = {
+                        navController.navigate(AppScreens.HOME.name)
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button)
+                        )
+                    }
+                }
+                if (currentScreen != AppScreens.WELCOME_SCREEN.name && currentScreen != AppScreens.HOME.name && currentScreen != AppScreens.LOGIN.name && currentScreen != AppScreens.MAP.name) {
                     IconButton(onClick = {
                         if (route != null) {
                             navController.navigate(route)

@@ -1,15 +1,19 @@
 package com.example.moveapp.ui.navigation
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -23,6 +27,7 @@ import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
+import com.example.moveapp.ui.composables.LocationButton
 import com.example.moveapp.ui.composables.SplitFloatingActionButton
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.FilterBar
@@ -117,7 +122,6 @@ fun AppNavigation() {
 
 
     if (!isAuthChecked) {
-        // Du kan vise en loader her om du vil
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
@@ -143,6 +147,9 @@ fun AppNavigation() {
             },
 
             floatingActionButton = {
+                if (currentScreen == AppScreens.MAP.name) {
+                    LocationButton(navController = navController)
+                }
                 if (currentScreen == AppScreens.HOME.name) {
                     SplitFloatingActionButton(
                         isListView = isListView,
