@@ -2,10 +2,13 @@ package com.example.moveapp.ui.navigation.navBars
 
 import android.util.Log
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
@@ -21,15 +24,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,8 +45,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.moveapp.R
+import com.example.moveapp.repository.ChatRepo.Companion.listenForUnreadMessages
 import com.example.moveapp.ui.composables.NavigationIcon
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
 import com.example.moveapp.utility.FireAuthService.signOutUser
 
@@ -47,11 +56,13 @@ import com.example.moveapp.utility.FireAuthService.signOutUser
 data class BottomNavItems(val route: AppScreens, val icon: ImageVector, @StringRes val label: Int)
 
 @Composable
-fun BottomNavBar(navController: NavController, category: String?) {
+fun BottomNavBar(navController: NavController, category: String?, hasUnreadMessages: Boolean? ) {
     var isProfileMenuExpanded by remember { mutableStateOf(false) }
     var showLogoutConfirmation by remember { mutableStateOf(false) }
     val currentShortcuts = remember(category, isUserLoggedIn()) { getBottomNavShortcuts(category) }
-    Log.d("filter bottom bar", "category: $category")
+    val currentUserId = getCurrentUser()?.uid
+
+    Log.d("", "category: $category")
 
     val dropdownRoutes = listOf(
         AppScreens.LOGIN.name,
@@ -62,9 +73,40 @@ fun BottomNavBar(navController: NavController, category: String?) {
         AppScreens.PROFILE_SETTINGS.name
     )
 
+
     NavigationBar () {
         currentShortcuts.forEach { shortcut ->
             if (shortcut.route != AppScreens.MORE) {
+                if (shortcut.route == AppScreens.ALL_MESSAGES) {
+                    NavigationBarItem(
+                        icon = {
+                            Box {
+                                Icon(Icons.Default.Email, contentDescription = stringResource(shortcut.label))
+                                if (hasUnreadMessages == true) {
+                                    Log.d("Unreadmeld? :", hasUnreadMessages.toString())
+                                    Box(
+                                        modifier = Modifier
+                                            .offset(x = 7.dp, y = (-3).dp)
+                                            .size(12.dp)
+                                            .align(Alignment.TopEnd),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Canvas(modifier = Modifier.fillMaxSize()) {
+                                            drawCircle(color = Color.Red)
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        label = { Text(stringResource(shortcut.label)) },
+                        selected = getCurrentScreen(navController) == shortcut.route.name,
+                        onClick = {
+                            navController.navigate(shortcut.route.name)
+                        }
+                    )
+
+                }
+                else{
                 NavigationBarItem(
                     icon = { NavigationIcon(shortcut.icon, getCurrentScreen(navController) == shortcut.route.name, stringResource(shortcut.label)) },
                     label = { Text(stringResource(shortcut.label)) },
@@ -75,7 +117,9 @@ fun BottomNavBar(navController: NavController, category: String?) {
                     }
 
                 )
+                }
             }
+
             else {
                 NavigationBarItem(
                     icon = { NavigationIcon(shortcut.icon, getCurrentScreen(navController) == shortcut.route.name, stringResource(shortcut.label)) },
@@ -172,11 +216,6 @@ fun getCurrentScreen(navController: NavController): String {
     return navController.currentBackStackEntryAsState().value?.destination?.route.toString()
 }
 
-@Preview
-@Composable
-fun BottomNavBarPreview() {
-    BottomNavBar(rememberNavController(), category = null)
-}
 
 fun getBottomNavShortcuts(category: String?): List<BottomNavItems> {
     Log.d("filter in nav shortcuts", "filter $category")

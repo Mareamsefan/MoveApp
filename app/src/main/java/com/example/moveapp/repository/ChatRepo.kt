@@ -198,17 +198,17 @@ class ChatRepo {
         }
 
         fun listenForUnreadMessages(userId: String, onUnreadMessagesFound: (Boolean) -> Unit) {
-            val chatsRef = FirebaseRealtimeService.db
+            val chatsRef = FirebaseRealtimeService.db.child("chats")
 
             chatsRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     var hasUnreadMessages = false
 
-                    // Iterate through all chats
+
                     snapshot.children.forEach { chatSnapshot ->
                         val messagesSnapshot = chatSnapshot.child("messages")
 
-                        // Check each message in the chat
+
                         messagesSnapshot.children.forEach { messageSnapshot ->
                             val receiverId = messageSnapshot.child("receiverId").getValue(String::class.java)
                             val isRead = messageSnapshot.child("read").getValue(Boolean::class.java) ?: false
@@ -220,7 +220,7 @@ class ChatRepo {
                         }
                     }
 
-                    // Notify about unread messages
+
                     onUnreadMessagesFound(hasUnreadMessages)
                 }
 
@@ -230,6 +230,35 @@ class ChatRepo {
             })
         }
 
+        fun hasUnreadMessagesInChat(userId: String, chatId: String, onUnreadMessagesFound: (Boolean) -> Unit) {
+            val chatRef = FirebaseRealtimeService.db.child("chats").child(chatId).child("messages")
+
+            chatRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    var hasUnreadMessages = false
+
+
+                    snapshot.children.forEach { messageSnapshot ->
+                        val receiverId = messageSnapshot.child("receiverId").getValue(String::class.java)
+                        val isRead = messageSnapshot.child("read").getValue(Boolean::class.java) ?: false
+
+
+                        if (receiverId == userId && !isRead) {
+                            hasUnreadMessages = true
+                            return@forEach
+                        }
+                    }
+
+
+                    onUnreadMessagesFound(hasUnreadMessages)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("ChatRepo", "Database operation cancelled: ${error.message}")
+                    onUnreadMessagesFound(false)
+                }
+            })
+        }
 
 
 

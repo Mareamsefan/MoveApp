@@ -3,6 +3,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,6 +30,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
+import com.example.moveapp.repository.ChatRepo.Companion.hasUnreadMessagesInChat
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
@@ -37,12 +39,17 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun ChatItemWithAd(navcontroller: NavController, chat: ChatData, ad: AdData?, onClick: () -> Unit) {
+fun ChatItemWithAd(navcontroller: NavController,
+                   chat: ChatData,
+                   ad: AdData?,
+                   onClick: () -> Unit) {
     val adImageUrl = ad?.adImages?.firstOrNull()
     var username by remember { mutableStateOf<String?>(null) }
     val currentUser = getCurrentUser()
     val userNames = remember { mutableStateOf<List<String>>(emptyList()) }
     val adId = ad?.adId
+    val unread = remember { mutableStateOf<Boolean?>(false) }
+
     LaunchedEffect(chat.users) {
         val names = chat.users.mapNotNull { userId ->
             getUserNameById(userId)
@@ -55,7 +62,18 @@ fun ChatItemWithAd(navcontroller: NavController, chat: ChatData, ad: AdData?, on
         }
     }
 
+    LaunchedEffect(chat) {
+        if (currentUser != null) {
+            hasUnreadMessagesInChat(currentUser.uid, chat.chatId) { hasUnreadMessages ->
+                if (hasUnreadMessages) {
+                    unread.value = true
+                }
+            }
+        }
+    }
+
     val formattedTimestamp = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(chat.lastMessageTimestamp))
+
 
     Row(
         modifier = Modifier
@@ -84,6 +102,16 @@ fun ChatItemWithAd(navcontroller: NavController, chat: ChatData, ad: AdData?, on
                 contentScale = ContentScale.Crop
             )
         }
+        Log.d("hasUndreadMessages:", unread.value.toString())
+        if (unread.value == true) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.Top)
+                    .size(12.dp)
+                    .background(color = Color.Red, shape = RoundedCornerShape(6.dp))
+            )
+        }
+
 
         Column(modifier = Modifier.weight(2f)) {
             Text(

@@ -23,6 +23,7 @@ import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.repository.ChatRepo
+import com.example.moveapp.repository.ChatRepo.Companion.listenForUnreadMessages
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.LocationButton
 import com.example.moveapp.ui.composables.NoInternet
@@ -60,10 +61,10 @@ import kotlinx.coroutines.launch
 fun AppNavigation() {
     val navController = rememberNavController()
     val currentScreen = getCurrentScreen(navController)
+    val context = LocalContext.current
     val currentUser = getCurrentUser()
     var isAuthChecked by remember { mutableStateOf(false) }
     val network = NetworkUtil()
-    val context = LocalContext.current
     val isConnected by rememberUpdatedState(network.isUserConnectedToInternet(context))
     // State variables for filters
     val location = remember { mutableStateOf<String?>(null) }
@@ -82,6 +83,8 @@ fun AppNavigation() {
     val ad = remember { mutableStateOf<AdData?>(null) }
     val chatId = remember { mutableStateOf<String?>(null) }
     val chatUsername = remember { mutableStateOf<String?>(null) }
+
+    val hasUnreadMessages = remember { mutableStateOf(false) }
 
     var isListView by remember { mutableStateOf(PreferencesHelper.getViewType(context)) }
 
@@ -122,6 +125,14 @@ fun AppNavigation() {
         }
     }
 
+    if (currentUser != null) {
+        LaunchedEffect(currentUser.uid) {
+            listenForUnreadMessages(currentUser.uid) { unreadMessages ->
+                hasUnreadMessages.value = unreadMessages
+            }
+        }
+    }
+
 
     if (!isAuthChecked) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -149,7 +160,7 @@ fun AppNavigation() {
                 )
             },
             bottomBar = {
-                BottomNavBar(navController, category.value)
+                BottomNavBar(navController, category.value, hasUnreadMessages.value)
             },
 
             floatingActionButton = {
