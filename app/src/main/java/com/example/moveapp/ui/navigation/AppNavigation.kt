@@ -26,6 +26,7 @@ import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.repository.ChatRepo
+import com.example.moveapp.repository.ChatRepo.Companion.listenForUnreadMessages
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.LocationButton
 import com.example.moveapp.ui.composables.SplitFloatingActionButton
@@ -83,6 +84,8 @@ fun AppNavigation() {
     val chatUsername = remember { mutableStateOf<String?>(null) }
     // State variable for Grid <-> List view
 
+    val hasUnreadMessages = remember { mutableStateOf(false) }
+
     val context = LocalContext.current
     var isListView by remember { mutableStateOf(PreferencesHelper.getViewType(context)) }
 
@@ -118,6 +121,14 @@ fun AppNavigation() {
         }
     }
 
+    if (currentUser != null) {
+        LaunchedEffect(currentUser.uid) {
+            listenForUnreadMessages(currentUser.uid) { unreadMessages ->
+                hasUnreadMessages.value = unreadMessages
+            }
+        }
+    }
+
 
     if (!isAuthChecked) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -141,7 +152,7 @@ fun AppNavigation() {
                 )
             },
             bottomBar = {
-                BottomNavBar(navController, category.value)
+                BottomNavBar(navController, category.value, hasUnreadMessages.value)
             },
 
             floatingActionButton = {
