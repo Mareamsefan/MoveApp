@@ -9,7 +9,6 @@ enum class AppScreens {
     PROFILE_SETTINGS,
     POST_AD,
     MAP,
-    GUEST_DENIED,
     MY_ADS,
     MY_FAVORITES,
     WELCOME_SCREEN,
