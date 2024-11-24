@@ -33,7 +33,6 @@ object FirebaseRealtimeService {
     suspend fun <T: Any> updateData(path: String, data: T) {
         try {
             db.child(path).setValue(data).await()
-            Log.d("THE PATH:", path )
         } catch (e: Exception) {
             e.printStackTrace()
         }

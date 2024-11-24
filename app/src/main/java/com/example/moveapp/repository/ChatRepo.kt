@@ -169,40 +169,31 @@ class ChatRepo {
             }
         }
 
-        suspend fun markMessagesAsRead(chatId: String, userId: String) {
+        private suspend fun markMessagesAsRead(chatId: String, userId: String) {
             try {
                 val messagesSnapshot = FirebaseRealtimeService.getData("chats/$chatId/messages")
 
                 if (messagesSnapshot == null) {
-                    Log.e("markMessagesAsRead", "No messages found for chatId: $chatId")
                     return
                 }
-
-                Log.d("markMessagesAsRead", "Fetched ${messagesSnapshot.childrenCount} messages for chatId: $chatId")
 
                 messagesSnapshot.children.forEach { messageSnapshot ->
                     val receiverId = messageSnapshot.child("receiverId").getValue(String::class.java)
                     val isRead = messageSnapshot.child("read").getValue(Boolean::class.java) ?: false
                     val messageId = messageSnapshot.key
 
-                    Log.d("markMessagesAsRead", "Processing messageId: $messageId, receiverId: $receiverId, isRead: $isRead")
-                    Log.d("currentUser: ", "Processing messageId: $messageId, receiverId: $receiverId, isRead: $isRead")
-
                     if (receiverId?.trim() == userId.trim() && !isRead) {
                         if (messageId != null) {
-
                             val path = "chats/$chatId/messages/$messageId/read"
-                            Log.d("markMessagesAsRead", "Marking message as read at path: $path")
                             FirebaseRealtimeService.updateData(path, true)
-                        } else {
-                            Log.e("markMessagesAsRead", "Message ID is null for receiverId: $receiverId")
                         }
                     }
                 }
             } catch (e: Exception) {
-                Log.e("markMessagesAsRead", "Error marking messages as read: ${e.message}", e)
+                Log.e("ChatRepo", ",Error while setting messages as read: ${e.message}")
             }
         }
+
 
 
 
