@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,14 +45,13 @@ fun ChatItemWithAd(navcontroller: NavController, chat: ChatData, ad: AdData?, on
     val adId = ad?.adId
     LaunchedEffect(chat.users) {
         val names = chat.users.mapNotNull { userId ->
-            getUserNameById(userId)?.replaceFirstChar{
-                 it.titlecase(Locale.getDefault())
-            }
+            getUserNameById(userId)
         }
 
         userNames.value = names
         if (currentUser != null) {
             username = names.find { it != getUserNameById(currentUser.uid) }
+
         }
     }
 
@@ -87,7 +87,9 @@ fun ChatItemWithAd(navcontroller: NavController, chat: ChatData, ad: AdData?, on
 
         Column(modifier = Modifier.weight(2f)) {
             Text(
-                text = username ?: "Unknown user",
+                text = (username ?: "Unknown user").replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase() else it.toString()
+                },
                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
             Text(
