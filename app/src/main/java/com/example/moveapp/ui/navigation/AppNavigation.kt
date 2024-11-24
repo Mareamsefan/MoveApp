@@ -86,7 +86,6 @@ fun AppNavigation() {
     val context = LocalContext.current
     var isListView by remember { mutableStateOf(PreferencesHelper.getViewType(context)) }
 
-    Log.d("ISLISTVIEW:::", isListView.toString())
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()
@@ -109,13 +108,12 @@ fun AppNavigation() {
     LaunchedEffect(chatId.value) {
         val chat = chatId.value?.let { ChatRepo.getChatById(it) }
         val names = chat?.users?.mapNotNull { userId ->
-            getUserNameById(userId)?.replaceFirstChar{
-                it.titlecase(Locale.getDefault())
-            }
+            getUserNameById(userId)
         }
         if (currentUser != null) {
             if (names != null) {
                 chatUsername.value = names.find { it != getUserNameById(currentUser.uid) }
+
             }
         }
     }
