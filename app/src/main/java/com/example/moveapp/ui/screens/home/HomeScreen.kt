@@ -58,7 +58,6 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     var isListView by remember { mutableStateOf(initialIsListView) }
 
-    Log.d("LISTVIEW234:",isListView.toString())
     // request for user location
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation(navController)
@@ -66,9 +65,6 @@ fun HomeScreen(
     locationUtil.getUserLocation(context) { loca ->
         loca?.let {
             userLocation = it
-            Log.d("MapScreen", "User location retrieved: ${it.latitude}, ${it.longitude}")
-        } ?: run {
-            Log.d("MapScreen", "Failed to retrieve user location")
         }
     }
 
