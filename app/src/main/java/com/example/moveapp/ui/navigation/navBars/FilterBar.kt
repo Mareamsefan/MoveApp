@@ -93,7 +93,7 @@ fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice:
                     ) {
                         Icon(
                             imageVector = Icons.Filled.LocationOn,
-                            contentDescription = stringResource(R.string.edit_ad)
+                            contentDescription = stringResource(R.string.location)
                         )
                     }
                 }
