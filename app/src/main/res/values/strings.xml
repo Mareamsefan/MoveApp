@@ -107,7 +107,7 @@
     <string name="confirm">Confirm</string>
     <string name="welcome">Welcome</string>
 
-    <string name="retrieve_permissions">Retrieve permissions</string>
+    <string name="revoke_permissions">Revoke permissions</string>
     <string name="lead_me_to_settings">Lead me to settings</string>
 
 </resources>

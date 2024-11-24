@@ -24,7 +24,7 @@ fun ProfileSettingsScreen(navController: NavController) {
         Column(){
             Row(verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)){
-                Text(stringResource(R.string.retrieve_permissions))
+                Text(stringResource(R.string.revoke_permissions))
                 Button(onClick = {
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     val uri = android.net.Uri.fromParts("package", context.packageName, null)
