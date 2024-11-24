@@ -48,7 +48,6 @@ fun HomeScreen(
 ) {
     // States to store filtered ads, loading status, and error messages
     var filteredAds by remember { mutableStateOf<List<AdData>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
     var userLocation by remember { mutableStateOf<GeoPoint?>(null) }
     val context = LocalContext.current
@@ -59,7 +58,6 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     var isListView by remember { mutableStateOf(initialIsListView) }
 
-    Log.d("LISTVIEW234:",isListView.toString())
     // request for user location
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation(navController)
@@ -67,9 +65,6 @@ fun HomeScreen(
     locationUtil.getUserLocation(context) { loca ->
         loca?.let {
             userLocation = it
-            Log.d("MapScreen", "User location retrieved: ${it.latitude}, ${it.longitude}")
-        } ?: run {
-            Log.d("MapScreen", "Failed to retrieve user location")
         }
     }
 
@@ -88,17 +83,14 @@ fun HomeScreen(
                         currentLocation = it,
                         onSuccess = { fetchedAds ->
                             filteredAds = fetchedAds
-                            loading = false
                         },
                         onFailure = { exception ->
                             errorMessage = exception.message ?: "Error fetching ads"
-                            loading = false
                         }
                     )
                 }
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Exception fetching ads"
-                loading = false
             } finally {
                 isRefreshing = false  // Hide refreshing indicator
             }
@@ -127,23 +119,6 @@ fun HomeScreen(
     )
     { Column {
         when {
-            loading -> {
-                Text(text = "Loading")
-            }
-            errorMessage.isNotEmpty() -> {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Error: $errorMessage", color = Color.Red)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        // Retry fetching ads
-                        loading = true
-                        errorMessage = ""
-                        fetchAds()
-                    }) {
-                        Text(text = "Retry")
-                    }
-                }
-            }
             filteredAds.isNotEmpty() -> {
                 if (initialIsListView) {
                     // List View
@@ -158,7 +133,7 @@ fun HomeScreen(
                                     .clickable {
                                         navController.navigate("${AppScreens.SPECIFIC_AD.name}/${ad.adId}")
                                     }
-                                    .padding(8.dp) // Optional padding around the card
+                                    .padding(8.dp)
                             ) {
                                 AdItemList(navController, ad = ad)
                             }
