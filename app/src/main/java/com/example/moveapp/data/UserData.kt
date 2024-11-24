@@ -3,7 +3,6 @@ package com.example.moveapp.data
 import com.example.moveapp.utility.UserTypeEnum
 import com.google.firebase.firestore.IgnoreExtraProperties
 import com.google.firebase.firestore.ServerTimestamp
-import com.example.moveapp.utility.FireAuthService
 import java.util.Date
 
 // IgnoreExtraProperties is a safety feature that prevents failure

@@ -1,11 +1,10 @@
 package com.example.moveapp.repository
 
 import com.example.moveapp.data.ReportData
-import com.example.moveapp.data.UserData
 import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.ReportSeverityEnum
 import com.example.moveapp.utility.ReportStatusEnum
-import kotlinx.coroutines.tasks.await
+
 
 class ReportRepo {
     companion object {

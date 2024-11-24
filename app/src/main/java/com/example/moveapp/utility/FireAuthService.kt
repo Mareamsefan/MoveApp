@@ -1,7 +1,6 @@
 package com.example.moveapp.utility
 
-import android.content.Context
-import android.util.Log
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.example.moveapp.repository.UserRepo.Companion.updateUserDatabaseEmail

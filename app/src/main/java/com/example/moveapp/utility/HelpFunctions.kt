@@ -1,11 +1,7 @@
 package com.example.moveapp.utility
-import java.security.MessageDigest
+
 import android.content.Context
-import android.widget.Toast
-import com.example.moveapp.utility.FirestoreService.getCollection
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.auth.User
-import kotlinx.coroutines.tasks.await
+
 
 class HelpFunctions {
 

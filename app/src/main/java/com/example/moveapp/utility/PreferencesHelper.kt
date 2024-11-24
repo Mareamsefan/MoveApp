@@ -1,7 +1,7 @@
 package com.example.moveapp.utility
 
 import android.content.Context
-import android.content.SharedPreferences
+
 
 /**
  * Utility class for managing app preferences like view type (ListView/GridView)

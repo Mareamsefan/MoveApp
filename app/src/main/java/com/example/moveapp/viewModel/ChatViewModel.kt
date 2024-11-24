@@ -1,13 +1,13 @@
 package com.example.moveapp.viewModel
 
-import androidx.lifecycle.ViewModel
+
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.example.moveapp.data.MessageData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.*
+
 
 class ChatViewModel {
 

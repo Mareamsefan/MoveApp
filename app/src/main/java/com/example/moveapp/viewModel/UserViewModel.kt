@@ -1,6 +1,6 @@
 package com.example.moveapp.viewModel
 
-//import com.example.moveapp.utility.HelpFunctions.Companion.checkIfUserExist
+
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -11,7 +11,6 @@ import com.example.moveapp.repository.UserRepo.Companion.addUserToDatabase
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FirestoreService.updateDocument
 import com.example.moveapp.utility.FirestoreService.readDocument
-import com.example.moveapp.utility.FirestoreService.getCollection
 import com.example.moveapp.utility.FireStorageService
 import com.google.firebase.auth.FirebaseUser
 

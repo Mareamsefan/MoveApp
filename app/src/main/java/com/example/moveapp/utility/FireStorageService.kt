@@ -1,17 +1,11 @@
 package com.example.moveapp.utility
 
-import com.google.firebase.firestore.FirebaseFirestore
+
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import android.net.Uri
 import android.util.Log
-import com.example.moveapp.data.AdData
-import com.example.moveapp.utility.FirestoreService.db
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+
 
 object FireStorageService {
     val storage: FirebaseStorage by lazy {

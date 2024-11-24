@@ -1,13 +1,12 @@
 package com.example.moveapp.repository
 
-import android.util.Log
+
 import com.example.moveapp.data.UserData
 import kotlinx.coroutines.tasks.await
 import com.example.moveapp.utility.FirestoreService
 import com.example.moveapp.utility.FireAuthService.getUserId
 import com.example.moveapp.utility.FirestoreService.readDocument
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FieldValue
+
 
 
 class UserRepo {

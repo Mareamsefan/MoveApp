@@ -16,7 +16,6 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import com.example.moveapp.utility.LocationUtil
 
 
 // Using object instead of class to ensure that there is only one instance

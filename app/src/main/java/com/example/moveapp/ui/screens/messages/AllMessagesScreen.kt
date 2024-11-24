@@ -123,6 +123,5 @@ fun AllMessagesScreen(navController: NavController) {
                 }
             }
         }
-
     }
 }
