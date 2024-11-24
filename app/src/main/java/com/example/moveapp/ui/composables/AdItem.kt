@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -97,7 +98,12 @@ fun AdItem(navcontroller: NavController, ad: AdData) {
             // Optional: If you want to display a short description (limit to 2 lines)
             Spacer(modifier = Modifier.height(4.dp))
             //Text(text = ad.adDescription, maxLines = 2) // Limit description to 2 lines
-            Button(onClick = {
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.surface
+                ),
+                onClick = {
                 navcontroller.navigate("specific_ad/${ad.adId}")
             }) {
                 Text("View Ad") // Optional: Add a label to your button

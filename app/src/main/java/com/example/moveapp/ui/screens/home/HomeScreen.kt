@@ -2,6 +2,7 @@ package com.example.moveapp.ui.screens.home
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,7 @@ import com.example.moveapp.ui.composables.AdItemList
 import com.example.moveapp.utility.LocationUtil
 import com.google.firebase.firestore.GeoPoint
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme.colorScheme
 import kotlinx.coroutines.launch
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -125,7 +127,12 @@ fun HomeScreen(
             fetchAds()
         }
     )
-    { Column {
+    { Column (
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.background),
+
+    ) {
         when {
             loading -> {
                 Text(text = "Loading")

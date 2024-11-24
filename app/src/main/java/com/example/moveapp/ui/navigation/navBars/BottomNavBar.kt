@@ -14,14 +14,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +48,11 @@ fun BottomNavBar(navController: NavController, category: String?) {
     val currentShortcuts = remember(category, isUserLoggedIn()) { getBottomNavShortcuts(category) }
     Log.d("filter bottom bar", "category: $category")
 
-    NavigationBar () {
+    NavigationBar (
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.scrim,
+
+    ) {
         currentShortcuts.forEach { shortcut ->
             if (shortcut.route != AppScreens.PROFILE) {
                 NavigationBarItem(
@@ -58,7 +67,7 @@ fun BottomNavBar(navController: NavController, category: String?) {
             }
             else {
                 NavigationBarItem(
-                    icon = { Icon(shortcut.icon, contentDescription = stringResource(shortcut.label)) },
+                    icon = { Icon(shortcut.icon, contentDescription = stringResource(shortcut.label), tint = MaterialTheme.colorScheme.tertiary) },
                     label = { Text(stringResource(shortcut.label)) },
                     selected = getCurrentScreen(navController) == shortcut.route.name,
                     onClick = { isProfileMenuExpanded = true }
@@ -72,7 +81,8 @@ fun BottomNavBar(navController: NavController, category: String?) {
                             DropdownMenuItem(
                                 text = { Text("Login")},
                                 onClick = { navController.navigate(AppScreens.LOGIN.name) },
-                                interactionSource = remember { MutableInteractionSource() }
+                                interactionSource = remember { MutableInteractionSource() },
+
                             )
                             DropdownMenuItem(
                                 text = { Text("Register")},

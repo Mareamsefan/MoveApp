@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +42,10 @@ fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Un
             Text(text = stringResource(id = R.string.what_looking_for), style = MaterialTheme.typography.titleLarge)
 
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.scrim
+                ),
                 onClick = {
                     onApplyCategory("Rent vehicle")
                     navController.navigate(AppScreens.HOME.name)
@@ -50,6 +56,10 @@ fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Un
             }
 
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.scrim
+                ),
                 onClick = {
                     onApplyCategory("Delivery service")
                     navController.navigate(AppScreens.HOME.name)
@@ -60,6 +70,10 @@ fun WelcomeScreen(navController: NavController, onApplyCategory: (String?) -> Un
             }
 
             Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.scrim
+                ),
                 onClick = {
                     onApplyCategory("Unwanted items")
                     navController.navigate(AppScreens.HOME.name)

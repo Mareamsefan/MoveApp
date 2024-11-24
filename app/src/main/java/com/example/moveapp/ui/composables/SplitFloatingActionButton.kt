@@ -31,7 +31,7 @@ fun SplitFloatingActionButton(
             .height(56.dp)
             .wrapContentWidth(),
         shape = RoundedCornerShape(28.dp),
-        color = MaterialTheme.colorScheme.primary,
+        color = MaterialTheme.colorScheme.tertiary,
         tonalElevation = 6.dp,
         shadowElevation = 6.dp
     ) {
