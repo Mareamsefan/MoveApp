@@ -6,7 +6,11 @@ import com.example.moveapp.data.AdData
 import com.example.moveapp.data.ChatData
 import com.example.moveapp.data.MessageData
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FirebaseRealtimeService
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -95,9 +99,14 @@ class ChatRepo {
 
         suspend fun getChatById(chatId: String): ChatData? {
             return try {
+                val currentUserId = getCurrentUser()?.uid
                 val chatRef = FirebaseRealtimeService.db.child("chats").child(chatId)
                 val snapshot = chatRef.get().await()
                 if (snapshot.exists()) {
+                    if (currentUserId != null) {
+                        Log.d("KJØRER DENNE?:", chatId)
+                        markMessagesAsRead(chatId, currentUserId)
+                    }
                     snapshot.getValue(ChatData::class.java)
                 } else {
                     Log.d("ChatRepo", "Chat not found for chatId: $chatId")
@@ -151,6 +160,8 @@ class ChatRepo {
                             }
                         } else {
                             withContext(Dispatchers.Main) {
+                                markMessagesAsRead(chatId, currentUserId)
+                                Log.d("KJØRER DENNE:", chatId)
                                 navController.navigate("${AppScreens.SPECIFIC_MESSAGE_SCREEN}/$chatId")
                             }
                         }
@@ -160,6 +171,67 @@ class ChatRepo {
                 }
             }
         }
+
+        private suspend fun markMessagesAsRead(chatId: String, userId: String) {
+            try {
+                val messagesSnapshot = FirebaseRealtimeService.getData("chats/$chatId/messages")
+
+                if (messagesSnapshot == null) {
+                    return
+                }
+
+                messagesSnapshot.children.forEach { messageSnapshot ->
+                    val receiverId = messageSnapshot.child("receiverId").getValue(String::class.java)
+                    val isRead = messageSnapshot.child("read").getValue(Boolean::class.java) ?: false
+                    val messageId = messageSnapshot.key
+
+                    if (receiverId?.trim() == userId.trim() && !isRead) {
+                        if (messageId != null) {
+                            val path = "chats/$chatId/messages/$messageId/read"
+                            FirebaseRealtimeService.updateData(path, true)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ChatRepo", ",Error while setting messages as read: ${e.message}")
+            }
+        }
+
+        fun listenForUnreadMessages(userId: String, onUnreadMessagesFound: (Boolean) -> Unit) {
+            val chatsRef = FirebaseRealtimeService.db
+
+            chatsRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    var hasUnreadMessages = false
+
+                    // Iterate through all chats
+                    snapshot.children.forEach { chatSnapshot ->
+                        val messagesSnapshot = chatSnapshot.child("messages")
+
+                        // Check each message in the chat
+                        messagesSnapshot.children.forEach { messageSnapshot ->
+                            val receiverId = messageSnapshot.child("receiverId").getValue(String::class.java)
+                            val isRead = messageSnapshot.child("read").getValue(Boolean::class.java) ?: false
+
+                            if (receiverId == userId && !isRead) {
+                                hasUnreadMessages = true
+                                return@forEach
+                            }
+                        }
+                    }
+
+                    // Notify about unread messages
+                    onUnreadMessagesFound(hasUnreadMessages)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("ChatRepo", "Database operation cancelled: ${error.message}")
+                }
+            })
+        }
+
+
+
 
 
 

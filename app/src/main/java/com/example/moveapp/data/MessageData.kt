@@ -10,7 +10,7 @@ data class MessageData (
     var messageText: String,
     var messageTimestamp: Long,
     var messageImageUrl: String?,
-    var isRead: Boolean,// ? -> you likely will not need an img for every message.
+    var isRead: Boolean,
 )
 {
     constructor() : this("", "", "", "", 0L, null, false)
