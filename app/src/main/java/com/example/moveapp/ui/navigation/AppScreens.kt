@@ -16,7 +16,6 @@ enum class AppScreens {
     EDIT_AD_SCREEN,
     SPECIFIC_AD,
     SPECIFIC_MESSAGE_SCREEN,
-    NOTIFICATIONS,
     MORE,
 
 }
