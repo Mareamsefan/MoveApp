@@ -35,7 +35,6 @@ import com.example.moveapp.ui.navigation.navBars.TopBar
 import com.example.moveapp.ui.navigation.navBars.getCurrentScreen
 import com.example.moveapp.ui.screens.ad.EditAdScreen
 import com.example.moveapp.ui.screens.ad.SpecificAdScreen
-import com.example.moveapp.ui.screens.guest.GuestDenied
 import com.example.moveapp.ui.screens.home.HomeScreen
 import com.example.moveapp.ui.screens.login.ForgotPassword
 import com.example.moveapp.ui.screens.login.LoginScreen
@@ -170,7 +169,6 @@ fun AppNavigation() {
 
         ) { innerPadding ->
 
-
             Box(modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)) {
@@ -240,12 +238,7 @@ fun AppNavigation() {
                     }
 
                     composable(AppScreens.PROFILE.name) {
-                        if (currentUser != null && !currentUser.isAnonymous) {
-                            Profile(navController)
-                        } else {
-                            GuestDenied(navController)
-                        }
-
+                        Profile(navController)
                     }
 
 
@@ -255,35 +248,21 @@ fun AppNavigation() {
 
 
                     composable(AppScreens.ALL_MESSAGES.name) {
-                        if (currentUser != null && !currentUser.isAnonymous) {
-                            AllMessagesScreen(navController)
-                        } else {
-                            GuestDenied(navController)
-                        }
+                        AllMessagesScreen(navController)
                     }
 
                     composable(AppScreens.POST_AD.name) {
-                        if (currentUser != null && !currentUser.isAnonymous) {
-                            PostAdScreen(navController)
-                        } else {
-                            GuestDenied(navController)
-                        }
+                        PostAdScreen(navController)
+
                     }
                     composable(AppScreens.NOTIFICATIONS.name) {
-                        if (currentUser != null && !currentUser.isAnonymous) {
-                            NotificationScreen(navController)
-                        } else {
-                            GuestDenied(navController)
-                        }
+                        NotificationScreen(navController)
                     }
 
                     composable(AppScreens.MAP.name) {
                         MapScreen(navController, location.value, category.value, underCategory.value, minPrice.value, maxPrice.value, searchQuery.value)
                     }
 
-                    composable(AppScreens.GUEST_DENIED.name) {
-                        GuestDenied(navController)
-                    }
 
                     composable("${AppScreens.SPECIFIC_AD.name}/{adId}") { backStackEntry ->
                         adId.value = backStackEntry.arguments?.getString("adId")
@@ -305,19 +284,15 @@ fun AppNavigation() {
 
 
                     composable(AppScreens.MY_ADS.name) {
-                        if (currentUser != null && !currentUser.isAnonymous) {
-                            MyAdsScreen(navController)
-                        } else {
-                            GuestDenied(navController)
-                        }
+
+                        MyAdsScreen(navController)
+
                     }
 
                     composable(AppScreens.MY_FAVORITES.name) {
-                        if (currentUser != null && !currentUser.isAnonymous) {
-                            MyFavoritesScreen(navController)
-                        } else {
-                            GuestDenied(navController)
-                        }
+
+                        MyFavoritesScreen(navController)
+
                     }
 
                     composable(AppScreens.FORGOT_PASSWORD.name) {
