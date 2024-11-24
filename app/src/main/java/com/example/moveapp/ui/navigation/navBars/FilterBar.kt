@@ -83,7 +83,7 @@ fun FilterBar(category: String?, location: String?, minPrice: Double?, maxPrice:
                     onValueChange = { newValue ->
                         tempLocation = newValue
                     },
-                    label = { Text(text = stringResource(R.string.location)) }
+                    label = { Text(text = stringResource(R.string.city)) }
                 )
                 if(!locationUtil.isLocationOn()) {
                     IconButton(

@@ -1,19 +1,16 @@
 package com.example.moveapp.ui.navigation
 
+import android.net.Network
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -28,6 +25,7 @@ import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.repository.UserRepo.Companion.getUserNameById
 import com.example.moveapp.ui.composables.LocationButton
+import com.example.moveapp.ui.composables.NoInternet
 import com.example.moveapp.ui.composables.SplitFloatingActionButton
 import com.example.moveapp.ui.navigation.navBars.BottomNavBar
 import com.example.moveapp.ui.navigation.navBars.FilterBar
@@ -51,10 +49,10 @@ import com.example.moveapp.ui.screens.register.Register
 import com.example.moveapp.ui.screens.welcome.WelcomeScreen
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
+import com.example.moveapp.utility.NetworkUtil
 import com.example.moveapp.utility.PreferencesHelper
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +62,9 @@ fun AppNavigation() {
     val currentScreen = getCurrentScreen(navController)
     val currentUser = getCurrentUser()
     var isAuthChecked by remember { mutableStateOf(false) }
+    val network = NetworkUtil()
+    val context = LocalContext.current
+    val isConnected by rememberUpdatedState(network.isUserConnectedToInternet(context))
     // State variables for filters
     val location = remember { mutableStateOf<String?>(null) }
     val category = remember { mutableStateOf<String?>(null) }
@@ -81,11 +82,14 @@ fun AppNavigation() {
     val ad = remember { mutableStateOf<AdData?>(null) }
     val chatId = remember { mutableStateOf<String?>(null) }
     val chatUsername = remember { mutableStateOf<String?>(null) }
-    // State variable for Grid <-> List view
 
-    val context = LocalContext.current
     var isListView by remember { mutableStateOf(PreferencesHelper.getViewType(context)) }
 
+    Log.d("Network", "network status: " +
+            "${network.isUserConnectedToInternet(context)}")
+
+
+    Log.d("ISLISTVIEW:::", isListView.toString())
     LaunchedEffect(currentScreen) {
         coroutineScope.launch {
             val userLoggedIn = FireAuthService.isUserLoggedIn()
@@ -102,7 +106,7 @@ fun AppNavigation() {
     }
 
     LaunchedEffect(adId.value) {
-         ad.value  = getAd(adId.value)
+        ad.value = getAd(adId.value)
     }
 
     LaunchedEffect(chatId.value) {
@@ -126,10 +130,14 @@ fun AppNavigation() {
     } else {
         Scaffold(
             topBar = {
-                    TopBar(navController = navController,
-                          category.value, ad.value?.adTitle, chatUsername.value, onApplySearch = { newSearchQuery ->
+                TopBar(navController = navController,
+                    category.value,
+                    ad.value?.adTitle,
+                    chatUsername.value,
+                    onApplySearch = { newSearchQuery ->
                         searchQuery.value = newSearchQuery
-                    }, onResetCategory = {
+                    },
+                    onResetCategory = {
                         location.value = null
                         category.value = null
                         underCategory.value = null
@@ -165,13 +173,13 @@ fun AppNavigation() {
             }
 
 
-
-
-        ) { innerPadding ->
-
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)) {
+        )
+        { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
                 if (showBottomSheet) {
                     ModalBottomSheet(
                         onDismissRequest = {
@@ -179,8 +187,12 @@ fun AppNavigation() {
                         },
                         sheetState = sheetState
                     ) {
-                        FilterBar(category.value, location.value, minPrice.value, maxPrice.value, underCategory.value,
-                            onApplyFilter = {newLocation, newUnderCategory, newMinPrice, newMaxPrice ->
+                        FilterBar(category.value,
+                            location.value,
+                            minPrice.value,
+                            maxPrice.value,
+                            underCategory.value,
+                            onApplyFilter = { newLocation, newUnderCategory, newMinPrice, newMaxPrice ->
                                 location.value = newLocation
                                 underCategory.value = newUnderCategory
                                 minPrice.value = newMinPrice
@@ -188,7 +200,7 @@ fun AppNavigation() {
                             }
                         )
                         ExtendedFloatingActionButton(
-                            text = { Text(stringResource(R.string.hide_filter))},
+                            text = { Text(stringResource(R.string.hide_filter)) },
                             icon = { Icon(Icons.Filled.Clear, contentDescription = null) },
                             onClick = {
                                 scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -211,67 +223,123 @@ fun AppNavigation() {
                 ) {
 
                     composable(AppScreens.WELCOME_SCREEN.name) {
-                        WelcomeScreen(navController, onApplyCategory = { selectedCategory ->
-                            category.value = selectedCategory
-                        })
+                        if(isConnected)
+                            WelcomeScreen(navController, onApplyCategory = { selectedCategory ->
+                                category.value = selectedCategory
+                            })
+                        else{
+                            NoInternet()
+                        }
                     }
 
                     composable(AppScreens.LOGIN.name) {
-                        LoginScreen(navController)
+                        if(isConnected) {
+                            LoginScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable(AppScreens.HOME.name) {
-                        HomeScreen(
-                            navController,
-                            searchQuery = searchQuery.value,
-                            location = location.value,
-                            category = category.value,
-                            underCategory = underCategory.value,
-                            minPrice = minPrice.value,
-                            maxPrice = maxPrice.value,
-                            initialIsListView = isListView,
-                        )
+                        if(isConnected) {
+                            HomeScreen(
+                                navController,
+                                searchQuery = searchQuery.value,
+                                location = location.value,
+                                category = category.value,
+                                underCategory = underCategory.value,
+                                minPrice = minPrice.value,
+                                maxPrice = maxPrice.value,
+                                initialIsListView = isListView,
+                            )
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable(AppScreens.REGISTER.name) {
-                        Register(navController)
+                        if(isConnected) {
+                            Register(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable(AppScreens.PROFILE.name) {
-                        Profile(navController)
+                        if(isConnected) {
+                            Profile(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
 
                     composable(AppScreens.PROFILE_SETTINGS.name) {
-                        ProfileSettingsScreen(navController)
+                        if(isConnected) {
+                            ProfileSettingsScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
 
                     composable(AppScreens.ALL_MESSAGES.name) {
-                        AllMessagesScreen(navController)
+                        if(isConnected) {
+                            AllMessagesScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable(AppScreens.POST_AD.name) {
-                        PostAdScreen(navController)
+                        if(isConnected) {
+                            PostAdScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
 
                     }
                     composable(AppScreens.NOTIFICATIONS.name) {
-                        NotificationScreen(navController)
+                        if(isConnected) {
+                            NotificationScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable(AppScreens.MAP.name) {
-                        MapScreen(navController, location.value, category.value, underCategory.value, minPrice.value, maxPrice.value, searchQuery.value)
+                        if(isConnected) {
+                            MapScreen(
+                                navController,
+                                location.value,
+                                category.value,
+                                underCategory.value,
+                                minPrice.value,
+                                maxPrice.value,
+                                searchQuery.value
+                            )
+                        }else{
+                            NoInternet()
+                        }
                     }
 
 
                     composable("${AppScreens.SPECIFIC_AD.name}/{adId}") { backStackEntry ->
-                        adId.value = backStackEntry.arguments?.getString("adId")
-                        SpecificAdScreen(navController, adId.value)
+                        if(isConnected) {
+                            adId.value = backStackEntry.arguments?.getString("adId")
+                            SpecificAdScreen(navController, adId.value)
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable("${AppScreens.EDIT_AD_SCREEN.name}/{adId}") { backStackEntry ->
-                        val adIdE = backStackEntry.arguments?.getString("adId")
-                        adIdE?.let { EditAdScreen(navController, it) }
+                        if(isConnected) {
+                            val adIdE = backStackEntry.arguments?.getString("adId")
+                            adIdE?.let { EditAdScreen(navController, it) }
+                        }else{
+                            NoInternet()
+                        }
                     }
 
                     composable(
@@ -284,19 +352,29 @@ fun AppNavigation() {
 
 
                     composable(AppScreens.MY_ADS.name) {
-
-                        MyAdsScreen(navController)
+                        if(isConnected) {
+                            MyAdsScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
 
                     }
 
                     composable(AppScreens.MY_FAVORITES.name) {
-
-                        MyFavoritesScreen(navController)
+                        if(isConnected) {
+                            MyFavoritesScreen(navController)
+                        }else{
+                            NoInternet()
+                        }
 
                     }
 
                     composable(AppScreens.FORGOT_PASSWORD.name) {
-                        ForgotPassword(navController)
+                        if(isConnected){
+                            ForgotPassword(navController)
+                        }else{
+                            NoInternet()
+                        }
                     }
                 }
             }
