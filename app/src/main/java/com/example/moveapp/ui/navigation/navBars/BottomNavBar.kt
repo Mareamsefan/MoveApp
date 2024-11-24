@@ -194,7 +194,7 @@ fun getBottomNavShortcuts(category: String?): List<BottomNavItems> {
     } else {
         return listOf(
             BottomNavItems(homescreen, Icons.Default.Home, R.string.home),
-            BottomNavItems(AppScreens.NOTIFICATIONS, Icons.Default.Notifications, R.string.notifications),
+            //BottomNavItems(AppScreens.NOTIFICATIONS, Icons.Default.Notifications, R.string.notifications),
             BottomNavItems(AppScreens.POST_AD, Icons.Default.AddCircle, R.string.post_ad),
             BottomNavItems(AppScreens.ALL_MESSAGES, Icons.Default.Email, R.string.messages),
             BottomNavItems(AppScreens.MORE,  Icons.Default.AccountCircle, R.string.my_profile),
