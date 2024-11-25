@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.messages
 import ChatItemWithAd
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items

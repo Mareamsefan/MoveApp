@@ -47,7 +47,6 @@ fun MapScreen(
     var errorMessage by remember { mutableStateOf("") }
     var loading by remember { mutableStateOf(true) } // Loading state
     val mapGeo: MutableMap<GeoPoint, MutableList<AdData>> = mutableMapOf()
-    val network = NetworkUtil()
 
     // Fetch user location
     locationUtil.getUserLocation(context) { loca ->

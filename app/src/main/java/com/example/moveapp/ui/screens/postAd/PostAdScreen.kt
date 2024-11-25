@@ -43,6 +43,7 @@ import java.io.File
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
 import com.example.moveapp.utility.HelpFunctions.Companion.isNumericFinal
 import com.example.moveapp.utility.HelpFunctions.Companion.isNumericInput
+import com.example.moveapp.utility.NetworkUtil
 import com.example.moveapp.utility.ProhibitedContentException
 import org.osmdroid.util.GeoPoint
 
@@ -69,6 +70,8 @@ fun PostAdScreen(navController: NavController) {
     var dialogMessage by remember { mutableStateOf("") }
     var redirect by remember { mutableStateOf(false) }
     var formSubmitted by remember { mutableStateOf(false) }
+    val networkUtil = NetworkUtil()
+    val isNetworkOn = networkUtil.isUserConnectedToInternet(context)
 
     // State for sending request to database
     var isPosting by remember { mutableStateOf(false) }
@@ -352,16 +355,14 @@ fun PostAdScreen(navController: NavController) {
             showHelperMessage(description.value, formSubmitted)
 
 
-            // turn the location information to a geopoint that gets saved in the database
-            val fullAddress = "${address}, ${postalCode}, ${city}"
-            geoPoint = locationUtil.addressToGeopoint(context = context, addressString = fullAddress)
+            geoPoint = locationUtil.addressToGeopoint(context = context, addressString = address.value, city = city.value, postalCode = postalCode.value)
+            Log.d("geopoint in ad", "$geoPoint")
 
 
             Button(
                 modifier = Modifier,
                 onClick = {
                     formSubmitted = true
-
                     if (
                         title.value.isEmpty() ||
                         price.value.isEmpty() ||
@@ -373,7 +374,13 @@ fun PostAdScreen(navController: NavController) {
                         underCategory.value.isEmpty()
                     ) {
                         errorMessage = "Please complete all the required fields marked with an asterisk (*)."
-                    } else if (!isPosting && currentUser != null) {
+                    }else if(!isNetworkOn) {
+                        errorMessage = "Ad could not be posted, no internet connection."
+                    }
+                    else if(geoPoint==null){
+                        errorMessage = "Double check address, city and postal code, not a valid location."
+                    }
+                    else if (!isPosting && currentUser != null) {
                         try {
                             censorshipValidator(title.value)
                             censorshipValidator(description.value)

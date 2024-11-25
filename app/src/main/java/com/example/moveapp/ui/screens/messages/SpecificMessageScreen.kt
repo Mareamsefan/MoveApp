@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.messages
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
@@ -11,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.data.ChatData
@@ -23,6 +25,7 @@ import kotlinx.coroutines.launch
 import com.example.moveapp.utility.HelpFunctions.Companion.censorshipValidator
 import com.example.moveapp.utility.HelpFunctions.Companion.validateMessageLength
 import com.example.moveapp.utility.MessageTooLongException
+import com.example.moveapp.utility.NetworkUtil
 import com.example.moveapp.utility.ProhibitedContentException
 
 @Composable
@@ -33,6 +36,9 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
     val currentUserId = FireAuthService.getUserId()
     var errorMessage by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
+    val networkUtil = NetworkUtil()
+    val context = LocalContext.current
+    val isNetworkOn = networkUtil.isUserConnectedToInternet(context)
 
     LaunchedEffect(chatId) {
         scope.launch {
@@ -94,12 +100,15 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                                     messageImageUrl = null,
                                     isRead = false,
                                 )
+                                if(!isNetworkOn) {
+                                    Toast.makeText(context, "No internet connection, message could not be sent", Toast.LENGTH_SHORT).show()
+                                    messageText.value = ""
+                                }else{
+                                    ChatRepo.addMessageToChat(chatId, newMessage)
+                                    chat.value = ChatRepo.getChatById(chatId)
+                                    messageText.value = ""
+                                }
 
-
-                                ChatRepo.addMessageToChat(chatId, newMessage)
-                                chat.value = ChatRepo.getChatById(chatId)
-
-                                messageText.value = ""
                             } catch (e: ProhibitedContentException) {
                                 errorMessage = e.message.toString()
                                 showErrorDialog = true
