@@ -46,10 +46,12 @@ import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.repository.AdRepo.Companion.updateAdInDatabase
+import com.example.moveapp.repository.ChatRepo.Companion.deleteChatsByAdId
 import com.example.moveapp.ui.composables.CameraPermission
 import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.composables.Image_swipe_delete
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireStorageService.deleteFileFromStorage
 import com.example.moveapp.utility.FirestoreService
 import kotlinx.coroutines.launch
 import java.io.File
@@ -426,10 +428,14 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                 text = { Text(stringResource(R.string.confirm_delete)) },
                 confirmButton = {
                     TextButton(onClick = {
-
-                        //TODO: LEGG TIL FUNKSJONALITET SOM SLETTER ALLE BILDENE FRA FIRESTORAGE TIL AD-EN
                         coroutineScope.launch {
-                            ad!!.adId?.let { FirestoreService.deleteDocument("ads", it) }
+                            ad!!.adId?.let {
+                                FirestoreService.deleteDocument("ads", it)
+                                ad!!.adImages.map { image ->
+                                    deleteFileFromStorage(image)
+                                }
+                                deleteChatsByAdId(it)
+                            }
                             navController.navigate(AppScreens.MY_ADS.name)
                         }
                     }) {
