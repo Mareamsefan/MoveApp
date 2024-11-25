@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.ad
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +53,7 @@ import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
 import com.example.moveapp.utility.FireAuthService.isUserLoggedIn
+import com.example.moveapp.utility.NetworkUtil
 import com.example.moveapp.viewModel.UserViewModel.Companion.addAdToFavorites
 import com.example.moveapp.viewModel.UserViewModel.Companion.isAdInFavorites
 import com.example.moveapp.viewModel.UserViewModel.Companion.removeFromFavorites
@@ -68,6 +71,8 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     var showSuccessMessageRemoved by remember { mutableStateOf(false) }
     val currentUser = getCurrentUser()
     var isFavorites  by remember { mutableStateOf(false) }
+    val networkUtil = NetworkUtil()
+    val context = LocalContext.current
     LaunchedEffect(adId) {
         adId?.let { id ->
             currentUser?.uid?.let { userId ->
@@ -133,11 +138,20 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                         if (isFavorites) {
                             IconButton(
                                 onClick = {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        ad!!.adId?.let { removeFromFavorites(currentUser!!.uid, it) }
-                                        isFavorites = false
-                                        showSuccessMessageRemoved = true
-                                        showSuccessMessage = false
+                                    if(networkUtil.isUserConnectedToInternet(context)) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            ad!!.adId?.let {
+                                                removeFromFavorites(
+                                                    currentUser!!.uid,
+                                                    it
+                                                )
+                                            }
+                                            isFavorites = false
+                                            showSuccessMessageRemoved = true
+                                            showSuccessMessage = false
+                                        }
+                                    }else{
+                                        Toast.makeText(context, "Failed to remove from favorites, no internet connection", Toast.LENGTH_SHORT).show()
                                     }
                                 },
                             ) {
@@ -156,12 +170,16 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                         else {
                             IconButton(
                                 onClick = {
+                                    if(networkUtil.isUserConnectedToInternet(context)){
                                     CoroutineScope(Dispatchers.IO).launch {
                                         ad!!.adId?.let { addAdToFavorites(currentUser!!.uid, it) }
                                         isFavorites = true
                                         showSuccessMessage = true
                                         showSuccessMessageRemoved = false
                                     }
+                                }else{
+                                        Toast.makeText(context, "Could not add favorite, no internet connection", Toast.LENGTH_SHORT).show()
+                                }
                                 },
                             ) {
                                 Icon(
@@ -245,7 +263,16 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                 if(isUserLoggedIn()) {
                     Button(
                         onClick = {
-                            startOrOpenChat(navController, ad!!.userId, currentUser?.uid, ad!!.adId)
+                            if(networkUtil.isUserConnectedToInternet(context)) {
+                                startOrOpenChat(
+                                    navController,
+                                    ad!!.userId,
+                                    currentUser?.uid,
+                                    ad!!.adId
+                                )
+                            }else{
+                                Toast.makeText(context, "Could not start chat, no internet connection", Toast.LENGTH_SHORT).show()
+                            }
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {

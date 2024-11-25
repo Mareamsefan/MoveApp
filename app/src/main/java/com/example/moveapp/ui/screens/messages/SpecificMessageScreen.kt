@@ -38,7 +38,6 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
     var showErrorDialog by remember { mutableStateOf(false) }
     val networkUtil = NetworkUtil()
     val context = LocalContext.current
-    val isNetworkOn = networkUtil.isUserConnectedToInternet(context)
 
     LaunchedEffect(chatId) {
         scope.launch {
@@ -100,9 +99,8 @@ fun SpecificMessageScreen(navController: NavController, chatId: String) {
                                     messageImageUrl = null,
                                     isRead = false,
                                 )
-                                if(!isNetworkOn) {
+                                if(!networkUtil.isUserConnectedToInternet(context)) {
                                     Toast.makeText(context, "No internet connection, message could not be sent", Toast.LENGTH_SHORT).show()
-                                    messageText.value = ""
                                 }else{
                                     ChatRepo.addMessageToChat(chatId, newMessage)
                                     chat.value = ChatRepo.getChatById(chatId)

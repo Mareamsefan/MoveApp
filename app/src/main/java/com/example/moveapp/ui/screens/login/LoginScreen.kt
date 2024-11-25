@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.NetworkUtil
 import com.example.moveapp.viewModel.UserViewModel.Companion.loginUser
 import com.example.moveapp.viewModel.UserViewModel.Companion.logoutUser
 import kotlinx.coroutines.MainScope
@@ -39,6 +41,7 @@ fun LoginScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
     var showErrorDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
+    val networkUtil = NetworkUtil()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -69,18 +72,22 @@ fun LoginScreen(navController: NavController) {
             Button(
                 onClick = {
                     coroutineScope.launch() {
-                        if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
-                            val user = loginUser(email.value, password.value)
-                            if (user != null) {
-                                navController.navigate(AppScreens.HOME.name)
-                            }
-                            else {
-                                dialogMessage = "Login failed. Either the email is not registered, or the password is not correct. Please check your credentials"
+                        if(networkUtil.isUserConnectedToInternet(context)) {
+                            if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                                val user = loginUser(email.value, password.value)
+                                if (user != null) {
+                                    navController.navigate(AppScreens.WELCOME_SCREEN.name)
+                                } else {
+                                    dialogMessage =
+                                        "Login failed. Either the email is not registered, or the password is not correct. Please check your credentials"
+                                    showErrorDialog = true
+                                }
+                            } else {
+                                dialogMessage = "Please fill in both email and password"
                                 showErrorDialog = true
                             }
-                        } else {
-                            dialogMessage = "Please fill in both email and password"
-                            showErrorDialog = true
+                        }else{
+                            Toast.makeText(context, "Login failed, no internet connection", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
