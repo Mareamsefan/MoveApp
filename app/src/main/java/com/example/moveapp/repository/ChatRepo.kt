@@ -261,6 +261,23 @@ class ChatRepo {
         }
 
 
+        suspend fun deleteChatsByAdId(adId: String) {
+            try {
+                val chatsSnapshot = FirebaseRealtimeService.db.child("chats").get().await()
+
+                if (chatsSnapshot.exists()) {
+                    for (chat in chatsSnapshot.children) {
+
+                        val chatAdId = chat.child("adId").getValue(String::class.java)
+                        if (chatAdId == adId) {
+                            chat.ref.removeValue().await()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
 
 
 
