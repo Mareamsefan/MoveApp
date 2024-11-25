@@ -1,5 +1,6 @@
 package com.example.moveapp.ui.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +17,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.ui.navigation.AppScreens
 import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
+import com.example.moveapp.utility.NetworkUtil
 import com.example.moveapp.viewModel.UserViewModel.Companion.validateEmail
 
 @Composable
@@ -30,6 +33,8 @@ fun ForgotPassword(navController: NavController) {
     var showErrorDialog by remember { mutableStateOf(false) }
     val errorMessage = remember { mutableStateOf("") }
     var dialogMessage by remember { mutableStateOf("") }
+    val networkUtil = NetworkUtil()
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -48,18 +53,27 @@ fun ForgotPassword(navController: NavController) {
             )
             // --- Send Password Reset Email ---
             Button(onClick = {
-                val emailToSendRequestTo = email.value
+                if(networkUtil.isUserConnectedToInternet(context)) {
+                    val emailToSendRequestTo = email.value
 
-                if (emailToSendRequestTo.isEmpty() || !validateEmail(emailToSendRequestTo)){
-                    errorMessage.value = "Please enter a valid email address."
-                } else if (emailToSendRequestTo.isNotEmpty() and validateEmail(emailToSendRequestTo)){
-                    sendUserPasswordResetEmail(emailToSendRequestTo)
-                    errorMessage.value = "We have sent an email to ${emailToSendRequestTo}." +
-                            " If you do not see the email shortly, please check your spam folder."
-                } else {
-                    errorMessage.value = "Something went wrong. Please wait a few seconds and try again."
+                    if (emailToSendRequestTo.isEmpty() || !validateEmail(emailToSendRequestTo)) {
+                        errorMessage.value = "Please enter a valid email address."
+                    } else if (emailToSendRequestTo.isNotEmpty() and validateEmail(
+                            emailToSendRequestTo
+                        )
+                    ) {
+                        sendUserPasswordResetEmail(emailToSendRequestTo)
+                        errorMessage.value = "We have sent an email to ${emailToSendRequestTo}." +
+                                " If you do not see the email shortly, please check your spam folder."
+                    } else {
+                        errorMessage.value =
+                            "Something went wrong. Please wait a few seconds and try again."
+                    }
+                }else{
+                    Toast.makeText(context, "Failed to send email, no internet connection", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
+            )
             {
                 Text(text = stringResource(R.string.send_password_reset_email))
             }
