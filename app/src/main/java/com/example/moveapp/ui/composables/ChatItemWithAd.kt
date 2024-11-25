@@ -112,6 +112,9 @@ fun ChatItemWithAd(navcontroller: NavController,
             )
         }
 
+        val sortedChats = chat.messages.values.sortedByDescending { it.messageTimestamp }
+
+
 
         Column(modifier = Modifier.weight(2f)) {
             Text(
@@ -121,7 +124,7 @@ fun ChatItemWithAd(navcontroller: NavController,
                 style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
             Text(
-                text = "Last message: ${chat.messages.values.firstOrNull()?.messageText ?: "No messages"}",
+                text = "Last message: ${sortedChats.firstOrNull()?.messageText ?: "No messages"}",
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 1,
                 color = Color.Gray

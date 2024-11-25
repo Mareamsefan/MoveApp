@@ -31,13 +31,27 @@ import kotlin.math.sqrt
 class LocationUtil() {
 
     @Composable
-    fun addressToGeopoint(context: Context, addressString: String): GeoPoint? {
+    fun addressToGeopoint(context: Context, addressString: String, city: String, postalCode: String): GeoPoint? {
         val geocoder = Geocoder(context)
+
         return try {
-            val addresses: MutableList<Address>? = geocoder.getFromLocationName(addressString, 1)
-            if (addresses?.isNotEmpty() == true) {
-                val address = addresses[0]
-                GeoPoint(address.latitude, address.longitude)
+            val isAddressValid = geocoder.getFromLocationName(addressString, 1)
+            val isCityValid = geocoder.getFromLocationName(city, 1)
+            val isPostalCodeValid = geocoder.getFromLocationName(postalCode, 1)
+
+            Log.d("geopoint in ad", "$addressString, $city, $postalCode")
+            Log.d("geopoint in ad", "$isAddressValid, $isCityValid, $isPostalCodeValid")
+
+            if (!isAddressValid.isNullOrEmpty() && !isCityValid.isNullOrEmpty()) {
+                val fullAddress = "$addressString, $city, $postalCode"
+                val addresses = geocoder.getFromLocationName(fullAddress, 1)
+
+                if (addresses?.isNotEmpty() == true) {
+                    val address = addresses[0]
+                    GeoPoint(address.latitude, address.longitude)
+                } else {
+                    null
+                }
             } else {
                 null
             }
