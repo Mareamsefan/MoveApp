@@ -2,6 +2,7 @@ package com.example.moveapp.ui.navigation
 
 import android.net.Network
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -119,7 +120,6 @@ fun AppNavigation() {
         if (currentUser != null) {
             if (names != null) {
                 chatUsername.value = names.find { it != getUserNameById(currentUser.uid) }
-
             }
         }
     }
@@ -238,7 +238,7 @@ fun AppNavigation() {
                                 category.value = selectedCategory
                             })
                         else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.WELCOME_SCREEN.name)})
                         }
                     }
 
@@ -246,7 +246,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             LoginScreen(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.LOGIN.name)})
                         }
                     }
 
@@ -263,7 +263,7 @@ fun AppNavigation() {
                                 initialIsListView = isListView,
                             )
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.HOME.name)})
                         }
                     }
 
@@ -271,7 +271,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             Register(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.REGISTER.name)})
                         }
                     }
 
@@ -279,7 +279,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             Profile(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.PROFILE.name)})
                         }
                     }
 
@@ -288,7 +288,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             ProfileSettingsScreen(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.PROFILE_SETTINGS.name)})
                         }
                     }
 
@@ -297,7 +297,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             AllMessagesScreen(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.ALL_MESSAGES.name)})
                         }
                     }
 
@@ -305,7 +305,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             PostAdScreen(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.POST_AD.name)})
                         }
 
                     }
@@ -322,7 +322,7 @@ fun AppNavigation() {
                                 searchQuery.value
                             )
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.MAP.name)})
                         }
                     }
 
@@ -332,7 +332,16 @@ fun AppNavigation() {
                             adId.value = backStackEntry.arguments?.getString("adId")
                             SpecificAdScreen(navController, adId.value)
                         }else{
-                            NoInternet()
+
+                            NoInternet(refresh =
+                            { if(adId.value!=null){
+                                    navController.navigate("specific_ad/${adId.value}")
+                                }else{
+                                    navController.navigate(AppScreens.HOME.name)
+                                Toast.makeText(context, "Could not find ad", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            )
                         }
                     }
 
@@ -341,7 +350,15 @@ fun AppNavigation() {
                             val adIdE = backStackEntry.arguments?.getString("adId")
                             adIdE?.let { EditAdScreen(navController, it) }
                         }else{
-                            NoInternet()
+                            NoInternet(refresh =
+                            {
+                                if (adId.value != null) {
+                                    navController.navigate("${AppScreens.EDIT_AD_SCREEN.name}/${adId.value}")
+                                } else {
+                                    navController.navigate(AppScreens.MY_ADS.name)
+                                    Toast.makeText(context, "Could not find ad", Toast.LENGTH_SHORT).show()
+                                }
+                            })
                         }
                     }
 
@@ -349,8 +366,20 @@ fun AppNavigation() {
                         route = "${AppScreens.SPECIFIC_MESSAGE_SCREEN}/{chatId}",
                         arguments = listOf(navArgument("chatId") { type = NavType.StringType })
                     ) { backStackEntry ->
-                        chatId.value = backStackEntry.arguments?.getString("chatId") ?: ""
-                        SpecificMessageScreen(navController, chatId.value!!)
+                        if (isConnected) {
+                            chatId.value = backStackEntry.arguments?.getString("chatId") ?: ""
+                            SpecificMessageScreen(navController, chatId.value!!)
+                        }else{
+                            NoInternet(refresh =
+                            {
+                                if (chatId.value != null) {
+                                    navController.navigate("${AppScreens.SPECIFIC_MESSAGE_SCREEN}/${chatId.value}")
+                                } else {
+                                    navController.navigate(AppScreens.ALL_MESSAGES.name)
+                                    Toast.makeText(context, "Could not find chat", Toast.LENGTH_SHORT).show()
+                                }
+                            })
+                        }
                     }
 
 
@@ -358,7 +387,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             MyAdsScreen(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.MY_ADS.name)})
                         }
 
                     }
@@ -367,7 +396,7 @@ fun AppNavigation() {
                         if(isConnected) {
                             MyFavoritesScreen(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.MY_FAVORITES.name)})
                         }
 
                     }
@@ -376,7 +405,7 @@ fun AppNavigation() {
                         if(isConnected){
                             ForgotPassword(navController)
                         }else{
-                            NoInternet()
+                            NoInternet(refresh = {navController.navigate(AppScreens.FORGOT_PASSWORD.name)})
                         }
                     }
                 }
