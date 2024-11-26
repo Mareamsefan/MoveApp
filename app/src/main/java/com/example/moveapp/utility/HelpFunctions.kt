@@ -8,7 +8,9 @@ class HelpFunctions {
 
     companion object {
 
-        val blacklist = setOf("Cunt", "Penis", "Dick", "Cock", "Fag", "Faggot", "Tranny", "Whore", "Fuck", "Damn", "Porn", "Sex", "Fucking", "Hentai")
+        val blacklist = setOf("Cunt", "Penis", "Dick", "Cock", "Fag", "Faggot", "Tranny", "Whore",
+            "Fuck", "Damn", "Porn", "Sex", "Fucking", "Hentai", "Faen", "Hore", "Bitch", "Asshole",
+            "Jævel", "ræva", "Tis", "Vagina", "Pule", "Kuk", "Fitte",  "Drit", "Pokker", "Porno")
 
         @Throws(InvalidPasswordException::class)
         fun validatePassword(context: Context, password: String, confirmPassword: String): Boolean {

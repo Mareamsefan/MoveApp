@@ -3,11 +3,13 @@ package com.example.moveapp.utility
 import android.net.Uri
 import android.util.Log
 import com.example.moveapp.data.AdData
+import com.example.moveapp.utility.FireAuthService.auth
 import com.example.moveapp.utility.FireStorageService.uploadFileToStorage
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
@@ -213,6 +215,77 @@ object FirestoreService {
         }
     }
 
+    fun updateDataInUserTable(field: String, newValue: String, onComplete: (Boolean) -> Unit) {
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
+
+        val validFields = setOf(
+            "dateRegistered", "email", "favorites", "location",
+            "profilePictureUrl", "userId", "userType", "username",
+        )
+
+        if (field !in validFields) {
+            println("ProfileSettings Invalid field requested: $field")
+            onComplete(false)
+            return
+        }
+
+
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            // Henter firebase document til currentUser
+            val userDocRef = db.collection("users").document(userId)
+
+            // Oppdater Location med newLocation
+            userDocRef.update(field, newValue)
+                .addOnSuccessListener {
+                    onComplete(true)
+                }
+                .addOnFailureListener { exception ->
+                    onComplete(false)
+                    exception.printStackTrace()
+                }
+        } else {
+            onComplete(false)
+        }
+    }
+
+    fun getDataFromUserTable(field: String, onComplete: (String?) -> Unit) {
+        val validFields = setOf(
+            "dateRegistered", "email", "favorites", "location",
+            "profilePictureUrl", "userId", "userType", "username",
+        )
+
+        if (field !in validFields) {
+            println("ProfileSettings Invalid field requested: $field")
+            onComplete(null)
+            return
+        }
+
+        // Find current user
+        val currentUserId = auth.currentUser?.uid
+        if (currentUserId != null) {
+            db.collection("users")
+                .whereEqualTo("userId", currentUserId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        for (document in querySnapshot.documents) {
+                            val fieldValue = document.getString(field)
+                            onComplete(fieldValue)
+                            return@addOnSuccessListener
+                        }
+                    } else {
+                        onComplete(null)
+                    }
+                }
+                .addOnFailureListener { _ ->
+                    onComplete(null)
+                }
+        } else {
+            onComplete(null)
+        }
+    }
 
 
 }

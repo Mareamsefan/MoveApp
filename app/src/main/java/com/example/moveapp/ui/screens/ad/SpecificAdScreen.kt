@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.ad
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -89,9 +90,10 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
     val isOwner = currentUser != null && ad?.userId == currentUser.uid
     var owner by remember { mutableStateOf<UserData?>(null) }
     LaunchedEffect(ad) {
-        ad?.let {
-            owner = getUser(it.userId)
+        if(ad != null){
+            owner = getUser(ad!!.userId)
         }
+
     }
 
     Box(modifier = Modifier
@@ -253,6 +255,7 @@ fun SpecificAdScreen(navController: NavController, adId: String?) {
                     }
                         Column {
                             owner?.let {
+
                                 Text(text = it.username, fontWeight = FontWeight.Bold)
                             }
                             Text(text = stringResource(R.string.Seller), color = Color.Gray)
