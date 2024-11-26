@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.home
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.NetworkUtil
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,6 +59,9 @@ fun HomeScreen(
     val locationUtil = LocationUtil()
     locationUtil.RequestUserLocation(navController)
 
+    //check internet
+    val networkUtil = NetworkUtil()
+
     locationUtil.getUserLocation(context) { loca ->
         loca?.let {
             userLocation = it
@@ -65,29 +70,33 @@ fun HomeScreen(
 
     fun fetchAds() {
         coroutineScope.launch {
-            isRefreshing = true
-            try {
-                userLocation?.let {
-                    AdRepo.filterAd(
-                        location = location,
-                        category = category,
-                        underCategory = underCategory,
-                        minPrice = minPrice,
-                        maxPrice = maxPrice,
-                        search = searchQuery,
-                        currentLocation = it,
-                        onSuccess = { fetchedAds ->
-                            filteredAds = fetchedAds
-                        },
-                        onFailure = { exception ->
-                            errorMessage = exception.message ?: "Error fetching ads"
-                        }
-                    )
+            if(networkUtil.isUserConnectedToInternet(context)) {
+                isRefreshing = true
+                try {
+                    userLocation?.let {
+                        AdRepo.filterAd(
+                            location = location,
+                            category = category,
+                            underCategory = underCategory,
+                            minPrice = minPrice,
+                            maxPrice = maxPrice,
+                            search = searchQuery,
+                            currentLocation = it,
+                            onSuccess = { fetchedAds ->
+                                filteredAds = fetchedAds
+                            },
+                            onFailure = { exception ->
+                                errorMessage = exception.message ?: "Error fetching ads"
+                            }
+                        )
+                    }
+                } catch (e: Exception) {
+                    errorMessage = e.message ?: "Exception fetching ads"
+                } finally {
+                    isRefreshing = false
                 }
-            } catch (e: Exception) {
-                errorMessage = e.message ?: "Exception fetching ads"
-            } finally {
-                isRefreshing = false  // Hide refreshing indicator
+            }else{
+                Toast.makeText(context, "Could not get ads, no internet connection", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.moveapp.ui.screens.messages
 import ChatItemWithAd
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.data.AdData
@@ -19,6 +21,7 @@ import com.example.moveapp.repository.AdRepo
 import com.example.moveapp.utility.FireAuthService
 import com.example.moveapp.repository.ChatRepo
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.NetworkUtil
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,35 +35,41 @@ fun AllMessagesScreen(navController: NavController) {
     val refreshState = rememberPullToRefreshState()
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val networkUtil = NetworkUtil()
+
 
 
    fun fetchChats() {
         coroutineScope.launch {
-            isRefreshing = true
-            if (userId != null) {
-                try {
-                    val fetchedChats = ChatRepo.getUserChats(userId)
+            if(networkUtil.isUserConnectedToInternet(context)) {
+                isRefreshing = true
+                if (userId != null) {
+                    try {
+                        val fetchedChats = ChatRepo.getUserChats(userId)
 
-                    chats = fetchedChats.sortedByDescending { chat ->
-                        chat.messages.values.maxOfOrNull { it.messageTimestamp } ?: 0L
+                        chats = fetchedChats.sortedByDescending { chat ->
+                            chat.messages.values.maxOfOrNull { it.messageTimestamp } ?: 0L
+                        }
+
+                        loading = false
+                        errorMessage = null
+
+                        val adsIds = chats.map { chat -> chat.adId }
+                        val ads = adsIds.associateWith { adId -> AdRepo.getAd(adId) }
+                        adsMap = ads
+                    } catch (e: Exception) {
+                        errorMessage = "Error fetching chats or ads: ${e.message}"
+                        loading = false
+                    } finally {
+                        isRefreshing = false
                     }
-
+                } else {
                     loading = false
-                    errorMessage = null
-
-                    val adsIds = chats.map { chat -> chat.adId }
-                    val ads = adsIds.associateWith { adId -> AdRepo.getAd(adId) }
-                    adsMap = ads
-                } catch (e: Exception) {
-                    errorMessage = "Error fetching chats or ads: ${e.message}"
-                    loading = false
+                    errorMessage = "User not logged in"
                 }
-                finally {
-                    isRefreshing = false
-                }
-            } else {
-                loading = false
-                errorMessage = "User not logged in"
+            }else{
+                Toast.makeText(context, "Could not get messages, no internet connection", Toast.LENGTH_SHORT).show()
             }
         }
 
