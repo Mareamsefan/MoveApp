@@ -36,10 +36,10 @@ import com.example.moveapp.data.UserData
 import com.example.moveapp.ui.composables.ProfilePicture
 import com.example.moveapp.utility.FireAuthService.reauthenticateUser
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
-import com.example.moveapp.utility.FireAuthService.getDataFromUserTable
+import com.example.moveapp.utility.FirestoreService.getDataFromUserTable
 import com.example.moveapp.utility.FireAuthService.getUsername
 import com.example.moveapp.utility.FireAuthService.sendUserPasswordResetEmail
-import com.example.moveapp.utility.FireAuthService.updateDataInUserTable
+import com.example.moveapp.utility.FirestoreService.updateDataInUserTable
 import com.example.moveapp.utility.FireAuthService.updateUserEmail
 import com.example.moveapp.utility.FireAuthService.updateUsername
 import com.example.moveapp.utility.FirestoreService.readDocument
