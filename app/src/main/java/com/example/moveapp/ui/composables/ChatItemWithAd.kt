@@ -121,7 +121,7 @@ fun ChatItemWithAd(navcontroller: NavController,
                 text = (username ?: "Unknown user").replaceFirstChar {
                     if (it.isLowerCase()) it.titlecase() else it.toString()
                 },
-                style = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
+                style = MaterialTheme.typography.bodyLarge.copy()
             )
             Text(
                 text = "Last message: ${sortedChats.firstOrNull()?.messageText ?: "No messages"}",
