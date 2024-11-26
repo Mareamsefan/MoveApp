@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.UserRepo.Companion.updateUserUsername
 import com.example.moveapp.ui.composables.ProfilePicture
 import com.example.moveapp.utility.FireAuthService.reauthenticateUser
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
@@ -224,9 +225,10 @@ fun Profile(navController: NavController) {
                 coroutineScope.launch {
                     if (networkUtil.isUserConnectedToInternet(context)){
                         if (updatedUsername.value.isNotEmpty()) {
-                            val updateSuccess = updateUsername(updatedUsername.value)
+                            val updateSuccess =
+                                currentUser?.let { updateUserUsername(it.uid,updatedUsername.value) }
                             errorMessage.value =
-                                if (updateSuccess) {
+                                if (updateSuccess == true) {
                                     username.value = updatedUsername.value
                                     "Username updated successfully."
                                 } else {
