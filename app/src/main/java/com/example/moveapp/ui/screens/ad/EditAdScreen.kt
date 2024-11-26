@@ -3,18 +3,16 @@ package com.example.moveapp.ui.screens.ad
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,7 +20,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -32,25 +29,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
-import coil.compose.rememberAsyncImagePainter
 import com.example.moveapp.R
 import com.example.moveapp.data.AdData
 import com.example.moveapp.repository.AdRepo.Companion.getAd
 import com.example.moveapp.repository.AdRepo.Companion.updateAdInDatabase
+import com.example.moveapp.repository.ChatRepo.Companion.deleteChatsByAdId
 import com.example.moveapp.ui.composables.CameraPermission
-import com.example.moveapp.ui.composables.Image_swipe
 import com.example.moveapp.ui.composables.Image_swipe_delete
 import com.example.moveapp.ui.navigation.AppScreens
+import com.example.moveapp.utility.FireStorageService.deleteFileFromStorage
 import com.example.moveapp.utility.FirestoreService
+import com.example.moveapp.utility.NetworkUtil
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -60,6 +56,7 @@ import java.io.File
 fun EditAdScreen(navController: NavController, adId: String?) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val networkUtil = NetworkUtil()
     // Initialiser ad data hvis adId finnes
     var ad by remember { mutableStateOf<AdData?>(null) }
     if (adId != null) {
@@ -356,33 +353,34 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                 item {
                     // Save button
                     Button(
-
                         onClick = {
-
                             coroutineScope.launch {
-                                val success = updateAdInDatabase(
-                                    adId = adId.toString(),
-                                    newTitle = title,
-                                    newPrice = price,
-                                    newCategory = context.getString(selectedCategory),
-                                    newSubcategory = context.getString(selectedSubcategory),
-                                    newDescription = description,
-                                    newImages = adImages.toList(),
-                                    newAddress = address,
-                                    newPostalCode = postalCode,
-                                    newCity = city
-                                )
+                                if (networkUtil.isUserConnectedToInternet(context)) {
+                                    val success = updateAdInDatabase(
+                                        adId = adId.toString(),
+                                        newTitle = title,
+                                        newPrice = price,
+                                        newCategory = context.getString(selectedCategory),
+                                        newSubcategory = context.getString(selectedSubcategory),
+                                        newDescription = description,
+                                        newImages = adImages.toList(),
+                                        newAddress = address,
+                                        newPostalCode = postalCode,
+                                        newCity = city
+                                    )
 
-                                if (success) {
-                                    // Vis snackbar for suksess
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Changes saved successfully!")
+                                    if (success) {
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Changes saved successfully!")
+                                        }
+                                    } else {
+                                        // Vis snackbar for feil
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar("Failed to save changes.")
+                                        }
                                     }
-                                } else {
-                                    // Vis snackbar for feil
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("Failed to save changes.")
-                                    }
+                                }else{
+                                    Toast.makeText(context, "Could not update ad, no internet connection", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
@@ -426,11 +424,19 @@ fun EditAdScreen(navController: NavController, adId: String?) {
                 text = { Text(stringResource(R.string.confirm_delete)) },
                 confirmButton = {
                     TextButton(onClick = {
-
-                        //TODO: LEGG TIL FUNKSJONALITET SOM SLETTER ALLE BILDENE FRA FIRESTORAGE TIL AD-EN
                         coroutineScope.launch {
-                            ad!!.adId?.let { FirestoreService.deleteDocument("ads", it) }
-                            navController.navigate(AppScreens.MY_ADS.name)
+                            if(networkUtil.isUserConnectedToInternet(context)) {
+                                ad!!.adId?.let {
+                                    FirestoreService.deleteDocument("ads", it)
+                                    ad!!.adImages.map { image ->
+                                        deleteFileFromStorage(image)
+                                    }
+                                    deleteChatsByAdId(it)
+                                }
+                                navController.navigate(AppScreens.MY_ADS.name)
+                            }else{
+                                Toast.makeText(context, "Could not delete ad, no internet connection", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }) {
                         Text(stringResource(R.string.confirm))

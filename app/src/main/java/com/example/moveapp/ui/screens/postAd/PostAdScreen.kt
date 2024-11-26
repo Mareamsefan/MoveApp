@@ -71,7 +71,6 @@ fun PostAdScreen(navController: NavController) {
     var redirect by remember { mutableStateOf(false) }
     var formSubmitted by remember { mutableStateOf(false) }
     val networkUtil = NetworkUtil()
-    val isNetworkOn = networkUtil.isUserConnectedToInternet(context)
 
     // State for sending request to database
     var isPosting by remember { mutableStateOf(false) }
@@ -374,7 +373,7 @@ fun PostAdScreen(navController: NavController) {
                         underCategory.value.isEmpty()
                     ) {
                         errorMessage = "Please complete all the required fields marked with an asterisk (*)."
-                    }else if(!isNetworkOn) {
+                    }else if(!networkUtil.isUserConnectedToInternet(context)) {
                         errorMessage = "Ad could not be posted, no internet connection."
                     }
                     else if(geoPoint==null){

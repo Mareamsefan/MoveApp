@@ -3,6 +3,7 @@ package com.example.moveapp.ui.screens.profile
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -27,12 +28,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.moveapp.R
 import com.example.moveapp.data.UserData
+import com.example.moveapp.repository.UserRepo.Companion.updateUserUsername
 import com.example.moveapp.ui.composables.ProfilePicture
 import com.example.moveapp.utility.FireAuthService.reauthenticateUser
 import com.example.moveapp.utility.FireAuthService.getCurrentUser
@@ -50,6 +53,7 @@ import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.example.moveapp.ui.composables.ShowReauthenticationDialog
 import com.example.moveapp.utility.FireStorageService.deleteFileFromStorage
 import com.example.moveapp.utility.FirestoreService.removeProfilePictureUrl
+import com.example.moveapp.utility.NetworkUtil
 import java.net.URLDecoder
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -72,6 +76,8 @@ fun Profile(navController: NavController) {
     var tempEmailForUpdate by remember { mutableStateOf("") }
     var showErrorDialog by remember { mutableStateOf(false) }
     var dialogMessage by remember { mutableStateOf("") }
+    val networkUtil = NetworkUtil()
+    val context = LocalContext.current
 
     // Fetch user email
     LaunchedEffect(Unit) {
@@ -157,7 +163,13 @@ fun Profile(navController: NavController) {
             }
 
             // Upload or update image button
-            Button(onClick = { launcher.launch("image/*") }) {
+            Button(onClick = {
+                if(networkUtil.isUserConnectedToInternet(context)){
+                launcher.launch("image/*")
+                }else{
+                    Toast.makeText(context, "No internet connection, could not change picture", Toast.LENGTH_SHORT).show()
+                }
+            }) {
                 Text(
                     text = if (profileImageUrl.value.isEmpty()) {
                         stringResource(R.string.upload_image)
@@ -172,6 +184,7 @@ fun Profile(navController: NavController) {
             if (profileImageUrl.value.isNotEmpty()){
             Button(onClick = {
                 coroutineScope.launch {
+                    if(networkUtil.isUserConnectedToInternet(context)) {
                     userData.value?.profilePictureUrl?.let { fullUrl ->
                         // Decode the URL to get the correct path
                         val decodedUrl = URLDecoder.decode(fullUrl, "UTF-8")
@@ -190,8 +203,11 @@ fun Profile(navController: NavController) {
                             errorMessage.value = "Failed to remove profile image"
                         }
                     }
+                }else{
+                        Toast.makeText(context, "Could not change picture, no internet connection", Toast.LENGTH_SHORT).show()
                 }
-            }) {
+            }}
+            ) {
                 Text(text = stringResource(R.string.remove_image))
             }}
 
@@ -207,18 +223,23 @@ fun Profile(navController: NavController) {
             )
             Button(onClick = {
                 coroutineScope.launch {
-                    if (updatedUsername.value.isNotEmpty()) {
-                        val updateSuccess = updateUsername(updatedUsername.value)
-                        errorMessage.value =
-                            if (updateSuccess) {
-                                username.value = updatedUsername.value
-                                "Username updated successfully."
-                            } else {
-                                "Failed to update username."
-                            }
-                    } else {
-                        errorMessage.value = "Username cannot be empty."
-                    }
+                    if (networkUtil.isUserConnectedToInternet(context)){
+                        if (updatedUsername.value.isNotEmpty()) {
+                            val updateSuccess =
+                                currentUser?.let { updateUserUsername(it.uid,updatedUsername.value) }
+                            errorMessage.value =
+                                if (updateSuccess == true) {
+                                    username.value = updatedUsername.value
+                                    "Username updated successfully."
+                                } else {
+                                    "Failed to update username."
+                                }
+                        } else {
+                            errorMessage.value = "Username cannot be empty."
+                        }
+                }else{
+                        Toast.makeText(context, "Could not change username, No internet connection", Toast.LENGTH_SHORT).show()
+                }
                 }
             }) {
                 Text("Change Username")
@@ -239,6 +260,7 @@ fun Profile(navController: NavController) {
             )
             Button(onClick = {
                 coroutineScope.launch {
+                    if(networkUtil.isUserConnectedToInternet(context)){
                     val newEmail = updatedEmail.value
                     if (newEmail.isNotEmpty()) {
                         if (validateEmail(newEmail)) {
@@ -266,6 +288,9 @@ fun Profile(navController: NavController) {
                     } else {
                         errorMessage.value = "Email cannot be empty."
                     }
+                }else{
+                        Toast.makeText(context, "No internet connection, email could not be changed", Toast.LENGTH_SHORT).show()
+                }
                 }
             }) {
                 Text("Change Email")
@@ -274,12 +299,16 @@ fun Profile(navController: NavController) {
             // Send Password Reset Email
             Button(onClick = {
                 coroutineScope.launch {
+                    if(networkUtil.isUserConnectedToInternet(context)){
                     if (userEmail.value.isNotEmpty()) {
                         sendUserPasswordResetEmail(userEmail.value)
                         errorMessage.value = "Password reset email sent!"
                     } else {
                         errorMessage.value = "Failed to send password reset email."
                     }
+                } else{
+                        Toast.makeText(context, "Could not send mail, no internet connection", Toast.LENGTH_SHORT).show()
+                }
                 }
             }) {
                 Text(text = stringResource(R.string.send_password_reset_email))
