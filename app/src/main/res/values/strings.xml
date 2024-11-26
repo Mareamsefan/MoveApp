@@ -112,6 +112,9 @@
     <string name="lead_me_to_settings">Lead me to settings</string>
     <string name="notifications">Alerts</string>
     <string name="more">More\n</string>
+    <string name="choose_a_theme">Choose a theme</string>
+    <string name="dark_theme">Dark theme</string>
+    <string name="light_theme">Light theme</string>
 
 
 </resources>
